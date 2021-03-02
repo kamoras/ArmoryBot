@@ -18,7 +18,7 @@ namespace ArmoryBot
             this.BlizzAPI = new BlizzardAPI(); // Initializes BlizzardAPI Class, will load config and obtain a Blizz API Token
             using (StreamReader json = File.OpenText(Globals.DiscordConfigPath)) // Load Discord Config from json Config file
             {
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 this.discordConfig = new DiscordConfig();
                 this.discordConfig = (DiscordConfig)serializer.Deserialize(json, typeof(DiscordConfig));
                 this.discordConfig.SetPrefix(); // Save (char)cmdprefix as a string for quick concatenation with strings
@@ -72,25 +72,25 @@ namespace ArmoryBot
             }
             catch (Exception ex)
             {
-                Program.Log(msg.ToString() + ": " + ex.ToString());
+                Program.Log($"{msg}: {ex}");
             }
         }
         private async Task CMD_Help(SocketUserMessage msg) // Display usage help to requestor
         {
             try
             {
-                msg.Channel.SendMessageAsync("ArmoryBot Usage: `" + this.discordConfig.Prefix + "armory CharacterName-Realm pve/pvp`\n**NOTE:** Spaces in realm name should have a dash ' - '\n\nLearn more about ArmoryBot at: http://github.com/imerzan/ArmoryBot/");
+                msg.Channel.SendMessageAsync($"ArmoryBot Usage: `{this.discordConfig.Prefix}armory CharacterName-Realm pve/pvp`\n**NOTE:** Spaces in realm name should have a dash ' - '\n\nLearn more about ArmoryBot at: http://github.com/imerzan/ArmoryBot/");
             }
             catch (Exception ex)
             {
-                Program.Log(msg.ToString() + ": " + ex.ToString());
+                Program.Log($"{msg}: {ex}");
             }
         }
         private async Task CMD_Armory(SocketUserMessage msg, string[] cmd) // Main Armory Lookup: [0] = command, [1] = user-realm , [2] = pve/pvp
         {
             try
             {
-                Program.Log("Armory Lookup requested by " + msg.Author);
+                Program.Log($"Armory Lookup requested by {msg.Author}");
                 string[] character = cmd[1].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
                 ArmoryData info = await BlizzAPI.ArmoryLookup(character[0], character[1], cmd[2]); // Main Blizzard API Lookup
                 if (info.IsError == true) throw new Exception(info.ErrorInfo); // Re-throw exception passed to info.ErrorInfo from BlizzardAPI.cs
@@ -117,15 +117,15 @@ namespace ArmoryBot
                         default:
                             throw new Exception("Invalid type specified.");
                     }
-                    eb.WithFooter(this.discordConfig.Prefix + "armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
+                    eb.WithFooter($"{this.discordConfig.Prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
                     eb.ThumbnailUrl = info.AvatarUrl; // Set Character Avatar as Thumbnail Picture
                     msg.Channel.SendMessageAsync("", false, eb.Build()); // Send message to requestor with Armory Info
                 }
             }
             catch (Exception ex)
             {
-                Program.Log(msg.ToString() + ": " + ex.ToString() + "**Sending error notification to requestor**");
-                try { msg.Channel.SendMessageAsync("**ERROR** looking up: " + msg.ToString() + "\nSee `" + this.discordConfig.Prefix + "armory help`"); } catch { } // Generic error notification to user
+                Program.Log($"{msg}: {ex} **Sending error notification to requestor**");
+                try { msg.Channel.SendMessageAsync($"**ERROR** looking up: {msg}\nSee `{this.discordConfig.Prefix}armory help`"); } catch { } // Generic error notification to user
             }
         }
         private async Task Log(LogMessage msg)
