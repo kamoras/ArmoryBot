@@ -16,13 +16,13 @@ namespace ArmoryBot
             if (!File.Exists(Globals.DiscordConfigPath)) // check for Discord Config
             {
                 File.WriteAllText(Globals.DiscordConfigPath, "{\n\"token\": \"\",\n\"cmdprefix\": \"!\"\n}");
-                Console.WriteLine(Globals.DiscordConfigPath + " does not exist. Creating blank config file.");
+                Console.WriteLine($"{Globals.DiscordConfigPath} does not exist. Creating blank config file.");
                 return;
             }
             if (!File.Exists(Globals.BlizzardConfigPath)) // check for Blizzard Config
             {
                 File.WriteAllText(Globals.BlizzardConfigPath, "{\n\"client_id\": \"\",\n\"client_secret\": \"\",\n\"locale\": \"en_US\"\n}");
-                Console.WriteLine(Globals.BlizzardConfigPath + " does not exist. Creating blank config file.");
+                Console.WriteLine($"{Globals.BlizzardConfigPath} does not exist. Creating blank config file.");
                 return;
             }
             Log("Starting up...");
@@ -34,7 +34,7 @@ namespace ArmoryBot
         }
         internal static void Log(string entry)
         {
-            try { Console.WriteLine(DateTime.Now.ToString() + ": " + entry); } catch { }
+            try { Console.WriteLine($"{DateTime.Now}: {entry}"); } catch { }
         }
     }
 }

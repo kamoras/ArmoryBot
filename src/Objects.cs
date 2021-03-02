@@ -9,7 +9,7 @@ namespace ArmoryBot
     //
     public class ArmoryData // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
     {
-        public bool IsError { get; set; } // If BlizzardAPI.ArmoryLookup() throws an exception, this is set to true
+        public bool IsError; // If BlizzardAPI.ArmoryLookup() throws an exception, this is set to true
         public string ErrorInfo; // Stores exception.ToString() from BlizzardAPI.ArmoryLookup()
         public string CharacterInfo; // Stores string returned by BlizzardAPI.GetCharacter()
         public string AvatarUrl; // Stores string returned by BlizzardAPI.GetAvatar()
@@ -102,7 +102,7 @@ namespace ArmoryBot
                     this.DYNAMICnamespace = "?namespace=dynamic-eu";
                     break;
                 default:
-                    throw new Exception("Invalid locale specified in " + Globals.BlizzardConfigPath);
+                    throw new Exception($"Invalid locale specified in {Globals.BlizzardConfigPath}");
             }
         }
     }
@@ -119,7 +119,7 @@ namespace ArmoryBot
     }
     public class AchievementsList // Stores list of achievements via BlizzardAPI.GetAchievements()
     {
-        private Dictionary<int, AchievementItem> List { get; set; }
+        private Dictionary<int, AchievementItem> List;
         public AchievementsList()
         {
             this.List = new Dictionary<int, AchievementItem>(); // Key: (int)group , Value: (AchievementItem)  |   Uses group as key since there should only be one entry per group in the Dictionary.
@@ -179,7 +179,7 @@ namespace ArmoryBot
             string output = "";
             foreach (KeyValuePair<int, AchievementItem> entry in this.List)
             {
-                output += "* " + entry.Value.Name + "\n";
+                output += $"* {entry.Value.Name}\n";
             }
             if (output.Length == 0) return "None";
             else return output;
@@ -200,7 +200,7 @@ namespace ArmoryBot
     public class RaidData // Stores all current expansion raids via BlizzardAPI.GetRaids()
     {
         public List<RaidItem> Raids { get; private set; }
-        private string Locale { get; set; }
+        private string Locale;
         public RaidData(string locale)
         {
             this.Raids = new List<RaidItem>();
@@ -214,8 +214,8 @@ namespace ArmoryBot
     public class RaidItem // Child class for RaidData
     {
         public string Name { get; private set; }
-        private Instance Raid { get; set; }
-        private string Locale { get; set; }
+        private Instance Raid;
+        private string Locale;
         public RaidItem(Instance raid, string locale)
         {
             this.Name = raid.InstanceInstance.Name;
@@ -227,7 +227,7 @@ namespace ArmoryBot
             string output = "";
             foreach (Mode mode in this.Raid.Modes) // Check each difficulty
             {
-                output += "* " + mode.Progress.CompletedCount + "/" + mode.Progress.TotalCount + " " + mode.Difficulty.Name.GetLocale(this.Locale) + "\n"; // ex: 8/10 Normal
+                output += $"* {mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name.GetLocale(this.Locale)}\n"; // ex: 8/10 Normal
             }
             return output;
         }
@@ -239,7 +239,7 @@ namespace ArmoryBot
     */
     public class MythicPlusData // Sorts and returns the best runs per Dungeon ID
     {
-        private Dictionary<long, BestRun> Runs { get; set; }
+        private Dictionary<long, BestRun> Runs;
         public int HighestRun { get; private set; } // Highest M+ run player has completed
         public int Plus5Count { get; private set; } // Best runs between +5 and +9
         public int Plus10Count { get; private set; } // Best runs between +10 and +14
@@ -288,7 +288,7 @@ namespace ArmoryBot
         }
         public override string ToString() // Displays output 
         {
-            return "**Best Run:** +" + this.HighestRun + "\n* 5+ Runs: " + this.Plus5Count + "\n* 10+ Runs: " + this.Plus10Count + "\n* 15+ Runs: " + this.Plus15Count + "\n* Time Expired Runs: " + this.ExpiredCount;
+            return $"**Best Run:** +{this.HighestRun}\n* 5+ Runs: {this.Plus5Count}\n* 10+ Runs: {this.Plus10Count}\n* 15+ Runs: {this.Plus15Count}\n* Time Expired Runs: {this.ExpiredCount}";
         }
     }
 }
