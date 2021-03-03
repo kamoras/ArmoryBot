@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -18,9 +17,7 @@ namespace ArmoryBot
             this.BlizzAPI = new BlizzardAPI(); // Initializes BlizzardAPI Class, will load config and obtain a Blizz API Token
             using (StreamReader json = File.OpenText(Globals.DiscordConfigPath)) // Load Discord Config from json Config file
             {
-                var serializer = new JsonSerializer();
-                this.discordConfig = new DiscordConfig();
-                this.discordConfig = (DiscordConfig)serializer.Deserialize(json, typeof(DiscordConfig));
+                this.discordConfig = (DiscordConfig)Program.jsonSerializer.Deserialize(json, typeof(DiscordConfig));
             }
         }
         public async Task Startup() // Discord bot startup

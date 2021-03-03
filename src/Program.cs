@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -11,6 +12,7 @@ namespace ArmoryBot
         private static ArmoryBot bot_Main;
         private static HttpClientHandler httpClientHandler;
         internal static HttpClient httpClient;
+        internal static JsonSerializer jsonSerializer;
         static async Task Main() // ** Program Entry Point **
         {
             if (!File.Exists(Globals.DiscordConfigPath)) // check for Discord Config
@@ -26,6 +28,7 @@ namespace ArmoryBot
                 return;
             }
             Log("Starting up...");
+            jsonSerializer = new JsonSerializer(); // Use static instance of JSON Serializer
             httpClientHandler = new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }; // Perform automatic Decompression
             httpClient = new HttpClient(httpClientHandler); // Create static instance of HttpClient for entire program
             bot_Main = new ArmoryBot(); // Create new instance of ArmoryBot, will simultaneously connect to the Blizzard API and request a token.

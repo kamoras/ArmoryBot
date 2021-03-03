@@ -267,7 +267,7 @@ namespace ArmoryBot
             }
             else // Already in list, see if run is higher
             {
-                if (run.KeystoneLevel > this.Runs[run.Dungeon.Id].KeystoneLevel) // Run is higher - add
+                if (run.KeystoneLevel > this.Runs[run.Dungeon.Id].KeystoneLevel | (run.KeystoneLevel == this.Runs[run.Dungeon.Id].KeystoneLevel & run.IsCompletedWithinTime)) // Run is higher - add - OR - Run is equal but on-time
                 {
                     // De-increment old run
                     if (!this.Runs[run.Dungeon.Id].IsCompletedWithinTime) this.ExpiredCount -= 1;
