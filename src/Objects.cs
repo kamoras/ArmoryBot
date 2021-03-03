@@ -9,8 +9,6 @@ namespace ArmoryBot
     //
     public class ArmoryData // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
     {
-        public bool IsError; // If BlizzardAPI.ArmoryLookup() throws an exception, this is set to true
-        public string ErrorInfo; // Stores exception.ToString() from BlizzardAPI.ArmoryLookup()
         public string CharacterInfo; // Stores string returned by BlizzardAPI.GetCharacter()
         public string AvatarUrl; // Stores string returned by BlizzardAPI.GetAvatar()
         public RaidData RaidInfo; // Stores RaidData returned by BlizzardAPI.GetRaids()
@@ -18,22 +16,19 @@ namespace ArmoryBot
         public string Achievements; // Stores string returned by BlizzardAPI.GetAchievements()
         public string PVPRating; // Stores string returned by BlizzardAPI.GetPVP()
         public string PVPStats; // Stores string returned by BlizzardAPI.GetPvpStats()
-        public ArmoryData()
-        {
-            this.IsError = false;
-        }
     }
     public class DiscordConfig // Stores Discord Config as loaded from Config File
     {
         [JsonProperty("token")]
         public string token { get; private set; }
+        private char _cmdprefix; // Backing field
         [JsonProperty("cmdprefix")]
-        public char cmdprefix { get; private set; }
-        public string Prefix { get; private set; }
-        public void SetPrefix()
+        public char cmdprefix
         {
-            this.Prefix = this.cmdprefix.ToString();
+            get { return this._cmdprefix; }
+            private set { this._cmdprefix = value; this.Prefix = value.ToString(); }
         }
+        public string Prefix { get; private set; }
     }
     public class BlizzardConfig // Stores Blizzard Config as loaded from Config File
     {
@@ -41,70 +36,74 @@ namespace ArmoryBot
         public string client_id { get; private set; }
         [JsonProperty("client_secret")]
         public string client_secret { get; private set; }
+        private string _locale; // Backing field
         [JsonProperty("locale")]
-        public string locale { get; private set; }
+        public string locale
+        {
+            get { return this._locale; }
+            private set
+            {
+                this._locale = value;
+                switch (value)
+                {
+                    case "en_US":
+                        this.TOKENroot = "https://us.battle.net";
+                        this.APIroot = "https://us.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-us";
+                        this.DYNAMICnamespace = "?namespace=dynamic-us";
+                        break;
+                    case "es_MX":
+                        this.TOKENroot = "https://us.battle.net";
+                        this.APIroot = "https://us.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-us";
+                        this.DYNAMICnamespace = "?namespace=dynamic-us";
+                        break;
+                    case "pt_BR":
+                        this.TOKENroot = "https://us.battle.net";
+                        this.APIroot = "https://us.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-us";
+                        this.DYNAMICnamespace = "?namespace=dynamic-us";
+                        break;
+                    case "de_DE":
+                        this.TOKENroot = "https://eu.battle.net";
+                        this.APIroot = "https://eu.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-eu";
+                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                        break;
+                    case "en_GB":
+                        this.TOKENroot = "https://eu.battle.net";
+                        this.APIroot = "https://eu.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-eu";
+                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                        break;
+                    case "es_ES":
+                        this.TOKENroot = "https://eu.battle.net";
+                        this.APIroot = "https://eu.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-eu";
+                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                        break;
+                    case "fr_FR":
+                        this.TOKENroot = "https://eu.battle.net";
+                        this.APIroot = "https://eu.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-eu";
+                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                        break;
+                    case "it_IT":
+                        this.TOKENroot = "https://eu.battle.net";
+                        this.APIroot = "https://eu.api.blizzard.com";
+                        this.PROFILEnamespace = "?namespace=profile-eu";
+                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                        break;
+                    default:
+                        throw new Exception($"Invalid locale specified in {Globals.BlizzardConfigPath}");
+                } // End switch
+            } // end Private Set
+        } // End locale
         public string TOKENroot { get; private set; }
         public string APIroot { get; private set; }
         public string PROFILEnamespace { get; private set; }
         public string DYNAMICnamespace { get; private set; }
         public BlizzardAccessToken Token { get; set; }
-
-        public void SetLocale()
-        {
-            switch (this.locale)
-            {
-                case "en_US":
-                    this.TOKENroot = "https://us.battle.net";
-                    this.APIroot = "https://us.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-us";
-                    this.DYNAMICnamespace = "?namespace=dynamic-us";
-                    break;
-                case "es_MX":
-                    this.TOKENroot = "https://us.battle.net";
-                    this.APIroot = "https://us.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-us";
-                    this.DYNAMICnamespace = "?namespace=dynamic-us";
-                    break;
-                case "pt_BR":
-                    this.TOKENroot = "https://us.battle.net";
-                    this.APIroot = "https://us.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-us";
-                    this.DYNAMICnamespace = "?namespace=dynamic-us";
-                    break;
-                case "de_DE":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "en_GB":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "es_ES":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "fr_FR":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "it_IT":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                default:
-                    throw new Exception($"Invalid locale specified in {Globals.BlizzardConfigPath}");
-            }
-        }
     }
     public class BlizzardAccessToken // Blizzard Access Token Json > C# Class 
     {

@@ -21,7 +21,6 @@ namespace ArmoryBot
                 var serializer = new JsonSerializer();
                 this.discordConfig = new DiscordConfig();
                 this.discordConfig = (DiscordConfig)serializer.Deserialize(json, typeof(DiscordConfig));
-                this.discordConfig.SetPrefix(); // Save (char)cmdprefix as a string for quick concatenation with strings
             }
         }
         public async Task Startup() // Discord bot startup
@@ -42,11 +41,11 @@ namespace ArmoryBot
             bool IsDM = msg.Channel.GetType() == typeof(SocketDMChannel); // Check if DM Channel
             switch (HasPrefix)
             {
-                case false:
-                    if (IsDM) this.CMD_Help(msg);
+                case false: // No prefix used
+                    if (IsDM) this.CMD_Help(msg); // Respond to DM
                     return;
-                case true:
-                    this.Handle_CMD(msg);
+                case true: // Prefix used
+                    this.Handle_CMD(msg); // Handle CMD
                     return;
             }
         }
@@ -93,34 +92,30 @@ namespace ArmoryBot
                 Program.Log($"Armory Lookup requested by {msg.Author}");
                 string[] character = cmd[1].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
                 ArmoryData info = await BlizzAPI.ArmoryLookup(character[0], character[1], cmd[2]); // Main Blizzard API Lookup
-                if (info.IsError == true) throw new Exception(info.ErrorInfo); // Re-throw exception passed to info.ErrorInfo from BlizzardAPI.cs
-                else // Lookup successful, build embedded message
+                var eb = new EmbedBuilder(); // Build embedded discord msg
+                eb.WithTitle(info.CharacterInfo);
+                switch (cmd[2])
                 {
-                    var eb = new EmbedBuilder();
-                    eb.WithTitle(info.CharacterInfo);
-                    switch (cmd[2])
-                    {
-                        case "pve":
-                            if (info.RaidInfo.Raids.Count == 0) eb.AddField("Raids", "None", true); // None placeholder if no raids logged
-                            else foreach (RaidItem raid in info.RaidInfo.Raids) // Add a field for each raid
-                            {
-                                eb.AddField(raid.Name, raid.ToString(), true);
-                            }
-                            eb.AddField("Mythic+", info.MythicPlus, true);
-                            eb.AddField("PVE Achievements", info.Achievements, true);
-                            break;
-                        case "pvp":
-                            eb.AddField("Rated PVP", info.PVPRating, true);
-                            eb.AddField("PVP Stats", info.PVPStats, true);
-                            eb.AddField("PVP Achievements", info.Achievements, true);
-                            break;
-                        default:
-                            throw new Exception("Invalid type specified.");
-                    }
-                    eb.WithFooter($"{this.discordConfig.Prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
-                    eb.ThumbnailUrl = info.AvatarUrl; // Set Character Avatar as Thumbnail Picture
-                    msg.Channel.SendMessageAsync("", false, eb.Build()); // Send message to requestor with Armory Info
+                    case "pve":
+                        if (info.RaidInfo.Raids.Count == 0) eb.AddField("Raids", "None", true); // None placeholder if no raids logged
+                        else foreach (RaidItem raid in info.RaidInfo.Raids) // Add a field for each raid
+                        {
+                            eb.AddField(raid.Name, raid.ToString(), true);
+                        }
+                        eb.AddField("Mythic+", info.MythicPlus, true);
+                        eb.AddField("PVE Achievements", info.Achievements, true);
+                        break;
+                    case "pvp":
+                        eb.AddField("Rated PVP", info.PVPRating, true);
+                        eb.AddField("PVP Stats", info.PVPStats, true);
+                        eb.AddField("PVP Achievements", info.Achievements, true);
+                        break;
+                    default:
+                        throw new Exception("Invalid type specified.");
                 }
+                eb.WithFooter($"{this.discordConfig.Prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
+                eb.ThumbnailUrl = info.AvatarUrl; // Set Character Avatar as Thumbnail Picture
+                msg.Channel.SendMessageAsync("", false, eb.Build()); // Send message to requestor with Armory Info (embed)
             }
             catch (Exception ex)
             {

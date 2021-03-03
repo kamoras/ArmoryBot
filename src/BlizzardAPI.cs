@@ -13,7 +13,17 @@ namespace ArmoryBot
     public class BlizzardAPI
     {
         private BlizzardConfig Config;
-        private Timer TokenExpTimer;
+        private Timer _TokenExpTimer; // Backing field
+        private Timer TokenExpTimer
+        {
+            set 
+            {
+                this._TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Token usually lasts 24 hours (convert seconds to ms)
+                this._TokenExpTimer.AutoReset = false;
+                this._TokenExpTimer.Elapsed += TokenExpTimer_Elapsed; // Set event
+                this._TokenExpTimer.Start(); // Start timer
+            }
+        }
         public BlizzardAPI()
         {
             using (StreamReader json = File.OpenText(Globals.BlizzardConfigPath)) // Load Config
@@ -21,22 +31,14 @@ namespace ArmoryBot
                 var serializer = new JsonSerializer();
                 this.Config = new BlizzardConfig();
                 this.Config = (BlizzardConfig)serializer.Deserialize(json, typeof(BlizzardConfig));
-                this.Config.SetLocale(); // Sets locale (example: en_US) in Config
             }
             this.RequestToken();
         }
-        private async void TimerSet()
-        {
-            this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Token usually lasts 24 hours (convert seconds to ms)
-            this.TokenExpTimer.AutoReset = false;
-            this.TokenExpTimer.Elapsed += TokenExpTimer_Elapsed; // Set event
-            this.TokenExpTimer.Start(); // Start timer
-        }
         public async Task<ArmoryData> ArmoryLookup(string character, string realm, string type) // Main Armory Lookup Method exposed to ArmoryBot.cs
         {
-            ArmoryData info = new ArmoryData(); // This method makes a number of separate API Calls. All the data is stored to this ArmoryData class to easily pass to the calling function.
             try
             {
+                ArmoryData info = new ArmoryData(); // This method makes a number of separate API Calls. All the data is stored to this ArmoryData class to easily pass to the calling function.
                 if (type != "pve" & type != "pvp") throw new Exception($"Type must be either pve or pvp. '{type}' is invalid."); // Make sure lookup type is correct
                 Task<string> CharInfo = this.GetCharacter(character, realm); // Gets basic character info (Player name, race, class, spec, etc.)
                 Task<string> AvatarInfo = this.GetAvatar(character, realm); // Gets character avatar image URL
@@ -61,12 +63,10 @@ namespace ArmoryBot
                 info.CharacterInfo = CharInfo.Result; info.AvatarUrl = AvatarInfo.Result; // Move results into class:ArmoryData
                 return info; // Return class:ArmoryData to calling function
             }
-            catch (Exception ex)
+            catch
             {
                 this.CheckToken(); // Make sure token is not expired
-                info.IsError = true; // Set error status
-                info.ErrorInfo = ex.ToString(); // Save exception info (passed to calling function in ArmoryBot.cs)
-                return info; // Return class:ArmoryData to calling function. Calling function will check IsError and handle appropriately.
+                throw; // Re-throw exception, will be caught in calling function
             }
         }
         private async Task<string> GetCharacter(string character, string realm) // Returns a string to this.ArmoryLookup()
@@ -270,7 +270,7 @@ namespace ArmoryBot
                                 this.Config.Token = new BlizzardAccessToken(); // Create new instance of token (will erase old token)
                                 this.Config.Token = (BlizzardAccessToken)serializer.Deserialize(sr, typeof(BlizzardAccessToken));
                                 Program.Log("BlizzAPI Token obtained!");
-                                this.TimerSet(); // Set timer to renew token
+                                this.TokenExpTimer = new Timer();
                             }
                         }
                     }
