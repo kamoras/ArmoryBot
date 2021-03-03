@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -28,9 +27,7 @@ namespace ArmoryBot
         {
             using (StreamReader json = File.OpenText(Globals.BlizzardConfigPath)) // Load Config
             {
-                var serializer = new JsonSerializer();
-                this.Config = new BlizzardConfig();
-                this.Config = (BlizzardConfig)serializer.Deserialize(json, typeof(BlizzardConfig));
+                this.Config = (BlizzardConfig)Program.jsonSerializer.Deserialize(json, typeof(BlizzardConfig));
             }
             this.RequestToken();
         }
@@ -75,9 +72,7 @@ namespace ArmoryBot
             string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}{this.Config.PROFILEnamespace}");
             using (TextReader sr = new StringReader(json))
             {
-                var serializer = new JsonSerializer();
-                CharacterSummary charinfo = new CharacterSummary();
-                charinfo = (CharacterSummary)serializer.Deserialize(sr, typeof(CharacterSummary)); // De-serialize JSON to C# Classes
+                var charinfo = (CharacterSummary)Program.jsonSerializer.Deserialize(sr, typeof(CharacterSummary)); // De-serialize JSON to C# Classes
                 output += $"{charinfo.Name} {charinfo.Level} {charinfo.Race.Name.GetLocale(this.Config.locale)} {charinfo.ActiveSpec.Name.GetLocale(this.Config.locale)} {charinfo.CharacterClass.Name.GetLocale(this.Config.locale)}                                 \n**Item Level: {charinfo.EquippedItemLevel}     Renown: {charinfo.CovenantProgress?.RenownLevel} {charinfo.CovenantProgress?.ChosenCovenant.Name.GetLocale(this.Config.locale)}**";
             }
             return output;
@@ -87,9 +82,7 @@ namespace ArmoryBot
             string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/character-media{this.Config.PROFILEnamespace}");
             using (TextReader sr = new StringReader(json))
             {
-                var serializer = new JsonSerializer();
-                CharacterMedia charmedia = new CharacterMedia();
-                charmedia = (CharacterMedia)serializer.Deserialize(sr, typeof(CharacterMedia)); // De-serialize JSON to C# Classes
+                var charmedia = (CharacterMedia)Program.jsonSerializer.Deserialize(sr, typeof(CharacterMedia)); // De-serialize JSON to C# Classes
                 foreach (Asset asset in charmedia.Assets)
                 {
                     if (asset.Key.ToLower() == "avatar") return asset.Value.ToString();
@@ -103,9 +96,7 @@ namespace ArmoryBot
             string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/encounters/raids{this.Config.PROFILEnamespace}");
             using (TextReader sr = new StringReader(json))
             {
-                var serializer = new JsonSerializer();
-                RaidInfo raidinfo = new RaidInfo();
-                raidinfo = (RaidInfo)serializer.Deserialize(sr, typeof(RaidInfo)); // De-serialize JSON to C# Classes
+                var raidinfo = (RaidInfo)Program.jsonSerializer.Deserialize(sr, typeof(RaidInfo)); // De-serialize JSON to C# Classes
                 if (raidinfo.ExpansionsExpansions != null) foreach (Expansion expansion in raidinfo.ExpansionsExpansions)
                     {
                         switch (expansion.ExpansionExpansion.Id)
@@ -132,17 +123,13 @@ namespace ArmoryBot
                 string json_seasoninfo = await this.Call($"{this.Config.APIroot}/data/wow/mythic-keystone/season/index{this.Config.DYNAMICnamespace}");
                 using (TextReader sr = new StringReader(json_seasoninfo))
                 {
-                    var serializer = new JsonSerializer();
-                    MPlusSeasonIndex seasonindex = new MPlusSeasonIndex();
-                    seasonindex = (MPlusSeasonIndex)serializer.Deserialize(sr, typeof(MPlusSeasonIndex)); // De-serialize JSON to C# Classes
+                    var seasonindex = (MPlusSeasonIndex)Program.jsonSerializer.Deserialize(sr, typeof(MPlusSeasonIndex)); // De-serialize JSON to C# Classes
                     season = seasonindex.CurrentSeason.Id.ToString(); // Gets current season, used in the next API call
                 }
                 string json_characterinfo = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{season}{this.Config.PROFILEnamespace}"); // REMEMBER TO UPDATE SEASON
                 using (TextReader sr = new StringReader(json_characterinfo))
                 {
-                    var serializer = new JsonSerializer();
-                    MythicPlusSeasonInfo mplusseasoninfo = new MythicPlusSeasonInfo();
-                    mplusseasoninfo = (MythicPlusSeasonInfo)serializer.Deserialize(sr, typeof(MythicPlusSeasonInfo)); // De-serialize JSON to C# Classes
+                    var mplusseasoninfo = (MythicPlusSeasonInfo)Program.jsonSerializer.Deserialize(sr, typeof(MythicPlusSeasonInfo)); // De-serialize JSON to C# Classes
                     foreach (BestRun run in mplusseasoninfo.BestRuns)
                     {
                         data.Add(run);
@@ -158,9 +145,7 @@ namespace ArmoryBot
             string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/achievements{this.Config.PROFILEnamespace}");
             using (TextReader sr = new StringReader(json))
             {
-                var serializer = new JsonSerializer();
-                AchievementSummary achievinfo = new AchievementSummary();
-                achievinfo = (AchievementSummary)serializer.Deserialize(sr, typeof(AchievementSummary)); // De-serialize JSON to C# Classes
+                var achievinfo = (AchievementSummary)Program.jsonSerializer.Deserialize(sr, typeof(AchievementSummary)); // De-serialize JSON to C# Classes
                 switch (type)
                 {
                     case "pve":
@@ -193,9 +178,7 @@ namespace ArmoryBot
             await Task.WhenAll(json2v2, json3v3, jsonrbg); // Allow API calls to run concurrently
             using (TextReader sr = new StringReader(json2v2.Result)) // 2v2
             {
-                var serializer = new JsonSerializer();
-                PvpBracketInfo v2info = new PvpBracketInfo();
-                v2info = (PvpBracketInfo)serializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
+                var v2info = (PvpBracketInfo)Program.jsonSerializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
                 if (v2info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
                 {
                     int winpct = 0;
@@ -205,9 +188,7 @@ namespace ArmoryBot
             }
             using (TextReader sr = new StringReader(json3v3.Result)) // 3v3
             {
-                var serializer = new JsonSerializer();
-                PvpBracketInfo v3info = new PvpBracketInfo();
-                v3info = (PvpBracketInfo)serializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
+                var v3info = (PvpBracketInfo)Program.jsonSerializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
                 if (v3info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
                 {
                     int winpct = 0;
@@ -217,9 +198,7 @@ namespace ArmoryBot
             }
             using (TextReader sr = new StringReader(jsonrbg.Result)) // RBG
             {
-                var serializer = new JsonSerializer();
-                PvpBracketInfo rbginfo = new PvpBracketInfo();
-                rbginfo = (PvpBracketInfo)serializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
+                var rbginfo = (PvpBracketInfo)Program.jsonSerializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
                 if (rbginfo.SeasonMatchStatistics?.Played > 0) // Only list brackets played
                 {
                     int winpct = 0;
@@ -235,9 +214,7 @@ namespace ArmoryBot
             string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/statistics{this.Config.PROFILEnamespace}");
             using (TextReader sr = new StringReader(json))
             {
-                var serializer = new JsonSerializer();
-                CharacterStatsInfo stats = new CharacterStatsInfo();
-                stats = (CharacterStatsInfo)serializer.Deserialize(sr, typeof(CharacterStatsInfo)); // De-serialize JSON to C# Classes
+                var stats = (CharacterStatsInfo)Program.jsonSerializer.Deserialize(sr, typeof(CharacterStatsInfo)); // De-serialize JSON to C# Classes
                 return $"* Health: {stats.Health}\n* Versatility: {stats.VersatilityDamageDoneBonus}%";
             }
         }
@@ -266,9 +243,7 @@ namespace ArmoryBot
                         {
                             using (var sr = new StringReader(json))
                             {
-                                var serializer = new JsonSerializer();
-                                this.Config.Token = new BlizzardAccessToken(); // Create new instance of token (will erase old token)
-                                this.Config.Token = (BlizzardAccessToken)serializer.Deserialize(sr, typeof(BlizzardAccessToken));
+                                this.Config.Token = (BlizzardAccessToken)Program.jsonSerializer.Deserialize(sr, typeof(BlizzardAccessToken));
                                 Program.Log("BlizzAPI Token obtained!");
                                 this.TokenExpTimer = new Timer();
                             }
