@@ -11,7 +11,7 @@ namespace ArmoryBot
         private static ArmoryBot bot_Main;
         private static HttpClientHandler httpClientHandler;
         internal static HttpClient httpClient;
-        static void Main() // ** Program Entry Point **
+        static async Task Main() // ** Program Entry Point **
         {
             if (!File.Exists(Globals.DiscordConfigPath)) // check for Discord Config
             {
@@ -29,8 +29,8 @@ namespace ArmoryBot
             httpClientHandler = new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }; // Perform automatic Decompression
             httpClient = new HttpClient(httpClientHandler); // Create static instance of HttpClient for entire program
             bot_Main = new ArmoryBot(); // Create new instance of ArmoryBot, will simultaneously connect to the Blizzard API and request a token.
-            bot_Main.Startup(); // Startup Discord Bot
-            while (true) { Task.Delay(-1); } // Main loop
+            await bot_Main.Startup(); // Startup Discord Bot
+            await Task.Delay(-1); // Prevent exit
         }
         internal static void Log(string entry)
         {
