@@ -34,9 +34,10 @@ namespace ArmoryBot
         }
         private async Task MsgReceived(SocketMessage msgParam) // Triggered when a message is received in a channel the bot has visible
         {
-            var msg = msgParam as SocketUserMessage;
+            if (msgParam is null) return; // Null check
+            if (!(msgParam is SocketUserMessage msg)) return; // Ignore System/Other Bot Messages
+            if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
-            if (msg.Author.IsBot) return; // Bot Check
             bool HasPrefix = msg.HasCharPrefix(this.discordConfig.cmdprefix, ref argPos); // Check for cmd prefix
             bool IsDM = msg.Channel.GetType() == typeof(SocketDMChannel); // Check if DM Channel
             switch (HasPrefix)
