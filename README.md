@@ -1,8 +1,7 @@
 # ArmoryBot
 .NET Core Discord Bot for World of Warcraft Armory Lookups.
 
-Inspired by https://github.com/JamesIves/discord-wow-armory-bot
-## Current Status: Working in Shadowlands 9.0.2
+## Current Status: Working in Shadowlands 9.x
 
 ### Setup:
 1. Sign up for Blizzard API Access, and register an application at https://develop.battle.net/ , you will need a **client_id** and **client_secret**.
@@ -14,7 +13,7 @@ Inspired by https://github.com/JamesIves/discord-wow-armory-bot
 
 **macOS/Linux:** When running from bash terminal, use the following commands:
 ```
-sudo chmod 755 ArmoryBot
+chmod 755 ArmoryBot
 ./ArmoryBot
 ```
 **NOTE:** When reporting issues with the bot, please utilize https://github.com/imerzan/ArmoryBot/issues , and include any debug/exception info from your console window.
