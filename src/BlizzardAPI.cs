@@ -12,7 +12,6 @@ namespace ArmoryBot
     public class BlizzardAPI
     {
         private BlizzardConfig Config;
-        private Timer CheckToken_RateLimit = new Timer(); // Allow check token API call once every 15 minutes.
         private Timer _TokenExpTimer; // Backing field
         private Timer TokenExpTimer
         {
@@ -37,7 +36,6 @@ namespace ArmoryBot
             try
             {
                 ArmoryData info = new ArmoryData(); // This method makes a number of separate API Calls. All the data is stored to this ArmoryData class to easily pass to the calling function.
-                if (type != "pve" & type != "pvp") throw new Exception($"Type must be either pve or pvp. '{type}' is invalid."); // Make sure lookup type is correct
                 Task<string> CharInfo = this.GetCharacter(character, realm); // Gets basic character info (Player name, race, class, spec, etc.)
                 Task<string> AvatarInfo = this.GetAvatar(character, realm); // Gets character avatar image URL
                 switch (type)
@@ -67,6 +65,9 @@ namespace ArmoryBot
                 throw; // Re-throw exception, will be caught in calling function
             }
         }
+        //
+        // Shared/PVE Methods
+        //
         private async Task<string> GetCharacter(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             string output = "";
@@ -161,8 +162,6 @@ namespace ArmoryBot
                             if (Globals.AchievementsPVP.ContainsKey(achiev.Id)) list.Add(achiev.Id, achiev.AchievementAchievement.Name, type);
                         }
                         break;
-                    default:
-                        throw new Exception("Invalid type specified.");
                 } // End Switch
             }
             return list.ToString();
@@ -246,7 +245,7 @@ namespace ArmoryBot
                             {
                                 this.Config.Token = (BlizzardAccessToken)Program.jsonSerializer.Deserialize(sr, typeof(BlizzardAccessToken));
                                 Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                                this.TokenExpTimer = new Timer();
+                                this.TokenExpTimer = new Timer(); // Sets Auto-Renewing Timer for BlizzAPI Token
                             }
                         }
                     }
@@ -266,10 +265,6 @@ namespace ArmoryBot
         {
             try
             {
-                if (this.CheckToken_RateLimit.Enabled) return;
-                this.CheckToken_RateLimit = new Timer(900000); // Rate Limit once every 15 minutes
-                this.CheckToken_RateLimit.AutoReset = false;
-                this.CheckToken_RateLimit.Start();
                 Program.Log("Checking BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"{this.Config.TOKENroot}/oauth/check_token"))
                 {

@@ -15,7 +15,7 @@ namespace ArmoryBot
         internal static JsonSerializer jsonSerializer;
         static async Task Main() // ** Program Entry Point **
         {
-            if (!File.Exists(Globals.DiscordConfigPath) | !File.Exists(Globals.BlizzardConfigPath)) // Verify Config Files
+            if (!File.Exists(Globals.DiscordConfigPath) | !File.Exists(Globals.BlizzardConfigPath)) // Verify Config Files Exist
             {
                 if (!File.Exists(Globals.DiscordConfigPath)) // check for Discord Config
                 {
@@ -30,12 +30,12 @@ namespace ArmoryBot
                 return;
             }
             Log("Starting up ArmoryBot...");
-            jsonSerializer = new JsonSerializer(); // Use static instance of JSON Serializer
+            jsonSerializer = new JsonSerializer(); // Use static instance of JSON Serializer for entire program
             httpClientHandler = new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }; // Perform automatic Decompression
-            httpClient = new HttpClient(httpClientHandler); // Create static instance of HttpClient for entire program
+            httpClient = new HttpClient(httpClientHandler); // Use static instance of HttpClient for entire program
             bot_Main = new ArmoryBot(); // Create new instance of ArmoryBot, will simultaneously connect to the Blizzard API and request a token.
             await bot_Main.Startup(); // Startup Discord Bot
-            await Task.Delay(-1); // Prevent exit
+            await Task.Delay(-1); // Async Main Loop
         }
         internal static void Log(string entry)
         {
