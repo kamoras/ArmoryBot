@@ -111,8 +111,23 @@ namespace ArmoryBot
         public string access_token { get; private set; }
         [JsonProperty("token_type")]
         public string token_type { get; private set; }
+        private int _expires_in; // Backing Field
         [JsonProperty("expires_in")]
-        public int expires_in { get; private set; } // Seconds
+        public int expires_in // Seconds
+        {
+            get
+            {
+                return this._expires_in;
+            }
+            private set
+            {
+                this._expires_in = value;
+                DateTime now = DateTime.Now;
+                TimeSpan time = new TimeSpan(0, 0, value); // Hours , Minutes, Seconds
+                this.expire_date = now.Add(time);
+            }
+        }
+        public DateTime expire_date { get; private set; }
         [JsonProperty("scope")]
         public string scope { get; private set; }
     }

@@ -12,6 +12,7 @@ namespace ArmoryBot
     public class BlizzardAPI
     {
         private BlizzardConfig Config;
+        private Timer CheckToken_RateLimit = new Timer(); // Allow check token API call once every 15 minutes.
         private Timer _TokenExpTimer; // Backing field
         private Timer TokenExpTimer
         {
@@ -244,7 +245,7 @@ namespace ArmoryBot
                             using (var sr = new StringReader(json))
                             {
                                 this.Config.Token = (BlizzardAccessToken)Program.jsonSerializer.Deserialize(sr, typeof(BlizzardAccessToken));
-                                Program.Log("BlizzAPI Token obtained!");
+                                Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                                 this.TokenExpTimer = new Timer();
                             }
                         }
@@ -265,6 +266,10 @@ namespace ArmoryBot
         {
             try
             {
+                if (this.CheckToken_RateLimit.Enabled) return;
+                this.CheckToken_RateLimit = new Timer(900000); // Rate Limit once every 15 minutes
+                this.CheckToken_RateLimit.AutoReset = false;
+                this.CheckToken_RateLimit.Start();
                 Program.Log("Checking BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"{this.Config.TOKENroot}/oauth/check_token"))
                 {
@@ -279,7 +284,7 @@ namespace ArmoryBot
                     {
                         var json = content.ReadAsStringAsync().Result;
                         if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
-                        else Program.Log("BlizzAPI Token is valid!");
+                        else Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                     }
                 }
             }

@@ -15,19 +15,21 @@ namespace ArmoryBot
         internal static JsonSerializer jsonSerializer;
         static async Task Main() // ** Program Entry Point **
         {
-            if (!File.Exists(Globals.DiscordConfigPath)) // check for Discord Config
+            if (!File.Exists(Globals.DiscordConfigPath) | !File.Exists(Globals.BlizzardConfigPath)) // Verify Config Files
             {
-                File.WriteAllText(Globals.DiscordConfigPath, "{\n\"token\": \"\",\n\"cmdprefix\": \"!\"\n}");
-                Console.WriteLine($"{Globals.DiscordConfigPath} does not exist. Creating blank config file.");
+                if (!File.Exists(Globals.DiscordConfigPath)) // check for Discord Config
+                {
+                    File.WriteAllText(Globals.DiscordConfigPath, "{\n\"token\": \"\",\n\"cmdprefix\": \"!\"\n}");
+                    Console.WriteLine($"{Globals.DiscordConfigPath} does not exist. Creating blank config file.");
+                }
+                if (!File.Exists(Globals.BlizzardConfigPath)) // check for Blizzard Config
+                {
+                    File.WriteAllText(Globals.BlizzardConfigPath, "{\n\"client_id\": \"\",\n\"client_secret\": \"\",\n\"locale\": \"en_US\"\n}");
+                    Console.WriteLine($"{Globals.BlizzardConfigPath} does not exist. Creating blank config file.");
+                }
                 return;
             }
-            if (!File.Exists(Globals.BlizzardConfigPath)) // check for Blizzard Config
-            {
-                File.WriteAllText(Globals.BlizzardConfigPath, "{\n\"client_id\": \"\",\n\"client_secret\": \"\",\n\"locale\": \"en_US\"\n}");
-                Console.WriteLine($"{Globals.BlizzardConfigPath} does not exist. Creating blank config file.");
-                return;
-            }
-            Log("Starting up...");
+            Log("Starting up ArmoryBot...");
             jsonSerializer = new JsonSerializer(); // Use static instance of JSON Serializer
             httpClientHandler = new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }; // Perform automatic Decompression
             httpClient = new HttpClient(httpClientHandler); // Create static instance of HttpClient for entire program
