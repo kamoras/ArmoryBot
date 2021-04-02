@@ -9,7 +9,7 @@ namespace ArmoryBot
 {
     public class ArmoryBot
     {
-        private DiscordConfig Config;
+        private readonly DiscordConfig Config;
         private readonly BlizzardAPI BlizzAPI = new BlizzardAPI(); // Initializes Blizzard API
         private DiscordSocketClient Discord;
         public ArmoryBot()
@@ -30,15 +30,15 @@ namespace ArmoryBot
         private async Task Discord_MsgReceived(SocketMessage msgParam) // Triggered when a message is received in a channel the bot has visible
         {
             if (msgParam is null) return; // Null check
-            if (!(msgParam is SocketUserMessage msg)) return; // Ignore System/Other Bot Messages
+            if (!(msgParam is SocketUserMessage msg)) return; // Ignore System/Other messages
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
-            bool HasPrefix = msg.HasCharPrefix(this.Config.cmdprefix, ref argPos); // Check for cmd prefix
-            bool IsDM = msg.Channel.GetType() == typeof(SocketDMChannel); // Check if DM Channel
-            switch (HasPrefix)
+            bool hasPrefix = msg.HasCharPrefix(this.Config.cmdprefix, ref argPos); // Check for cmd prefix
+            bool isDM = msg.Channel.GetType() == typeof(SocketDMChannel); // Check if DM Channel
+            switch (hasPrefix)
             {
                 case false: // No prefix used
-                    if (IsDM) this.CMD_Help(msg); // Respond to DM
+                    if (isDM) this.CMD_Help(msg); // Respond to DM
                     return;
                 case true: // Prefix used
                     this.Handle_CMD(msg); // Handle CMD

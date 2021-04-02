@@ -28,30 +28,29 @@ namespace ArmoryBot
                 ArmoryData info = new ArmoryData(); // This method makes a number of separate API Calls. All the data is stored to this ArmoryData class to easily pass to the calling function.
                 Task<string> CharInfo = this.GetCharacter(character, realm); // Gets basic character info (Player name, race, class, spec, etc.)
                 Task<string> AvatarInfo = this.GetAvatar(character, realm); // Gets character avatar image URL
+                Task<string> AchievInfo = this.GetAchievements(character, realm, type); // Gets Achievements
                 switch (type)
                 {
                     case "pve":
                         Task<RaidData> RaidInfo = this.GetRaids(character, realm); // Gets all raid info from Current Expansion
                         Task<string> MythicPlus = this.GetMythicPlus(character, realm); // Gets all M+ info from Current Season
-                        Task<string> PVEAchiev = this.GetAchievements(character, realm, type); // Gets all PVE-Centric Achievements
-                        await Task.WhenAll(RaidInfo, MythicPlus, PVEAchiev); // Wait for all PVE tasks to finish up
-                        info.RaidInfo = RaidInfo.Result; info.MythicPlus = MythicPlus.Result; info.Achievements = PVEAchiev.Result; // Move results into class:ArmoryData
+                        await Task.WhenAll(RaidInfo, MythicPlus); // Wait for all PVE tasks to finish up
+                        info.RaidInfo = RaidInfo.Result; info.MythicPlus = MythicPlus.Result; // Move results into class:ArmoryData
                         break;
                     case "pvp":
                         Task<string> PvpInfo = this.GetPVP(character, realm); // Gets all rated PVP bracket info
                         Task<string> PVPStats = this.GetPvpStats(character, realm); // Gets all PVP Character Stats info (Versatility,etc.)
-                        Task<string> PVPAchiev = this.GetAchievements(character, realm, type); // Gets all PVP-Centric Achievements
-                        await Task.WhenAll(PvpInfo, PVPStats, PVPAchiev); // Wait for all PVP tasks to finish up
-                        info.PVPRating = PvpInfo.Result; info.PVPStats = PVPStats.Result; info.Achievements = PVPAchiev.Result; // Move results into class:ArmoryData
+                        await Task.WhenAll(PvpInfo, PVPStats); // Wait for all PVP tasks to finish up
+                        info.PVPRating = PvpInfo.Result; info.PVPStats = PVPStats.Result; // Move results into class:ArmoryData
                         break;
                 }
-                await Task.WhenAll(CharInfo, AvatarInfo); // Wait for all other tasks to finish up
-                info.CharacterInfo = CharInfo.Result; info.AvatarUrl = AvatarInfo.Result; // Move results into class:ArmoryData
+                await Task.WhenAll(CharInfo, AvatarInfo, AchievInfo); // Wait for all other tasks to finish up
+                info.CharacterInfo = CharInfo.Result; info.AvatarUrl = AvatarInfo.Result; info.Achievements = AchievInfo.Result; // Move results into class:ArmoryData
                 return info; // Return class:ArmoryData to calling function
             }
             catch
             {
-                this.CheckToken(); // Make sure token is not expired
+                this.CheckToken(); // Make sure token is valid
                 throw; // Re-throw exception, will be caught in calling function
             }
         }
@@ -224,22 +223,19 @@ namespace ArmoryBot
                     request.Content = new StringContent("grant_type=client_credentials");
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var response = await Program.httpClient.SendAsync(request);
-                    using (HttpContent content = response.Content)
+                    var response = await Program.httpClient.SendAsync(request); // Send HTTP request
+                    var json = response.Content.ReadAsStringAsync().Result; // Store json response
+                    if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
+                    else // Load token information
                     {
-                        var json = content.ReadAsStringAsync().Result;
-                        if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
-                        else // Load token information
+                        using (var sr = new StringReader(json))
                         {
-                            using (var sr = new StringReader(json))
-                            {
-                                this.Config.Token = (BlizzardAccessToken)Program.jsonSerializer.Deserialize(sr, typeof(BlizzardAccessToken));
-                                Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                                this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Convert seconds to ms
-                                this.TokenExpTimer.AutoReset = false;
-                                this.TokenExpTimer.Elapsed += TokenExpTimer_Elapsed; // Set elapsed event method
-                                this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
-                            }
+                            this.Config.Token = (BlizzardAccessToken)Program.jsonSerializer.Deserialize(sr, typeof(BlizzardAccessToken));
+                            Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                            this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Convert seconds to ms
+                            this.TokenExpTimer.AutoReset = false;
+                            this.TokenExpTimer.Elapsed += TokenExpTimer_Elapsed; // Set elapsed event method
+                            this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
                         }
                     }
                 }
@@ -267,13 +263,10 @@ namespace ArmoryBot
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var response = await Program.httpClient.SendAsync(request);
-                    using (HttpContent content = response.Content)
-                    {
-                        var json = content.ReadAsStringAsync().Result;
-                        if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
-                        else Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                    }
+                    var response = await Program.httpClient.SendAsync(request); // Send HTTP request
+                    var json = response.Content.ReadAsStringAsync().Result; // Store json response
+                    if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
+                    else Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                 }
             }
             catch (Exception ex)
@@ -288,11 +281,8 @@ namespace ArmoryBot
             {
                 request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
-                var response = await Program.httpClient.SendAsync(request); // Send GET request, await response
-                using (HttpContent content = response.Content) // Parse response
-                {
-                    return content.ReadAsStringAsync().Result; // return JSON string
-                }
+                var response = await Program.httpClient.SendAsync(request); // Send HTTP GET request
+                return response.Content.ReadAsStringAsync().Result; // return JSON response
             }
         }
     }
