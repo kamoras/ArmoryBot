@@ -12,24 +12,14 @@ namespace ArmoryBot
     public class BlizzardAPI
     {
         private BlizzardConfig Config;
-        private Timer _TokenExpTimer; // Backing field
-        private Timer TokenExpTimer
-        {
-            set 
-            {
-                this._TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Token usually lasts 24 hours (convert seconds to ms)
-                this._TokenExpTimer.AutoReset = false;
-                this._TokenExpTimer.Elapsed += TokenExpTimer_Elapsed; // Set event
-                this._TokenExpTimer.Start(); // Start timer
-            }
-        }
+        private Timer TokenExpTimer;
         public BlizzardAPI()
         {
             using (StreamReader json = File.OpenText(Globals.BlizzardConfigPath)) // Load Config
             {
                 this.Config = (BlizzardConfig)Program.jsonSerializer.Deserialize(json, typeof(BlizzardConfig));
             }
-            this.RequestToken();
+            this.RequestToken(); // Obtain initial BlizzAPI Token
         }
         public async Task<ArmoryData> ArmoryLookup(string character, string realm, string type) // Main Armory Lookup Method exposed to ArmoryBot.cs
         {
@@ -245,7 +235,10 @@ namespace ArmoryBot
                             {
                                 this.Config.Token = (BlizzardAccessToken)Program.jsonSerializer.Deserialize(sr, typeof(BlizzardAccessToken));
                                 Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                                this.TokenExpTimer = new Timer(); // Sets Auto-Renewing Timer for BlizzAPI Token
+                                this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Convert seconds to ms
+                                this.TokenExpTimer.AutoReset = false;
+                                this.TokenExpTimer.Elapsed += TokenExpTimer_Elapsed; // Set elapsed event method
+                                this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
                             }
                         }
                     }
