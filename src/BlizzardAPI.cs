@@ -224,7 +224,7 @@ namespace ArmoryBot
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
                     var response = await Program.httpClient.SendAsync(request); // Send HTTP request
-                    var json = response.Content.ReadAsStringAsync().Result; // Store json response
+                    var json = await response.Content.ReadAsStringAsync(); // Store json response
                     if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
                     else // Load token information
                     {
@@ -263,8 +263,7 @@ namespace ArmoryBot
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var response = await Program.httpClient.SendAsync(request); // Send HTTP request
-                    var json = response.Content.ReadAsStringAsync().Result; // Store json response
+                    var json = await Program.httpClient.SendAsync(request).Result.Content.ReadAsStringAsync(); // Send HTTP Request, Store JSON
                     if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
                     else Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                 }
@@ -290,8 +289,7 @@ namespace ArmoryBot
                 }
                 request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
-                var response = await Program.httpClient.SendAsync(request); // Send HTTP GET request
-                return response.Content.ReadAsStringAsync().Result; // return JSON response
+                return await Program.httpClient.SendAsync(request).Result.Content.ReadAsStringAsync(); // Send HTTP Request, Return JSON
             }
         }
     }

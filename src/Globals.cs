@@ -15,8 +15,8 @@ namespace ArmoryBot
     }
     internal static class Globals
     {
-        public const string DiscordConfigPath = "discord.json";
-        public const string BlizzardConfigPath = "blizzard.json";
+        public const string DiscordConfigPath = @"discord.json";
+        public const string BlizzardConfigPath = @"blizzard.json";
         /*
          AchievementItems are entered as follows: (int)Group, (int)Value
         The achievement id is the ID as listed on wowhead/blizz api.
