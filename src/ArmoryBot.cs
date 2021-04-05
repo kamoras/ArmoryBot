@@ -19,7 +19,7 @@ namespace ArmoryBot
                 this.Config = (DiscordConfig)Program.jsonSerializer.Deserialize(json, typeof(DiscordConfig));
             }
         }
-        public async Task Discord_Startup() // Discord bot startup
+        public async Task StartupAsync() // Discord bot startup
         {
             this.Discord = new DiscordSocketClient();
             this.Discord.Log += this.Discord_Log; // Set logging method

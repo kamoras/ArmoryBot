@@ -88,23 +88,23 @@ namespace ArmoryBot
 
         public string GetLocale(string locale)
         {
-            switch (locale)
+            switch (locale.ToLower())
             {
-                case "en_US":
+                case "en_us":
                     return this.EnUs;
-                case "es_MX":
+                case "es_mx":
                     return this.EsMx;
-                case "pt_BR":
+                case "pt_br":
                     return this.PtBr;
-                case "de_DE":
+                case "de_de":
                     return this.DeDe;
-                case "en_GB":
+                case "en_gb":
                     return this.EnGb;
-                case "es_ES":
+                case "es_es":
                     return this.EsEs;
-                case "fr_FR":
+                case "fr_fr":
                     return this.FrFr;
-                case "it_IT":
+                case "it_it":
                     return this.ItIt;
                 default:
                     throw new Exception("Invalid locale specified.");
@@ -338,23 +338,23 @@ namespace ArmoryBot
         public string ItIt { get; set; }
         public string GetLocale(string locale)
         {
-            switch (locale)
+            switch (locale.ToLower())
             {
-                case "en_US":
+                case "en_us":
                     return this.EnUs;
-                case "es_MX":
+                case "es_mx":
                     return this.EsMx;
-                case "pt_BR":
+                case "pt_br":
                     return this.PtBr;
-                case "de_DE":
+                case "de_de":
                     return this.DeDe;
-                case "en_GB":
+                case "en_gb":
                     return this.EnGb;
-                case "es_ES":
+                case "es_es":
                     return this.EsEs;
-                case "fr_FR":
+                case "fr_fr":
                     return this.FrFr;
-                case "it_IT":
+                case "it_it":
                     return this.ItIt;
                 default:
                     throw new Exception("Invalid locale specified.");

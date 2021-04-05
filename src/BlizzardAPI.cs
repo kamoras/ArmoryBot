@@ -60,7 +60,7 @@ namespace ArmoryBot
         private async Task<string> GetCharacter(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             string output = "";
-            string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}{this.Config.PROFILEnamespace}");
+            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}", Namespace.Profile);
             using (TextReader sr = new StringReader(json))
             {
                 var charinfo = (CharacterSummary)Program.jsonSerializer.Deserialize(sr, typeof(CharacterSummary)); // De-serialize JSON to C# Classes
@@ -70,7 +70,7 @@ namespace ArmoryBot
         }
         private async Task<string> GetAvatar(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
-            string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/character-media{this.Config.PROFILEnamespace}");
+            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/character-media", Namespace.Profile);
             using (TextReader sr = new StringReader(json))
             {
                 var charmedia = (CharacterMedia)Program.jsonSerializer.Deserialize(sr, typeof(CharacterMedia)); // De-serialize JSON to C# Classes
@@ -84,7 +84,7 @@ namespace ArmoryBot
         private async Task<RaidData> GetRaids(string character, string realm) // Returns class:RaidData to this.ArmoryLookup()
         {
             RaidData data = new RaidData(this.Config.locale);
-            string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/encounters/raids{this.Config.PROFILEnamespace}");
+            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/encounters/raids", Namespace.Profile);
             using (TextReader sr = new StringReader(json))
             {
                 var raidinfo = (RaidInfo)Program.jsonSerializer.Deserialize(sr, typeof(RaidInfo)); // De-serialize JSON to C# Classes
@@ -111,13 +111,13 @@ namespace ArmoryBot
             {
                 MythicPlusData data = new MythicPlusData();
                 string season = null;
-                string json_seasoninfo = await this.Call($"{this.Config.APIroot}/data/wow/mythic-keystone/season/index{this.Config.DYNAMICnamespace}");
+                string json_seasoninfo = await this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/season/index", Namespace.Dynamic);
                 using (TextReader sr = new StringReader(json_seasoninfo))
                 {
                     var seasonindex = (MPlusSeasonIndex)Program.jsonSerializer.Deserialize(sr, typeof(MPlusSeasonIndex)); // De-serialize JSON to C# Classes
                     season = seasonindex.CurrentSeason.Id.ToString(); // Gets current season, used in the next API call
                 }
-                string json_characterinfo = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{season}{this.Config.PROFILEnamespace}"); // REMEMBER TO UPDATE SEASON
+                string json_characterinfo = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{season}", Namespace.Profile);
                 using (TextReader sr = new StringReader(json_characterinfo))
                 {
                     var mplusseasoninfo = (MythicPlusSeasonInfo)Program.jsonSerializer.Deserialize(sr, typeof(MythicPlusSeasonInfo)); // De-serialize JSON to C# Classes
@@ -133,7 +133,7 @@ namespace ArmoryBot
         private async Task<string> GetAchievements(string character, string realm, string type) // Returns a string to this.ArmoryLookup()
         {
             AchievementsList list = new AchievementsList();
-            string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/achievements{this.Config.PROFILEnamespace}");
+            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/achievements", Namespace.Profile);
             using (TextReader sr = new StringReader(json))
             {
                 var achievinfo = (AchievementSummary)Program.jsonSerializer.Deserialize(sr, typeof(AchievementSummary)); // De-serialize JSON to C# Classes
@@ -161,9 +161,9 @@ namespace ArmoryBot
         private async Task<string> GetPVP(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             string output = "";
-            Task<string> json2v2 = this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/pvp-bracket/2v2{this.Config.PROFILEnamespace}");
-            Task<string> json3v3 = this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/pvp-bracket/3v3{this.Config.PROFILEnamespace}");
-            Task<string> jsonrbg = this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/pvp-bracket/rbg{this.Config.PROFILEnamespace}");
+            Task<string> json2v2 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/2v2", Namespace.Profile);
+            Task<string> json3v3 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/3v3", Namespace.Profile);
+            Task<string> jsonrbg = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/rbg", Namespace.Profile);
             await Task.WhenAll(json2v2, json3v3, jsonrbg); // Allow API calls to run concurrently
             using (TextReader sr = new StringReader(json2v2.Result)) // 2v2
             {
@@ -200,7 +200,7 @@ namespace ArmoryBot
         }
         private async Task<string> GetPvpStats(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
-            string json = await this.Call($"{this.Config.APIroot}/profile/wow/character/{realm}/{character}/statistics{this.Config.PROFILEnamespace}");
+            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/statistics", Namespace.Profile);
             using (TextReader sr = new StringReader(json))
             {
                 var stats = (CharacterStatsInfo)Program.jsonSerializer.Deserialize(sr, typeof(CharacterStatsInfo)); // De-serialize JSON to C# Classes
@@ -215,7 +215,7 @@ namespace ArmoryBot
             try
             {
                 Program.Log("Requesting new BlizzAPI Token...");
-                using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"{this.Config.TOKENroot}/oauth/token"))
+                using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/token"))
                 {
                     request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                     var base64authorization = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{this.Config.client_id}:{this.Config.client_secret}"));
@@ -234,7 +234,7 @@ namespace ArmoryBot
                             Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                             this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Convert seconds to ms
                             this.TokenExpTimer.AutoReset = false;
-                            this.TokenExpTimer.Elapsed += TokenExpTimer_Elapsed; // Set elapsed event method
+                            this.TokenExpTimer.Elapsed += this.TokenExpTimer_Elapsed; // Set elapsed event method
                             this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
                         }
                     }
@@ -255,7 +255,7 @@ namespace ArmoryBot
             try
             {
                 Program.Log("Checking BlizzAPI Token...");
-                using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"{this.Config.TOKENroot}/oauth/check_token"))
+                using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/check_token"))
                 {
                     request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                     var contentList = new List<string>();
@@ -275,10 +275,19 @@ namespace ArmoryBot
                 await this.RequestToken();
             }
         }
-        private async Task<string> Call(string uri) // API Lookup, returns a json string to calling function
+        private async Task<string> Call(string uri, Namespace space) // API Lookup, returns a json string to calling function
         {
             using (var request = new HttpRequestMessage(new HttpMethod("GET"), uri))
             {
+                switch (space)
+                {
+                    case Namespace.Profile:
+                        request.Headers.TryAddWithoutValidation("Battlenet-Namespace", $"profile-{this.Config.Region}");
+                        break;
+                    case Namespace.Dynamic:
+                        request.Headers.TryAddWithoutValidation("Battlenet-Namespace", $"dynamic-{this.Config.Region}");
+                        break;
+                }
                 request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
                 var response = await Program.httpClient.SendAsync(request); // Send HTTP GET request

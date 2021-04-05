@@ -43,66 +43,39 @@ namespace ArmoryBot
             get { return this._locale; }
             private set
             {
-                this._locale = value;
-                switch (value)
+                this._locale = value.ToLower();
+                switch (value.ToLower())
                 {
-                    case "en_US":
-                        this.TOKENroot = "https://us.battle.net";
-                        this.APIroot = "https://us.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-us";
-                        this.DYNAMICnamespace = "?namespace=dynamic-us";
+                    case "en_us":
+                        this.Region = "us";
                         break;
-                    case "es_MX":
-                        this.TOKENroot = "https://us.battle.net";
-                        this.APIroot = "https://us.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-us";
-                        this.DYNAMICnamespace = "?namespace=dynamic-us";
+                    case "es_mx":
+                        this.Region = "us";
                         break;
-                    case "pt_BR":
-                        this.TOKENroot = "https://us.battle.net";
-                        this.APIroot = "https://us.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-us";
-                        this.DYNAMICnamespace = "?namespace=dynamic-us";
+                    case "pt_br":
+                        this.Region = "us";
                         break;
-                    case "de_DE":
-                        this.TOKENroot = "https://eu.battle.net";
-                        this.APIroot = "https://eu.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-eu";
-                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                    case "de_de":
+                        this.Region = "eu";
                         break;
-                    case "en_GB":
-                        this.TOKENroot = "https://eu.battle.net";
-                        this.APIroot = "https://eu.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-eu";
-                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                    case "en_gb":
+                        this.Region = "eu";
                         break;
-                    case "es_ES":
-                        this.TOKENroot = "https://eu.battle.net";
-                        this.APIroot = "https://eu.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-eu";
-                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                    case "es_es":
+                        this.Region = "eu";
                         break;
-                    case "fr_FR":
-                        this.TOKENroot = "https://eu.battle.net";
-                        this.APIroot = "https://eu.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-eu";
-                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                    case "fr_fr":
+                        this.Region = "eu";
                         break;
-                    case "it_IT":
-                        this.TOKENroot = "https://eu.battle.net";
-                        this.APIroot = "https://eu.api.blizzard.com";
-                        this.PROFILEnamespace = "?namespace=profile-eu";
-                        this.DYNAMICnamespace = "?namespace=dynamic-eu";
+                    case "it_it":
+                        this.Region = "eu";
                         break;
                     default:
                         throw new Exception($"Invalid locale specified in {Globals.BlizzardConfigPath}");
                 } // End switch
             } // end Private Set
         } // End locale
-        public string TOKENroot { get; private set; }
-        public string APIroot { get; private set; }
-        public string PROFILEnamespace { get; private set; }
-        public string DYNAMICnamespace { get; private set; }
+        public string Region { get; private set; } // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
         public BlizzardAccessToken Token { get; set; }
     }
     public class BlizzardAccessToken // Blizzard Access Token Json > C# Class 

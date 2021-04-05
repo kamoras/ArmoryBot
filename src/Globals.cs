@@ -7,6 +7,12 @@ namespace ArmoryBot
     {
         CurrentExpansion = 499 // Shadowlands
     }
+    enum Namespace : int // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
+    {
+        Profile = 0,
+        Dynamic = 1
+        // Static unused
+    }
     internal static class Globals
     {
         public const string DiscordConfigPath = "discord.json";
