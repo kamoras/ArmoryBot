@@ -27,4 +27,4 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ```
 Example: ```!armory Frostchiji-Sargeras pvp``` **NOTE:** Spaces in realm name should have a ' - ' character.
 
-![Example](https://user-images.githubusercontent.com/42287509/113590095-d486d900-95f7-11eb-892e-6a5c3d717d1d.jpg)
+![Example](https://user-images.githubusercontent.com/42287509/113607069-68fc3600-960e-11eb-8288-61f30eb12001.jpg)
