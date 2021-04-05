@@ -12,7 +12,7 @@
 6. Launch the application. The bot should come online and respond to requests. See usage below.
 
 **macOS/Linux:** When running from bash terminal, use the following commands:
-```
+```bash
 chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ./ArmoryBot    ## Starts the executable
 ```
