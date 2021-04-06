@@ -26,10 +26,10 @@ namespace ArmoryBot
         {
             this._client = new DiscordSocketClient();
             this._commands = new CommandService();
-            this._services = new ServiceCollection().AddSingleton(_client).AddSingleton(_commands).BuildServiceProvider();
+            this._services = new ServiceCollection().AddSingleton(this._client).AddSingleton(this._commands).BuildServiceProvider();
             this._client.Log += this.Discord_Log; // Set logging method
             this._client.MessageReceived += this.Discord_HandleCommandAsync; // Set msg received method
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), this._services);
             await this._client.LoginAsync(TokenType.Bot, this.Config.token);
             await this._client.StartAsync();
             await this._client.SetGameAsync($"{this.Config.Prefix}armory help", null, ActivityType.Listening); // Set Discord Status
@@ -58,8 +58,16 @@ namespace ArmoryBot
             string prefix = Context.Message.ToString()[0].ToString(); // Get prefix char (ex: !)
             for (int i = 0; i < cmd.Length; i++) { cmd[i] = cmd[i].Trim().ToLower(); } // Trim cmd string
             if (cmd.Length < 1) return; // Args Length Check
-            if (cmd[0] == "help") await this.CMD_Help(prefix);
-            else if (cmd[0] == "token") await this.CMD_Token(prefix);
+            if (cmd[0] == "help")
+            {
+                await this.CMD_Help(prefix);
+                return;
+            }
+            else if (cmd[0] == "token")
+            {
+                await this.CMD_Token(prefix);
+                return;
+            }
             if (cmd.Length < 2) return;
             await this.CMD_Armory(cmd, prefix);
         }
