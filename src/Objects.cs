@@ -9,7 +9,7 @@ namespace ArmoryBot
     //
     public class ArmoryData // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
     {
-        public string CharacterInfo; // Stores string returned by BlizzardAPI.GetCharacter()
+        public CharacterInfo CharInfo; // Stores string returned by BlizzardAPI.GetCharacter()
         public string AvatarUrl; // Stores string returned by BlizzardAPI.GetAvatar()
         public RaidData RaidInfo; // Stores RaidData returned by BlizzardAPI.GetRaids()
         public string MythicPlus; // Stores string returned by BlizzardAPI.GetMythicPlus()
@@ -166,7 +166,7 @@ namespace ArmoryBot
             string output = "";
             foreach (KeyValuePair<int, AchievementItem> entry in this.List)
             {
-                output += $"* {entry.Value.Name}\n";
+                output += $"{entry.Value.Name}\n";
             }
             if (output.Length == 0) return "None";
             else return output;
@@ -183,6 +183,13 @@ namespace ArmoryBot
             this.Value = value;
             this.Name = name;
         }
+    }
+    public class CharacterInfo // sub-class of (ArmoryData)
+    {
+        public string Name; // Stores string returned by BlizzardAPI.GetCharacter()
+        public string ItemLevel; // Stores string returned by BlizzardAPI.GetCharacter()
+        public string Renown; // Stores string returned by BlizzardAPI.GetCharacter()
+        public string ArmoryUrl; // Stores string returned by BlizzardAPI.GetCharacter()
     }
     public class RaidData // Stores all current expansion raids via BlizzardAPI.GetRaids()
     {
@@ -214,7 +221,7 @@ namespace ArmoryBot
             string output = "";
             foreach (Mode mode in this.Raid.Modes) // Check each difficulty
             {
-                output += $"* {mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name.GetLocale(this.Locale)}\n"; // ex: 8/10 Normal
+                output += $"{mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name.GetLocale(this.Locale)}\n"; // ex: 8/10 Normal
             }
             return output;
         }
@@ -226,14 +233,16 @@ namespace ArmoryBot
     */
     public class MythicPlusData // Sorts and returns the best runs per Dungeon ID
     {
+        private readonly int DungeonCount = 0;
         private Dictionary<long, BestRun> Runs;
         public int HighestRun { get; private set; } // Highest M+ run player has completed
         public int Plus5Count { get; private set; } // Best runs between +5 and +9
         public int Plus10Count { get; private set; } // Best runs between +10 and +14
         public int Plus15Count { get; private set; } // Best runs +15 and higher
         public int ExpiredCount { get; private set; } // Best runs that the timer expired
-        public MythicPlusData()
+        public MythicPlusData(int dungeonCount)
         {
+            this.DungeonCount = dungeonCount;
             this.Runs = new Dictionary<long, BestRun>();
             this.HighestRun = 0;
             this.Plus5Count = 0;
@@ -275,7 +284,7 @@ namespace ArmoryBot
         }
         public override string ToString() // Displays output 
         {
-            return $"**Best Run:** +{this.HighestRun}\n* 5+ Runs: {this.Plus5Count}\n* 10+ Runs: {this.Plus10Count}\n* 15+ Runs: {this.Plus15Count}\n* Time Expired Runs: {this.ExpiredCount}";
+            return $"Best Run: +{this.HighestRun}\n5+ Dungeons: {this.Plus5Count}/{this.DungeonCount}\n10+ Dungeons: {this.Plus10Count}/{this.DungeonCount}\n15+ Dungeons: {this.Plus15Count}/{this.DungeonCount}\nExpired Dungeons: {this.ExpiredCount}/{this.DungeonCount}";
         }
     }
 }

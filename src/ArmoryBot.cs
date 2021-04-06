@@ -83,26 +83,28 @@ namespace ArmoryBot
                 string[] character = cmd[1].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
                 ArmoryData info = await this.BlizzAPI.ArmoryLookup(character[0], character[1], cmd[2]); // Main Blizzard API Lookup
                 var eb = new EmbedBuilder(); // Build embedded discord msg
-                eb.WithTitle(info.CharacterInfo);
+                eb.WithTitle(info.CharInfo.Name);
+                eb.Description = $"{info.CharInfo.ItemLevel} // {info.CharInfo.Renown}";
                 switch (cmd[2])
                 {
                     case "pve":
                         if (info.RaidInfo.Raids.Count == 0) eb.AddField("Raids", "None", true); // None placeholder if no raids logged
                         else foreach (RaidItem raid in info.RaidInfo.Raids) // Add a field for each raid
                         {
-                            eb.AddField(raid.Name, raid.ToString(), true);
+                            eb.AddField(raid.Name, raid.ToString(), true); // inline, up to 3 columns per row
                         }
-                        eb.AddField("Mythic+", info.MythicPlus, true);
-                        eb.AddField("PVE Achievements", info.Achievements, true);
+                        eb.AddField("Mythic+", info.MythicPlus, false);
+                        eb.AddField("PVE Achievements", info.Achievements, false);
                         break;
                     case "pvp":
-                        eb.AddField("Rated PVP", info.PVPRating, true);
-                        eb.AddField("PVP Stats", info.PVPStats, true);
-                        eb.AddField("PVP Achievements", info.Achievements, true);
+                        eb.AddField("Rated PVP", info.PVPRating, false);
+                        eb.AddField("PVP Stats", info.PVPStats, false);
+                        eb.AddField("PVP Achievements", info.Achievements, false);
                         break;
                 }
                 eb.WithFooter($"{this.Config.Prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
                 eb.ThumbnailUrl = info.AvatarUrl; // Set Character Avatar as Thumbnail Picture
+                eb.Url = info.CharInfo.ArmoryUrl; // Set Armory URL (Clickable on title)
                 msg.Channel.SendMessageAsync("", false, eb.Build()); // Send message to requestor with Armory Info (embed)
             }
             catch (Exception ex)

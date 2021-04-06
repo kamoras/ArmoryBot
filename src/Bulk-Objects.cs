@@ -1276,4 +1276,68 @@ namespace ArmoryBot
         //[JsonProperty("self")]
         //public Self Self { get; set; }
     }
+    // Mythic Keystone Dungeons Index
+    /// <summary>
+    /// https://us.api.blizzard.com/data/wow/mythic-keystone/dungeon/index
+    /// Added via https://app.quicktype.io/
+    /// </summary>
+    public partial class AllDungeons
+    {
+        [JsonProperty("_links")]
+        public Links Links { get; set; }
+
+        [JsonProperty("dungeons")]
+        public Dungeon[] Dungeons { get; set; }
+    }
+
+    //public partial class Dungeon
+    //{
+    //    [JsonProperty("key")]
+    //    public Self Key { get; set; }
+
+    //    [JsonProperty("name")]
+    //    public Name Name { get; set; }
+
+    //    [JsonProperty("id")]
+    //    public long Id { get; set; }
+    //}
+
+    //public partial class Self
+    //{
+    //    [JsonProperty("href")]
+    //    public Uri Href { get; set; }
+    //}
+
+    //public partial class Name
+    //{
+    //    [JsonProperty("en_US")]
+    //    public string EnUs { get; set; }
+
+    //    [JsonProperty("es_MX")]
+    //    public string EsMx { get; set; }
+
+    //    [JsonProperty("pt_BR")]
+    //    public string PtBr { get; set; }
+
+    //    [JsonProperty("de_DE")]
+    //    public string DeDe { get; set; }
+
+    //    [JsonProperty("en_GB")]
+    //    public string EnGb { get; set; }
+
+    //    [JsonProperty("es_ES")]
+    //    public string EsEs { get; set; }
+
+    //    [JsonProperty("fr_FR")]
+    //    public string FrFr { get; set; }
+
+    //    [JsonProperty("it_IT")]
+    //    public string ItIt { get; set; }
+    //}
+
+    //public partial class Links
+    //{
+    //    [JsonProperty("self")]
+    //    public Self Self { get; set; }
+    //}
 }
