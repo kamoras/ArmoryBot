@@ -17,6 +17,12 @@ namespace ArmoryBot
         public string PVPRating; // Stores string returned by BlizzardAPI.GetPVP()
         public string PVPStats; // Stores string returned by BlizzardAPI.GetPvpStats()
     }
+    public class WoWToken // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
+    {
+        public string Price;
+        public string Last_Updated;
+        public string TokenAvatarUrl;
+    }
     public class DiscordConfig // Stores Discord Config as loaded from Config File
     {
         [JsonProperty("token")]

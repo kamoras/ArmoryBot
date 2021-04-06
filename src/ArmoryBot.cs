@@ -59,11 +59,33 @@ namespace ArmoryBot
                         this.CMD_Help(msg); // Help command
                         return;
                     }
+                    else if (cmd[1] == "token")
+                    {
+                        this.CMD_Token(msg); // Token Command
+                        return;
+                    }
                     if (cmd.Length < 3) return; // Arg Length Check
                     this.CMD_Armory(msg, cmd); // Armory Command
                 }
             }
             catch { return; }
+        }
+        private async Task CMD_Token(SocketUserMessage msg)
+        {
+            try
+            {
+                WoWToken token = await this.BlizzAPI.WoWTokenLookup();
+                var eb = new EmbedBuilder(); // Build embedded discord msg
+                eb.WithTitle("WoW Token");
+                eb.AddField("Quote", $"Price: {token.Price}\nLast Updated: {token.Last_Updated}", false);
+                eb.WithThumbnailUrl(token.TokenAvatarUrl);
+                msg.Channel.SendMessageAsync("", false, eb.Build()); // Send embed message to requestor
+            }
+            catch (Exception ex)
+            {
+                Program.Log($"{msg}: {ex} **Sending generic error notification to {msg.Author}**");
+                try { msg.Channel.SendMessageAsync($"**ERROR** looking up WoW Token Data.\nSee `{this.Config.Prefix}armory help`"); } catch { } // Generic error notification to user
+            }
         }
         private async Task CMD_Help(SocketUserMessage msg) // Display usage help to requestor
         {
@@ -84,7 +106,7 @@ namespace ArmoryBot
                 ArmoryData info = await this.BlizzAPI.ArmoryLookup(character[0], character[1], cmd[2]); // Main Blizzard API Lookup
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle(info.CharInfo.Name);
-                eb.Description = $"{info.CharInfo.ItemLevel} // {info.CharInfo.Renown}";
+                eb.WithDescription($"{info.CharInfo.ItemLevel} | {info.CharInfo.Renown}");
                 switch (cmd[2])
                 {
                     case "pve":
@@ -103,8 +125,8 @@ namespace ArmoryBot
                         break;
                 }
                 eb.WithFooter($"{this.Config.Prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
-                eb.ThumbnailUrl = info.AvatarUrl; // Set Character Avatar as Thumbnail Picture
-                eb.Url = info.CharInfo.ArmoryUrl; // Set Armory URL (Clickable on title)
+                eb.WithThumbnailUrl(info.AvatarUrl); // Set Character Avatar as Thumbnail Picture
+                eb.WithUrl(info.CharInfo.ArmoryUrl); // Set Armory URL (Clickable on title)
                 msg.Channel.SendMessageAsync("", false, eb.Build()); // Send message to requestor with Armory Info (embed)
             }
             catch (Exception ex)

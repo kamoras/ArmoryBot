@@ -5,13 +5,14 @@ namespace ArmoryBot
 {
     enum ID : long
     {
-        CurrentExpansion = 499 // Shadowlands
+        CurrentExpansion = 499, // Shadowlands
+        WoWToken = 122284 // WoW Token Item
     }
     enum Namespace : int // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
     {
         Profile = 0,
-        Dynamic = 1
-        // Static unused
+        Static = 1,
+        Dynamic = 2
     }
     internal static class Globals
     {
