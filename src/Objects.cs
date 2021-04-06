@@ -7,7 +7,7 @@ namespace ArmoryBot
     //
     // ** Custom Classes used in program
     //
-    public class ArmoryData // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
+    public class ArmoryData // Stores collection of data passed from BlizzardAPI.cs to DiscordBot.cs
     {
         public CharacterInfo CharInfo; // Stores string returned by BlizzardAPI.GetCharacter()
         public string AvatarUrl; // Stores string returned by BlizzardAPI.GetAvatar()
@@ -17,7 +17,7 @@ namespace ArmoryBot
         public string PVPRating; // Stores string returned by BlizzardAPI.GetPVP()
         public string PVPStats; // Stores string returned by BlizzardAPI.GetPvpStats()
     }
-    public class WoWToken // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
+    public class WoWToken // Stores collection of data passed from BlizzardAPI.cs to DiscordBot.cs
     {
         public string Price;
         public string Last_Updated;

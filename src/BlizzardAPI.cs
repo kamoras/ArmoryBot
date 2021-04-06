@@ -24,7 +24,7 @@ namespace ArmoryBot
             }
             this.RequestToken(); // Obtain initial BlizzAPI Token
         }
-        public async Task<ArmoryData> ArmoryLookup(string character, string realm, string type) // Main Armory Lookup Method exposed to ArmoryBot.cs
+        public async Task<ArmoryData> ArmoryLookup(string character, string realm, string type) // Main Armory Lookup Method exposed to DiscordBot.cs
         {
             try
             {
