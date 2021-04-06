@@ -166,7 +166,7 @@ namespace ArmoryBot
             string output = "";
             foreach (KeyValuePair<int, AchievementItem> entry in this.List)
             {
-                output += $"{entry.Value.Name}\n";
+                output += $"•{entry.Value.Name}\n";
             }
             if (output.Length == 0) return "None";
             else return output;
@@ -221,7 +221,7 @@ namespace ArmoryBot
             string output = "";
             foreach (Mode mode in this.Raid.Modes) // Check each difficulty
             {
-                output += $"{mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name.GetLocale(this.Locale)}\n"; // ex: 8/10 Normal
+                output += $"•{mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name.GetLocale(this.Locale)}\n"; // ex: 8/10 Normal
             }
             return output;
         }
@@ -284,7 +284,7 @@ namespace ArmoryBot
         }
         public override string ToString() // Displays output 
         {
-            return $"Best Run: +{this.HighestRun}\n5+ Dungeons: {this.Plus5Count}/{this.DungeonCount}\n10+ Dungeons: {this.Plus10Count}/{this.DungeonCount}\n15+ Dungeons: {this.Plus15Count}/{this.DungeonCount}\nExpired Dungeons: {this.ExpiredCount}/{this.DungeonCount}";
+            return $"•Best Run: +{this.HighestRun}\n•5+ Dungeons: {this.Plus5Count}/{this.DungeonCount}\n•10+ Dungeons: {this.Plus10Count}/{this.DungeonCount}\n•15+ Dungeons: {this.Plus15Count}/{this.DungeonCount}\n•Expired Dungeons: {this.ExpiredCount}/{this.DungeonCount}";
         }
     }
 }

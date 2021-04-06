@@ -170,7 +170,7 @@ namespace ArmoryBot
                 {
                     int winpct = 0;
                     if (v2info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v2info.SeasonMatchStatistics.Won / (double)v2info.SeasonMatchStatistics.Played) * (double)100);
-                    output += $"2v2 Rating: {v2info.Rating} (Won {winpct}%)\n";
+                    output += $"•2v2 Rating: {v2info.Rating} (Won {winpct}%)\n";
                 }
             }
             using (TextReader sr = new StringReader(json3v3.Result)) // 3v3
@@ -180,7 +180,7 @@ namespace ArmoryBot
                 {
                     int winpct = 0;
                     if (v3info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v3info.SeasonMatchStatistics.Won / (double)v3info.SeasonMatchStatistics.Played) * (double)100);
-                    output += $"3v3 Rating: {v3info.Rating} (Won {winpct}%)\n";
+                    output += $"•3v3 Rating: {v3info.Rating} (Won {winpct}%)\n";
                 }
             }
             using (TextReader sr = new StringReader(jsonrbg.Result)) // RBG
@@ -190,7 +190,7 @@ namespace ArmoryBot
                 {
                     int winpct = 0;
                     if (rbginfo.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)rbginfo.SeasonMatchStatistics.Won / (double)rbginfo.SeasonMatchStatistics.Played) * (double)100);
-                    output += $"RBG Rating: {rbginfo.Rating} (Won {winpct}%)\n";
+                    output += $"•RBG Rating: {rbginfo.Rating} (Won {winpct}%)\n";
                 }
             }
             if (output.Length == 0) return "None";
@@ -202,7 +202,7 @@ namespace ArmoryBot
             using (TextReader sr = new StringReader(json))
             {
                 var stats = (CharacterStatsInfo)Program.jsonSerializer.Deserialize(sr, typeof(CharacterStatsInfo)); // De-serialize JSON to C# Classes
-                return $"Health: {stats.Health}\nVersatility: {stats.VersatilityDamageDoneBonus}%";
+                return $"•Health: {stats.Health}\n•Versatility: {stats.VersatilityDamageDoneBonus}%";
             }
         }
         //
