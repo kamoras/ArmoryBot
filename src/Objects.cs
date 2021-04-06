@@ -284,7 +284,7 @@ namespace ArmoryBot
         }
         public override string ToString() // Displays output 
         {
-            return $"• Best Run: +{this.HighestRun}\n• 5+ Runs: {this.Plus5Count}/{this.DungeonCount}\n• 10+ Runs: {this.Plus10Count}/{this.DungeonCount}\n• 15+ Runs: {this.Plus15Count}/{this.DungeonCount}\n• Time-Expired Runs: {this.ExpiredCount}/{this.DungeonCount}";
+            return $"• Best Run: +{this.HighestRun}\n• 5+ Runs: {this.Plus5Count}/{this.DungeonCount}\n• 10+ Runs: {this.Plus10Count}/{this.DungeonCount}\n• 15+ Runs: {this.Plus15Count}/{this.DungeonCount}\n• Expired Runs: {this.ExpiredCount}/{this.DungeonCount}";
         }
     }
 }

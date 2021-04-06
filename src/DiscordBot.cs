@@ -134,7 +134,12 @@ namespace ArmoryBot
             try
             {
                 Program.Log($"Help Command requested by {Context.Message.Author}");
-                await Context.Message.Channel.SendMessageAsync($"ArmoryBot Usage: `{prefix}armory CharacterName-Realm pve/pvp`\n**NOTE:** Spaces in realm name should have a dash ' - '\n\nLearn more about ArmoryBot at: http://github.com/imerzan/ArmoryBot/");
+                var eb = new EmbedBuilder(); // Build embedded discord msg
+                eb.WithTitle("ArmoryBot");
+                eb.WithDescription($"Armory Lookup: `{prefix}armory CharacterName-Realm pve/pvp`\nWoW Token Lookup: `{prefix}armory token`\n**NOTE:** Spaces in realm name should have a dash ' - '\n\nLearn more about ArmoryBot at: http://github.com/imerzan/ArmoryBot/");
+                eb.WithUrl("http://github.com/imerzan/ArmoryBot");
+                await Context.User.GetOrCreateDMChannelAsync(); // Send user a DM Response
+                await Context.User.SendMessageAsync(Context.User.Mention, false, eb.Build());
             }
             catch { return; }
         }
