@@ -32,6 +32,7 @@ namespace ArmoryBot
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
             await this._client.LoginAsync(TokenType.Bot, this.Config.token);
             await this._client.StartAsync();
+            await this._client.SetGameAsync($"{this.Config.Prefix}armory help", null, ActivityType.Listening); // Set Discord Status
         }
         private async Task Discord_HandleCommandAsync(SocketMessage msgParam) // Triggered when a message is received in a channel the bot has visible
         {
@@ -111,12 +112,12 @@ namespace ArmoryBot
                 eb.WithTitle("WoW Token");
                 eb.AddField("Quote", $"Price: {token.Price}\nLast Updated: {token.Last_Updated}", false);
                 eb.WithThumbnailUrl(token.TokenAvatarUrl);
-                await Context .Message.Channel.SendMessageAsync("", false, eb.Build()); // Send embed message to requestor
+                await Context.Message.Channel.SendMessageAsync("", false, eb.Build()); // Send embed message to requestor
             }
             catch (Exception ex)
             {
                 Program.Log($"{Context.Message}: {ex} **Sending generic error notification to {Context.Message.Author}**");
-                try { await Context .Message.Channel.SendMessageAsync($"**ERROR** looking up WoW Token Data.\nSee `{prefix}armory help`"); } catch { } // Generic error notification to user
+                try { await Context.Message.Channel.SendMessageAsync($"**ERROR** looking up WoW Token Data.\nSee `{prefix}armory help`"); } catch { } // Generic error notification to user
             }
         }
         private async Task CMD_Help(string prefix) // Display usage help to requestor
@@ -124,7 +125,7 @@ namespace ArmoryBot
             try
             {
                 Program.Log($"Help Command requested by {Context.Message.Author}");
-                await Context .Message.Channel.SendMessageAsync($"ArmoryBot Usage: `{prefix}armory CharacterName-Realm pve/pvp`\n**NOTE:** Spaces in realm name should have a dash ' - '\n\nLearn more about ArmoryBot at: http://github.com/imerzan/ArmoryBot/");
+                await Context.Message.Channel.SendMessageAsync($"ArmoryBot Usage: `{prefix}armory CharacterName-Realm pve/pvp`\n**NOTE:** Spaces in realm name should have a dash ' - '\n\nLearn more about ArmoryBot at: http://github.com/imerzan/ArmoryBot/");
             }
             catch { return; }
         }
