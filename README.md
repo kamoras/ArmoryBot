@@ -4,7 +4,7 @@
 ## Current Status: Working in Shadowlands 9.x
 
 ### Setup:
-1. Sign up for [Blizzard API Access](https://develop.battle.net/). You will need a **client_id** and **client_secret**.
+1. Sign up for [Blizzard API Access](https://develop.battle.net/), and register an application. You will need a **client_id** and **client_secret**.
 2. Register a new [Discord Application](https://discord.com/developers/applications). Subsequently create a "Bot" for your application, and take note of the **token** for your created bot.
 3. On the Oauth2 page of your discord application, use the supplied URL to join your bot to your server(s). The URL should look like `https://discord.com/api/oauth2/authorize?client_id=YOURCLIENTID&permissions=281600&scope=bot`   where YOURCLIENTID is the id listed on the "General Information" page.
 4. Modify **blizzard.json** and **discord.json** with the above parameters that are bolded in parts 1 & 2. See [WoW Localizations](https://develop.battle.net/documentation/world-of-warcraft/guides/localization) for localization info, or leave as default (en_US). Non-English localizations are not fully supported.
@@ -27,4 +27,4 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ```
 Example: ```!armory Frostchiji-Sargeras pvp``` **NOTE:** Spaces in realm name should have a ' - ' character.
 
-![Example](https://user-images.githubusercontent.com/42287509/113590095-d486d900-95f7-11eb-892e-6a5c3d717d1d.jpg)
+![Example](https://user-images.githubusercontent.com/42287509/113607069-68fc3600-960e-11eb-8288-61f30eb12001.jpg)
