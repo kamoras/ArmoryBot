@@ -23,8 +23,11 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ## Discord Usage:
 ```discord
 !armory character-realm pve/pvp    ## Armory Lookup Command
+!armory token    ## WoW Token Lookup Command
 !armory help    ## Help Command
 ```
 Example: ```!armory Frostchiji-Sargeras pvp``` **NOTE:** Spaces in realm name should have a ' - ' character.
 
-![Example](https://user-images.githubusercontent.com/42287509/113654910-83f69680-965e-11eb-941d-ae2973b51a9b.jpg)
+![Example](https://user-images.githubusercontent.com/42287509/113754051-6bc15e80-96d4-11eb-8aac-ac5ab74c4620.jpg)
+
+![Example2](https://user-images.githubusercontent.com/42287509/113754064-6f54e580-96d4-11eb-9396-86f11d9fa1e8.jpg)
