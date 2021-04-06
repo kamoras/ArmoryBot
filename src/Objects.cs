@@ -27,14 +27,8 @@ namespace ArmoryBot
     {
         [JsonProperty("token")]
         public string token { get; private set; }
-        private char _cmdprefix; // Backing field
         [JsonProperty("cmdprefix")]
-        public char cmdprefix
-        {
-            get { return this._cmdprefix; }
-            private set { this._cmdprefix = value; this.Prefix = value.ToString(); }
-        }
-        public string Prefix { get; private set; }
+        public char cmdprefix { get; private set; }
     }
     public class BlizzardConfig // Stores Blizzard Config as loaded from Config File
     {

@@ -13,9 +13,9 @@ namespace ArmoryBot
     {
         private BlizzardConfig Config;
         private Timer TokenExpTimer;
-        private string MplusSeason = null;
-        private int MplusDungeonCount = 0;
-        private string TokenMediaUrl = null;
+        private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
+        private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
+        private string WoWTokenMediaUrl = null; // Stores WoW Token Avatar URL as obtained by this.GetGameData() 
         public BlizzardAPI()
         {
             using (StreamReader json = File.OpenText(Globals.BlizzardConfigPath)) // Load Config
@@ -67,9 +67,11 @@ namespace ArmoryBot
                 {
                     var wowtoken = (WoWTokenJson)Program.jsonSerializer.Deserialize(sr, typeof(WoWTokenJson)); // De-serialize JSON to C# Classes
                     info.Price = (wowtoken.Price / 10000).ToString("N0");
-                    DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                    info.Last_Updated = origin.AddMilliseconds(wowtoken.LastUpdatedTimestamp).ToLocalTime().ToString();
-                    info.TokenAvatarUrl = this.TokenMediaUrl;
+                    DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                    DateTime lastupdate = origin.AddMilliseconds(wowtoken.LastUpdatedTimestamp).ToUniversalTime();
+                    TimeSpan span = DateTime.Now.ToUniversalTime() - lastupdate;
+                    info.Last_Updated = $"{lastupdate} ({span.Minutes} minutes ago)";
+                    info.TokenAvatarUrl = this.WoWTokenMediaUrl;
                 }
                 return info;
             }
@@ -138,7 +140,7 @@ namespace ArmoryBot
             try // This section will 404 Not found if no M+ completed, use try/catch
             {
                 MythicPlusData data = new MythicPlusData(this.MplusDungeonCount);
-                string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{this.MplusSeason}", Namespace.Profile);
+                string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{this.MplusSeasonID}", Namespace.Profile);
                 using (TextReader sr = new StringReader(json))
                 {
                     var mplusseasoninfo = (MythicPlusSeasonInfo)Program.jsonSerializer.Deserialize(sr, typeof(MythicPlusSeasonInfo)); // De-serialize JSON to C# Classes
@@ -240,7 +242,7 @@ namespace ArmoryBot
             using (TextReader sr = new StringReader(json_season.Result))
             {
                 var seasonindex = (MPlusSeasonIndex)Program.jsonSerializer.Deserialize(sr, typeof(MPlusSeasonIndex)); // De-serialize JSON to C# Classes
-                this.MplusSeason = seasonindex.CurrentSeason.Id.ToString();
+                this.MplusSeasonID = seasonindex.CurrentSeason.Id;
             }
             using (TextReader sr = new StringReader(json_dungeon.Result))
             {
@@ -254,7 +256,7 @@ namespace ArmoryBot
                 var token_media = (ItemMedia)Program.jsonSerializer.Deserialize(sr, typeof(ItemMedia)); // De-serialize JSON to C# Classes
                 foreach (Asset asset in token_media.Assets)
                 {
-                    if (asset.Key.ToLower() == "icon") this.TokenMediaUrl = asset.Value.ToString();
+                    if (asset.Key.ToLower() == "icon") this.WoWTokenMediaUrl = asset.Value.ToString();
                 }
             }
         }
@@ -320,7 +322,7 @@ namespace ArmoryBot
                     else
                     {
                         Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                        if (this.MplusSeason is null | this.MplusDungeonCount == 0 | this.TokenMediaUrl is null) await this.GetGameData(); // Make sure static assets are set
+                        if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1 | this.WoWTokenMediaUrl is null) await this.GetGameData(); // Make sure static assets are set
                     }
                 }
             }

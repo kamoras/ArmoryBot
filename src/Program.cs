@@ -10,8 +10,8 @@ namespace ArmoryBot
     class Program
     {
         private static DiscordBot discordBot;
-        internal static BlizzardAPI blizzardAPI;
         private static HttpClientHandler httpClientHandler;
+        internal static BlizzardAPI blizzardAPI;
         internal static HttpClient httpClient;
         internal static JsonSerializer jsonSerializer;
         static async Task Main() // ** Program Entry Point **
@@ -35,9 +35,9 @@ namespace ArmoryBot
             httpClientHandler = new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }; // Perform automatic Decompression
             httpClient = new HttpClient(httpClientHandler); // Use static instance of HttpClient for entire program
             blizzardAPI = new BlizzardAPI(); // Initializes Blizzard API
-            discordBot = new DiscordBot(); // Create new instance of ArmoryBot
+            discordBot = new DiscordBot(); // Initializes Discord Bot
             await discordBot.StartupAsync(); // Startup Discord Bot (async)
-            await Task.Delay(-1); // Async Main Loop
+            await Task.Delay(-1); // Prevents program from terminating early
         }
         internal static void Log(string entry)
         {

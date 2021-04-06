@@ -1372,7 +1372,7 @@ namespace ArmoryBot
 
     // Item Media
     /// <summary>
-    /// https://{this.Config.Region}.api.blizzard.com/data/wow/token/index
+    /// https://{this.Config.Region}.api.blizzard.com/data/wow/media/item/
     /// Added via https://app.quicktype.io/
     /// </summary>
     public partial class ItemMedia

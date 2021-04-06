@@ -32,7 +32,7 @@ namespace ArmoryBot
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), this._services);
             await this._client.LoginAsync(TokenType.Bot, this.Config.token);
             await this._client.StartAsync();
-            await this._client.SetGameAsync($"{this.Config.Prefix}armory help", null, ActivityType.Listening); // Set Discord Status
+            await this._client.SetGameAsync($"{this.Config.cmdprefix}armory help", null, ActivityType.Listening); // Set Discord Status
         }
         private async Task Discord_HandleCommandAsync(SocketMessage msgParam) // Triggered when a message is received in a channel the bot has visible
         {
@@ -53,36 +53,36 @@ namespace ArmoryBot
     public class ArmoryModule : ModuleBase<SocketCommandContext>
     {
         [Command]
-        public async Task HandleCMD(params string[] cmd)
+        public async Task HandleCMD(params string[] args)
         {
-            string prefix = Context.Message.ToString()[0].ToString(); // Get prefix char (ex: !)
-            for (int i = 0; i < cmd.Length; i++) { cmd[i] = cmd[i].Trim().ToLower(); } // Trim cmd string
-            if (cmd.Length < 1) return; // Args Length Check
-            if (cmd[0] == "help")
+            char prefix = Context.Message.ToString()[0]; // Get prefix char (ex: !)
+            for (int i = 0; i < args.Length; i++) { args[i] = args[i].Trim().ToLower(); } // Trim cmd string
+            if (args.Length < 1) return; // Args Length Check
+            if (args[0] == "help")
             {
                 await this.CMD_Help(prefix);
                 return;
             }
-            else if (cmd[0] == "token")
+            else if (args[0] == "token")
             {
                 await this.CMD_Token(prefix);
                 return;
             }
-            if (cmd.Length < 2) return;
-            await this.CMD_Armory(cmd, prefix);
+            if (args.Length < 2) return;
+            await this.CMD_Armory(args, prefix);
         }
-        private async Task CMD_Armory(string[] cmd, string prefix) // Main Armory Lookup: [0] = user-realm , [1] = pve/pvp
+        private async Task CMD_Armory(string[] args, char prefix) // Main Armory Lookup: [0] = user-realm , [1] = pve/pvp
         {
             try
             {
                 Program.Log($"Armory Command requested by {Context.Message.Author}");
-                if (cmd[1] != "pve" & cmd[1] != "pvp") throw new Exception($"Type must be either pve or pvp. '{cmd[2]}' is invalid."); // Make sure lookup type is valid
-                string[] character = cmd[0].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
-                ArmoryData info = await Program.blizzardAPI.ArmoryLookup(character[0], character[1], cmd[1]); // Main Blizzard API Lookup
+                if (args[1] != "pve" & args[1] != "pvp") throw new Exception($"Type must be either pve or pvp. '{args[2]}' is invalid."); // Make sure lookup type is valid
+                string[] character = args[0].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
+                ArmoryData info = await Program.blizzardAPI.ArmoryLookup(character[0], character[1], args[1]); // Main Blizzard API Lookup
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle(info.CharInfo.Name);
                 eb.WithDescription($"{info.CharInfo.ItemLevel} | {info.CharInfo.Renown}");
-                switch (cmd[1])
+                switch (args[1])
                 {
                     case "pve":
                         if (info.RaidInfo.Raids.Count == 0) eb.AddField("Raids", "None", true); // None placeholder if no raids logged
@@ -110,7 +110,7 @@ namespace ArmoryBot
                 try { await Context.Message.Channel.SendMessageAsync($"**ERROR** looking up `{Context.Message}`\nSee `{prefix}armory help`"); } catch { } // Generic error notification to user
             }
         }
-        private async Task CMD_Token(string prefix)
+        private async Task CMD_Token(char prefix)
         {
             try
             {
@@ -118,7 +118,8 @@ namespace ArmoryBot
                 WoWToken token = await Program.blizzardAPI.WoWTokenLookup();
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle("WoW Token");
-                eb.AddField("Quote", $"Price: {token.Price}\nLast Updated: {token.Last_Updated}", false);
+                eb.AddField("Quote", $"• Price: {token.Price}\n• Last Updated: {token.Last_Updated}", false);
+                eb.WithFooter($"{prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
                 eb.WithThumbnailUrl(token.TokenAvatarUrl);
                 await Context.Message.Channel.SendMessageAsync("", false, eb.Build()); // Send embed message to requestor
             }
@@ -128,7 +129,7 @@ namespace ArmoryBot
                 try { await Context.Message.Channel.SendMessageAsync($"**ERROR** looking up WoW Token Data.\nSee `{prefix}armory help`"); } catch { } // Generic error notification to user
             }
         }
-        private async Task CMD_Help(string prefix) // Display usage help to requestor
+        private async Task CMD_Help(char prefix) // Display usage help to requestor
         {
             try
             {
