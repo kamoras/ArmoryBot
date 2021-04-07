@@ -21,8 +21,8 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 **NOTE:** When reporting issues with the bot, please utilize the [Issues Page](https://github.com/imerzan/ArmoryBot/issues), and include any error info from your Bot Console Output.
 
 ### Docker Setup
-1. *(Optional)* For easier setup, download the pre-compiled release in [Releases](https://github.com/imerzan/ArmoryBot/releases), reference README.txt in the docker folder.
-2. Clone this repo to your system. Open a 'Developer Command Prompt for VS' terminal. Change directory to the folder with the Dockerfile for this project. Run the following commands:
+1. *(Optional)* For easier setup, download the pre-compiled release in [Releases](https://github.com/imerzan/ArmoryBot/releases), reference README.txt in the docker folder. Otherwise, continue to step 2.
+2. Clone this repo to your system. Open a 'Developer Command Prompt for VS' terminal. Change directory to the project folder with the Dockerfile and .csproj file. Run the following commands:
 ```csharp
 dotnet publish -c Release
 ```
@@ -35,7 +35,7 @@ docker start armorybot
 ```
 5. ArmoryBot should be good to go within Docker!
 
-**NOTE:** Docker is not 100% supported. My testing indicated that it seems to work very well in Docker for Windows, but I encountered some intermittent issues when running this on Debian (Linux arm32). If you run into issues, running this outside of Docker is *VERY* stable, and I would recommend that instead ([See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup)).
+**NOTE:** I do not officially support Docker for this project. My testing indicated that it seems to work very well in Docker for Windows, but I encountered some intermittent issues when running this on Debian (Linux arm32). If you run into issues, running this outside of Docker is *VERY* stable, and I would recommend that instead ([See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup)). I will be unable to provide Docker assistance.
 
 ## Discord Usage:
 ```docker
