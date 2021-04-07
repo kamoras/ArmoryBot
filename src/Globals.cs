@@ -14,7 +14,7 @@ namespace ArmoryBot
         Static,
         Dynamic
     }
-    internal static class Globals
+    public static class Globals
     {
         public const string DiscordConfigPath = @"discord.json";
         public const string BlizzardConfigPath = @"blizzard.json";
