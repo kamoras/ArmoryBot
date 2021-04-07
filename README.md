@@ -26,7 +26,7 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ```csharp
 dotnet publish -c Release
 ```
-3. In a separate window, navigate to the `bin\Release\netcoreapp3.1\publish` directory. Execute ArmoryBot.exe (or ArmoryBot.dll) to have a blank `discord.json` and `blizzard.json` config file created. Modify these files with your configuration, and save.
+3. In a separate window, navigate to the `bin\Release\netcoreapp3.1\publish` directory. Execute ArmoryBot.exe (or ArmoryBot.dll) to have a blank `discord.json` and `blizzard.json` config file created. Modify these files with your configuration, and save. ***IT IS VERY IMPORTANT YOU SET YOUR CONFIG FILES HERE BEFORE PROCEEDING!***
 4. Back in your Command Prompt, execute the remaining commands:
 ```console
 docker build -t armorybot-image -f Dockerfile .
