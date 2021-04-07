@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+#pragma warning disable 4014
 
 namespace ArmoryBot
 {
@@ -317,7 +318,8 @@ namespace ArmoryBot
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var json = await Program.httpClient.SendAsync(request).Result.Content.ReadAsStringAsync(); // Send HTTP Request, Store JSON
+                    var response = await Program.httpClient.SendAsync(request); // Send HTTP Request
+                    var json = await response.Content.ReadAsStringAsync(); // Store JSON
                     if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
                     else
                     {
@@ -350,7 +352,8 @@ namespace ArmoryBot
                 }
                 request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
-                return await Program.httpClient.SendAsync(request).Result.Content.ReadAsStringAsync(); // Send HTTP Request, Return JSON
+                var response = await Program.httpClient.SendAsync(request); // Send HTTP Request
+                return await response.Content.ReadAsStringAsync(); // Return JSON
             }
         }
     }

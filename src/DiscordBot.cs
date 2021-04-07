@@ -6,6 +6,8 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+#pragma warning disable 4014
+#pragma warning disable 1998
 
 namespace ArmoryBot
 {
@@ -29,7 +31,7 @@ namespace ArmoryBot
             this._services = new ServiceCollection().AddSingleton(this._client).AddSingleton(this._commands).BuildServiceProvider();
             this._client.Log += this.Discord_Log; // Set logging method
             this._client.MessageReceived += this.Discord_HandleCommandAsync; // Set msg received method
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), this._services);
+            await this._commands.AddModulesAsync(Assembly.GetEntryAssembly(), this._services);
             await this._client.LoginAsync(TokenType.Bot, this.Config.token);
             await this._client.StartAsync();
             await this._client.SetGameAsync($"{this.Config.cmdprefix}armory help", null, ActivityType.Listening); // Set Discord Status
@@ -41,7 +43,7 @@ namespace ArmoryBot
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
-            this._commands.ExecuteAsync(new SocketCommandContext(_client, msg), argPos, _services); // Do not await
+            this._commands.ExecuteAsync(new SocketCommandContext(this._client, msg), argPos, this._services); // Do not await
         }
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method
