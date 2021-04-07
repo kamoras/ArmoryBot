@@ -11,17 +11,34 @@
 5. Make sure you have [.NET Core 3.1 or newer runtime](https://dotnet.microsoft.com/download) installed on the system that will be running your bot (.NET Core is [cross-platform](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog) so you can run this on Windows/macOS/Linux).
 6. Launch the application. The bot should come online and respond to requests. [See Discord Usage](https://github.com/imerzan/ArmoryBot/tree/9.1-release#discord-usage)
 
-![Console output](https://user-images.githubusercontent.com/42287509/113591776-f3866a80-95f9-11eb-891f-3fa6912d5f5a.jpg)
-
 **macOS/Linux:** When running from bash terminal, use the following commands:
 ```bash
 chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ./ArmoryBot    ## Starts the executable
 ```
+![Console output](https://user-images.githubusercontent.com/42287509/113591776-f3866a80-95f9-11eb-891f-3fa6912d5f5a.jpg)
+
 **NOTE:** When reporting issues with the bot, please utilize the [Issues Page](https://github.com/imerzan/ArmoryBot/issues), and include any error info from your Bot Console Output.
 
+### Docker Setup
+1. *(Optional)* For easier setup, download the pre-compiled release in [Releases](https://github.com/imerzan/ArmoryBot/releases), reference README.txt in the docker folder.
+2. Clone this repo to your system. Open a 'Developer Command Prompt for VS' terminal. Change directory to the folder with the Dockerfile for this project. Run the following commands:
+```csharp
+dotnet publish -c Release
+```
+3. Navigate to the `bin\Release\netcoreapp3.1\publish` directory. Execute ArmoryBot.exe (or ArmoryBot.dll) to have a blank `discord.json` and `blizzard.json` config file created. Modify these files with your configuration, and save.
+4. Back in your Command Prompt, execute the remaining commands:
+```console
+docker build -t armorybot-image -f Dockerfile .
+docker create --name armorybot armorybot-image --restart always --net host
+docker start armorybot
+```
+5. ArmoryBot should be good to go within Docker!
+
+**NOTE:** Docker is not 100% supported. My testing indicated that it seems to work very well in Docker for Windows, but I encountered some intermittent issues when running this on Debian (Linux arm32). If you run into issues, running this outside of Docker is *VERY* stable, and I would recommend that instead.
+
 ## Discord Usage:
-```discord
+```docker
 !armory character-realm pve/pvp    ## Armory Lookup Command
 !armory token    ## WoW Token Lookup Command
 !armory help    ## Help Command
