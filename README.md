@@ -9,7 +9,7 @@
 3. On the Oauth2 page of your discord application, use the supplied URL to join your bot to your server(s). The URL should look like `https://discord.com/api/oauth2/authorize?client_id=YOURCLIENTID&permissions=281600&scope=bot`   where YOURCLIENTID is the id listed on the "General Information" page.
 4. Modify **blizzard.json** and **discord.json** with the above parameters that are bolded in parts 1 & 2. See [WoW Localizations](https://develop.battle.net/documentation/world-of-warcraft/guides/localization) for localization info, or leave as default (en_US). Non-English localizations are not fully supported.
 5. Make sure you have [.NET Core 3.1 or newer runtime](https://dotnet.microsoft.com/download) installed on the system that will be running your bot (.NET Core is [cross-platform](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog) so you can run this on Windows/macOS/Linux).
-6. Launch the application. The bot should come online and respond to requests. [See Discord Usage](https://github.com/imerzan/ArmoryBot/tree/9.1-release#discord-usage)
+6. Launch the application. The bot should come online and respond to requests. [See Discord Usage](https://github.com/imerzan/ArmoryBot/tree/master#discord-usage)
 
 **macOS/Linux:** When running from bash terminal, use the following commands:
 ```bash
@@ -35,7 +35,7 @@ docker start armorybot
 ```
 5. ArmoryBot should be good to go within Docker!
 
-**NOTE:** Docker is not 100% supported. My testing indicated that it seems to work very well in Docker for Windows, but I encountered some intermittent issues when running this on Debian (Linux arm32). If you run into issues, running this outside of Docker is *VERY* stable, and I would recommend that instead.
+**NOTE:** Docker is not 100% supported. My testing indicated that it seems to work very well in Docker for Windows, but I encountered some intermittent issues when running this on Debian (Linux arm32). If you run into issues, running this outside of Docker is *VERY* stable, and I would recommend that instead ([See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup)).
 
 ## Discord Usage:
 ```docker
