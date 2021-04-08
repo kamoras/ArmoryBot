@@ -32,6 +32,8 @@ docker start armorybot
 ```
 5. ArmoryBot should now be running in a new Docker container!
 
+**NOTE:** I do not officially support Docker for this project. My testing indicated that it seems to work very well in Docker for Windows, but I encountered some intermittent issues when running this on Debian (armv7l). If you run into issues, running this outside of Docker is *VERY* stable, and I would recommend that instead ([See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup)).
+
 ## Discord Usage:
 ```docker
 !armory character-realm pve/pvp    ## Armory Lookup Command
