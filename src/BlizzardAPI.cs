@@ -18,7 +18,7 @@ namespace ArmoryBot
     {
         private BlizzardConfig Config;
         private Timer TokenExpTimer;
-        private readonly IServiceProvider serviceProvider;
+        private readonly IServiceProvider _services;
         private readonly IHttpClientFactory clientFactory;
         private readonly JsonSerializer Serializer = new JsonSerializer();
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
@@ -26,12 +26,12 @@ namespace ArmoryBot
         private string WoWTokenMediaUrl = null; // Stores WoW Token Avatar URL as obtained by this.GetGameData() 
         public BlizzardAPI()
         {
-            this.serviceProvider = new ServiceCollection().AddHttpClient().Configure<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
+            this._services = new ServiceCollection().AddHttpClient().Configure<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
             builder.PrimaryHandler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             })).BuildServiceProvider();
-            this.clientFactory = this.serviceProvider.GetService<IHttpClientFactory>();
+            this.clientFactory = this._services.GetService<IHttpClientFactory>();
             using (StreamReader json = File.OpenText(Globals.BlizzardConfigPath)) // Load Config
             {
                 this.Config = (BlizzardConfig)this.Serializer.Deserialize(json, typeof(BlizzardConfig));
@@ -292,6 +292,7 @@ namespace ArmoryBot
 
                     using (var client = this.clientFactory.CreateClient())
                     {
+                        client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
                         var response = await client.SendAsync(request); // Send HTTP request
                         var json = await response.Content.ReadAsStringAsync(); // Store json response
                         if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
@@ -336,6 +337,7 @@ namespace ArmoryBot
 
                     using (var client = this.clientFactory.CreateClient())
                     {
+                        client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
                         var response = await client.SendAsync(request); // Send HTTP Request
                         var json = await response.Content.ReadAsStringAsync(); // Store JSON
                         if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
@@ -373,6 +375,7 @@ namespace ArmoryBot
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
                 using (var client = this.clientFactory.CreateClient())
                 {
+                    client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
                     var response = await client.SendAsync(request); // Send HTTP Request
                     return await response.Content.ReadAsStringAsync(); // Return JSON
                 }

@@ -25,7 +25,7 @@ namespace ArmoryBot
                 return;
             }
             Log("Starting up ArmoryBot...");
-            armoryBot = new ArmoryBot(); // Initializes Discord Bot
+            armoryBot = new ArmoryBot(); // Initializes ArmoryBot
             await armoryBot.StartupAsync(); // Startup Discord Bot (async)
             await Task.Delay(-1); // Prevents program from terminating early
         }
