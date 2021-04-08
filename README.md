@@ -23,8 +23,8 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ### Docker Setup
 1. Make sure you have [Docker](https://docs.docker.com/get-docker/) installed on your system.
 2. Download/clone the repo to your system.
-3. Modify the `blizzard.json` and `discord.json` config files with your parameters ([See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup)).
-4. Open a terminal/command prompt, and navigate to the repo folder (with the `Dockerfile` and `.csproj` files). Run the following commands:
+3. Download [discord.json & blizzard.json](https://github.com/imerzan/ArmoryBot/files/6280882/config.zip), and set your parameters in each file. Move these two files to the repo directory (with the `Dockerfile` and `.csproj` files). [See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup).
+4. Open a terminal/command prompt, and navigate to the repo directory (same as above). Run the following commands:
 ```console
 docker build -t armorybot-image -f Dockerfile .
 docker create --name armorybot armorybot-image --restart always --net host
