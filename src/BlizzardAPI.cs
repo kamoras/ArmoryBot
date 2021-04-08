@@ -18,20 +18,20 @@ namespace ArmoryBot
     {
         private BlizzardConfig Config;
         private Timer TokenExpTimer;
-        private readonly IServiceProvider _services;
-        private readonly IHttpClientFactory clientFactory;
+        private readonly IServiceProvider Services;
+        private readonly IHttpClientFactory ClientFactory;
         private readonly JsonSerializer Serializer = new JsonSerializer();
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
         private string WoWTokenMediaUrl = null; // Stores WoW Token Avatar URL as obtained by this.GetGameData() 
         public BlizzardAPI()
         {
-            this._services = new ServiceCollection().AddHttpClient().Configure<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
+            this.Services = new ServiceCollection().AddHttpClient().Configure<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
             builder.PrimaryHandler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             })).BuildServiceProvider();
-            this.clientFactory = this._services.GetService<IHttpClientFactory>();
+            this.ClientFactory = this.Services.GetService<IHttpClientFactory>();
             using (StreamReader json = File.OpenText(Globals.BlizzardConfigPath)) // Load Config
             {
                 this.Config = (BlizzardConfig)this.Serializer.Deserialize(json, typeof(BlizzardConfig));
@@ -290,7 +290,7 @@ namespace ArmoryBot
                     request.Content = new StringContent("grant_type=client_credentials");
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    using (var client = this.clientFactory.CreateClient())
+                    using (var client = this.ClientFactory.CreateClient())
                     {
                         client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
                         var response = await client.SendAsync(request); // Send HTTP request
@@ -335,7 +335,7 @@ namespace ArmoryBot
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    using (var client = this.clientFactory.CreateClient())
+                    using (var client = this.ClientFactory.CreateClient())
                     {
                         client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
                         var response = await client.SendAsync(request); // Send HTTP Request
@@ -373,7 +373,7 @@ namespace ArmoryBot
                 }
                 request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
-                using (var client = this.clientFactory.CreateClient())
+                using (var client = this.ClientFactory.CreateClient())
                 {
                     client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
                     var response = await client.SendAsync(request); // Send HTTP Request

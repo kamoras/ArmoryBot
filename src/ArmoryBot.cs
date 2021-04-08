@@ -16,9 +16,9 @@ namespace ArmoryBot
     {
         private readonly DiscordConfig Config;
         private BlizzardAPI BlizzAPI;
-        private DiscordSocketClient _client;
-        private CommandService _commands;
-        private IServiceProvider _services;
+        private DiscordSocketClient Client;
+        private CommandService Commands;
+        private IServiceProvider Services;
         public ArmoryBot()
         {
             this.BlizzAPI = new BlizzardAPI(); // Initializes Blizzard API
@@ -30,15 +30,15 @@ namespace ArmoryBot
         }
         public async Task StartupAsync() // Discord bot startup
         {
-            this._client = new DiscordSocketClient();
-            this._commands = new CommandService();
-            this._services = new ServiceCollection().AddSingleton(this._client).AddSingleton(this._commands).BuildServiceProvider();
-            this._client.Log += this.Discord_Log; // Set logging method
-            this._client.MessageReceived += this.Discord_HandleCommandAsync; // Set msg received method
-            await this._commands.AddModulesAsync(Assembly.GetEntryAssembly(), this._services);
-            await this._client.LoginAsync(TokenType.Bot, this.Config.token);
-            await this._client.StartAsync();
-            await this._client.SetGameAsync($"{this.Config.cmdprefix}armory help", null, ActivityType.Listening); // Set Discord Status
+            this.Client = new DiscordSocketClient();
+            this.Commands = new CommandService();
+            this.Services = new ServiceCollection().AddSingleton(this.Client).AddSingleton(this.Commands).BuildServiceProvider();
+            this.Client.Log += this.Discord_Log; // Set logging method
+            this.Client.MessageReceived += this.Discord_HandleCommandAsync; // Set msg received method
+            await this.Commands.AddModulesAsync(Assembly.GetEntryAssembly(), this.Services);
+            await this.Client.LoginAsync(TokenType.Bot, this.Config.token);
+            await this.Client.StartAsync();
+            await this.Client.SetGameAsync($"{this.Config.cmdprefix}armory help", null, ActivityType.Listening); // Set Discord Status
         }
         private async Task Discord_HandleCommandAsync(SocketMessage msgParam) // Triggered when a message is received in a channel the bot has visible
         {
@@ -47,7 +47,7 @@ namespace ArmoryBot
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
-            this._commands.ExecuteAsync(new ArmorySocketContext(this._client, msg, ref this.BlizzAPI), argPos, this._services); // Do not await
+            this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI), argPos, this.Services); // Do not await
         }
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method
@@ -55,8 +55,9 @@ namespace ArmoryBot
             Program.Log(msg.ToString());
         }
     }
+
     [Group("armory")] // Armory Base Command
-    public class ArmoryModule : ModuleBase<ArmorySocketContext>
+    public class ArmoryModule : ModuleBase<ArmoryCommandContext>
     {
         [Command]
         public async Task HandleCMD(params string[] args)
@@ -150,19 +151,22 @@ namespace ArmoryBot
             catch { return; }
         }
     }
-    public class ArmorySocketContext : ICommandContext // Custom Command Context to pass BlizzardAPI reference, using DI
+    public class ArmoryCommandContext : ICommandContext // Custom Command Context to pass BlizzardAPI reference, using DI
     {
         public BlizzardAPI BlizzAPI;
-        public ArmorySocketContext(DiscordSocketClient _client, SocketUserMessage _msg, ref BlizzardAPI _api)
+        public ArmoryCommandContext(DiscordSocketClient _client, SocketUserMessage _msg, ref BlizzardAPI _api)
         {
             this.Client = _client;
+            this.Guild = (_msg.Channel as IGuildChannel)?.Guild;
+            this.Channel = _msg.Channel;
+            this.User = _msg.Author;
             this.Message = _msg;
             this.BlizzAPI = _api;
         }
-        public IMessageChannel Channel { get; }
         public IDiscordClient Client { get; }
-        public IGuild Guild { get; }
         public IUserMessage Message { get; }
         public IUser User { get; }
+        public IGuild Guild { get; }
+        public IMessageChannel Channel { get; }
     }
 }
