@@ -20,12 +20,13 @@ namespace ArmoryBot
         private Timer TokenExpTimer;
         private readonly IServiceProvider Services;
         private readonly IHttpClientFactory ClientFactory;
-        private readonly JsonSerializer Serializer = new JsonSerializer();
+        private readonly JsonSerializer Serializer;
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
         private string WoWTokenMediaUrl = null; // Stores WoW Token Avatar URL as obtained by this.GetGameData() 
         public BlizzardAPI()
         {
+            this.Serializer = new JsonSerializer();
             this.Services = new ServiceCollection().AddHttpClient().Configure<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
             builder.PrimaryHandler = new HttpClientHandler
             {

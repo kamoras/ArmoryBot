@@ -15,13 +15,13 @@ namespace ArmoryBot
     public class ArmoryBot
     {
         private readonly DiscordConfig Config;
-        private BlizzardAPI BlizzAPI;
+        private BlizzardAPI blizzardAPI;
         private DiscordSocketClient Client;
         private CommandService Commands;
         private IServiceProvider Services;
         public ArmoryBot()
         {
-            this.BlizzAPI = new BlizzardAPI(); // Initializes Blizzard API
+            this.blizzardAPI = new BlizzardAPI(); // Initializes Blizzard API
             using (StreamReader json = File.OpenText(Globals.DiscordConfigPath)) // Load Config
             {
                 var serializer = new JsonSerializer();
@@ -47,7 +47,7 @@ namespace ArmoryBot
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
-            this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI), argPos, this.Services); // Do not await
+            this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.blizzardAPI), argPos, this.Services); // Do not await
         }
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method
@@ -85,7 +85,7 @@ namespace ArmoryBot
                 Program.Log($"Armory Command requested by {this.Context.Message.Author}");
                 if (args[1] != "pve" & args[1] != "pvp") throw new Exception($"Type must be either pve or pvp. '{args[2]}' is invalid."); // Make sure lookup type is valid
                 string[] character = args[0].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
-                ArmoryData info = await this.Context.BlizzAPI.ArmoryLookup(character[0], character[1], args[1]); // Main Blizzard API Lookup
+                ArmoryData info = await this.Context.API.ArmoryLookup(character[0], character[1], args[1]); // Main Blizzard API Lookup
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle(info.CharInfo.Name);
                 eb.WithDescription($"{info.CharInfo.ItemLevel} | {info.CharInfo.Renown}");
@@ -122,7 +122,7 @@ namespace ArmoryBot
             try
             {
                 Program.Log($"Token Command requested by {this.Context.Message.Author}");
-                WoWToken token = await this.Context.BlizzAPI.WoWTokenLookup();
+                WoWToken token = await this.Context.API.WoWTokenLookup();
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle("WoW Token");
                 eb.AddField("Quote", $"• Price: {token.Price}\n• Last Updated: {token.Last_Updated}", false);
@@ -153,7 +153,7 @@ namespace ArmoryBot
     }
     public class ArmoryCommandContext : ICommandContext // Custom Command Context to pass BlizzardAPI reference, using DI
     {
-        public BlizzardAPI BlizzAPI;
+        public BlizzardAPI API;
         public ArmoryCommandContext(DiscordSocketClient _client, SocketUserMessage _msg, ref BlizzardAPI _api)
         {
             this.Client = _client;
@@ -161,7 +161,7 @@ namespace ArmoryBot
             this.Channel = _msg.Channel;
             this.User = _msg.Author;
             this.Message = _msg;
-            this.BlizzAPI = _api;
+            this.API = _api;
         }
         public IDiscordClient Client { get; }
         public IUserMessage Message { get; }
