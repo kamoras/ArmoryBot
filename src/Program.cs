@@ -1,8 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 #pragma warning disable 4014
 
@@ -10,11 +7,7 @@ namespace ArmoryBot
 {
     class Program
     {
-        private static DiscordBot discordBot;
-        private static HttpClientHandler httpClientHandler;
-        public static BlizzardAPI blizzardAPI;
-        public static HttpClient httpClient;
-        public static JsonSerializer jsonSerializer;
+        private static ArmoryBot armoryBot;
         static async Task Main() // ** Program Entry Point **
         {
             if (!File.Exists(Globals.DiscordConfigPath) | !File.Exists(Globals.BlizzardConfigPath)) // Verify Config Files Exist
@@ -32,13 +25,8 @@ namespace ArmoryBot
                 return;
             }
             Log("Starting up ArmoryBot...");
-            jsonSerializer = new JsonSerializer(); // Use static instance of JSON Serializer for entire program
-            httpClientHandler = new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate }; // Perform automatic Decompression
-            httpClient = new HttpClient(httpClientHandler); // Use static instance of HttpClient for entire program
-            httpClient.Timeout = TimeSpan.FromSeconds(10); // 10 sec timeout on requests
-            blizzardAPI = new BlizzardAPI(); // Initializes Blizzard API
-            discordBot = new DiscordBot(); // Initializes Discord Bot
-            await discordBot.StartupAsync(); // Startup Discord Bot (async)
+            armoryBot = new ArmoryBot(); // Initializes Discord Bot
+            await armoryBot.StartupAsync(); // Startup Discord Bot (async)
             await Task.Delay(-1); // Prevents program from terminating early
         }
         public async static Task Log(string entry)

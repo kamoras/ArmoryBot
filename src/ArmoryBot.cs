@@ -6,22 +6,26 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Newtonsoft.Json;
 #pragma warning disable 4014
 #pragma warning disable 1998
 
 namespace ArmoryBot
 {
-    public class DiscordBot
+    public class ArmoryBot
     {
         private readonly DiscordConfig Config;
+        private BlizzardAPI BlizzAPI;
         private DiscordSocketClient _client;
         private CommandService _commands;
         private IServiceProvider _services;
-        public DiscordBot()
+        public ArmoryBot()
         {
+            this.BlizzAPI = new BlizzardAPI(); // Initializes Blizzard API
             using (StreamReader json = File.OpenText(Globals.DiscordConfigPath)) // Load Config
             {
-                this.Config = (DiscordConfig)Program.jsonSerializer.Deserialize(json, typeof(DiscordConfig));
+                var serializer = new JsonSerializer();
+                this.Config = (DiscordConfig)serializer.Deserialize(json, typeof(DiscordConfig));
             }
         }
         public async Task StartupAsync() // Discord bot startup
@@ -43,7 +47,7 @@ namespace ArmoryBot
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
-            this._commands.ExecuteAsync(new SocketCommandContext(this._client, msg), argPos, this._services); // Do not await
+            this._commands.ExecuteAsync(new ArmorySocketContext(this._client, msg, ref this.BlizzAPI), argPos, this._services); // Do not await
         }
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method
@@ -52,7 +56,7 @@ namespace ArmoryBot
         }
     }
     [Group("armory")] // Armory Base Command
-    public class ArmoryModule : ModuleBase<SocketCommandContext>
+    public class ArmoryModule : ModuleBase<ArmorySocketContext>
     {
         [Command]
         public async Task HandleCMD(params string[] args)
@@ -80,7 +84,7 @@ namespace ArmoryBot
                 Program.Log($"Armory Command requested by {this.Context.Message.Author}");
                 if (args[1] != "pve" & args[1] != "pvp") throw new Exception($"Type must be either pve or pvp. '{args[2]}' is invalid."); // Make sure lookup type is valid
                 string[] character = args[0].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
-                ArmoryData info = await Program.blizzardAPI.ArmoryLookup(character[0], character[1], args[1]); // Main Blizzard API Lookup
+                ArmoryData info = await this.Context.BlizzAPI.ArmoryLookup(character[0], character[1], args[1]); // Main Blizzard API Lookup
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle(info.CharInfo.Name);
                 eb.WithDescription($"{info.CharInfo.ItemLevel} | {info.CharInfo.Renown}");
@@ -117,7 +121,7 @@ namespace ArmoryBot
             try
             {
                 Program.Log($"Token Command requested by {this.Context.Message.Author}");
-                WoWToken token = await Program.blizzardAPI.WoWTokenLookup();
+                WoWToken token = await this.Context.BlizzAPI.WoWTokenLookup();
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle("WoW Token");
                 eb.AddField("Quote", $"• Price: {token.Price}\n• Last Updated: {token.Last_Updated}", false);
@@ -145,5 +149,20 @@ namespace ArmoryBot
             }
             catch { return; }
         }
+    }
+    public class ArmorySocketContext : ICommandContext // Custom Command Context to pass BlizzardAPI reference, using DI
+    {
+        public BlizzardAPI BlizzAPI;
+        public ArmorySocketContext(DiscordSocketClient _client, SocketUserMessage _msg, ref BlizzardAPI _api)
+        {
+            this.Client = _client;
+            this.Message = _msg;
+            this.BlizzAPI = _api;
+        }
+        public IMessageChannel Channel { get; }
+        public IDiscordClient Client { get; }
+        public IGuild Guild { get; }
+        public IUserMessage Message { get; }
+        public IUser User { get; }
     }
 }
