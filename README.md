@@ -21,21 +21,16 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 **NOTE:** When reporting issues with the bot, please utilize the [Issues Page](https://github.com/imerzan/ArmoryBot/issues), and include any error info from your Bot Console Output.
 
 ### Docker Setup
-1. *(Optional)* For easier setup, download the pre-compiled release in [Releases](https://github.com/imerzan/ArmoryBot/releases), reference README.txt in the docker folder. Otherwise, continue to step 2.
-2. Clone this repo to your system. Open a 'Developer Command Prompt for VS' terminal. Change directory to the project folder with the Dockerfile and .csproj file. Run the following commands:
-```csharp
-dotnet publish -c Release
-```
-3. In a separate window, navigate to the `bin\Release\netcoreapp3.1\publish` directory. Execute ArmoryBot.exe (or ArmoryBot.dll) to have a blank `discord.json` and `blizzard.json` config file created. Modify these files with your configuration, and save. ***IT IS VERY IMPORTANT YOU SET YOUR CONFIG FILES HERE BEFORE PROCEEDING!***
-4. Back in your Command Prompt, execute the remaining commands:
+1. Make sure you have [Docker](https://docs.docker.com/get-docker/) installed on your system.
+2. Download the pre-compiled release in [Releases](https://github.com/imerzan/ArmoryBot/releases).
+3. Modify the `blizzard.json` and `discord.json` config files with your parameters ([See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup)). Move both files into the docker folder.
+4. Open a terminal/command prompt, and navigate to the docker folder with the Dockerfile. Run the following commands:
 ```console
 docker build -t armorybot-image -f Dockerfile .
 docker create --name armorybot armorybot-image --restart always --net host
 docker start armorybot
 ```
-5. ArmoryBot should be good to go within Docker!
-
-**NOTE:** I do not officially support Docker for this project. My testing indicated that it seems to work very well in Docker for Windows, but I encountered some intermittent issues when running this on Debian (Linux arm32). If you run into issues, running this outside of Docker is *VERY* stable, and I would recommend that instead ([See Setup](https://github.com/imerzan/ArmoryBot/tree/master#setup)). I will be unable to provide Docker assistance.
+5. ArmoryBot should now be running in a new Docker container!
 
 ## Discord Usage:
 ```docker
