@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-#pragma warning disable 4014
 
 namespace ArmoryBot
 {
@@ -29,9 +28,9 @@ namespace ArmoryBot
             await armoryBot.StartupAsync(); // Startup Discord Bot (async)
             await Task.Delay(-1); // Prevents program from terminating early
         }
-        public async static Task Log(string entry)
+        public static void Log(string entry)
         {
-            try { await Task.Run(() => Console.WriteLine($"{DateTime.Now}: {entry}")); } catch { return; }
+            try { Console.WriteLine($"{DateTime.Now}: {entry}"); } catch { }
         }
     }
 }

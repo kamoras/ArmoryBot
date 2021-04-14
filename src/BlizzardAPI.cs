@@ -302,10 +302,7 @@ namespace ArmoryBot
                             using (var sr = new StringReader(json))
                             {
                                 this.Config.Token = (BlizzardAccessToken)this.Serializer.Deserialize(sr, typeof(BlizzardAccessToken));
-                                this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Convert seconds to ms
-                                this.TokenExpTimer.AutoReset = false;
-                                this.TokenExpTimer.Elapsed += this.TokenExpTimer_Elapsed; // Set elapsed event method
-                                this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
+                                TokenExpTimer_Start(); // Start Auto-Renewing Timer
                                 Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                                 await this.GetGameData(); // Update Static Assets
                             }
@@ -318,11 +315,20 @@ namespace ArmoryBot
                 Program.Log(ex.ToString());
             }
         } // End RequestToken()
+
+        private void TokenExpTimer_Start()
+        {
+            this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Convert seconds to ms
+            this.TokenExpTimer.AutoReset = false;
+            this.TokenExpTimer.Elapsed += this.TokenExpTimer_Elapsed; // Set elapsed event method
+            this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
+        }
         private async void TokenExpTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             Program.Log("BlizzAPI Token expired!");
             await this.RequestToken();
         }
+
         private async Task CheckToken()
         {
             try
