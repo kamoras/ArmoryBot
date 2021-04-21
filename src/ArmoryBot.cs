@@ -15,13 +15,13 @@ namespace ArmoryBot
     public class ArmoryBot
     {
         private readonly DiscordConfig Config;
-        private BlizzardAPI blizzardAPI;
+        private BlizzardAPI BlizzAPI;
         private DiscordSocketClient Client;
         private CommandService Commands;
         private IServiceProvider Services;
         public ArmoryBot()
         {
-            this.blizzardAPI = new BlizzardAPI(); // Initializes Blizzard API
+            this.BlizzAPI = new BlizzardAPI(); // Initializes Blizzard API
             using (StreamReader json = File.OpenText(Globals.DiscordConfigPath)) // Load Config
             {
                 var serializer = new JsonSerializer();
@@ -47,7 +47,7 @@ namespace ArmoryBot
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
-            this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.blizzardAPI), argPos, this.Services); // Do not await
+            this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI), argPos, this.Services); // Do not await
         }
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method

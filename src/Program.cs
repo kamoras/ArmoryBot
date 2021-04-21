@@ -6,7 +6,7 @@ namespace ArmoryBot
 {
     class Program
     {
-        private static ArmoryBot armoryBot;
+        private static ArmoryBot _ArmoryBot;
         static async Task Main() // ** Program Entry Point **
         {
             if (!File.Exists(Globals.DiscordConfigPath) | !File.Exists(Globals.BlizzardConfigPath)) // Verify Config Files Exist
@@ -24,8 +24,8 @@ namespace ArmoryBot
                 return;
             }
             Log("Starting up ArmoryBot...");
-            armoryBot = new ArmoryBot(); // Initializes ArmoryBot
-            await armoryBot.StartupAsync(); // Startup Discord Bot (async)
+            _ArmoryBot = new ArmoryBot(); // Initializes ArmoryBot
+            await _ArmoryBot.StartupAsync(); // Startup Discord Bot (async)
             await Task.Delay(-1); // Prevents program from terminating early
         }
         public static void Log(string entry)

@@ -351,7 +351,8 @@ namespace ArmoryBot
                         else
                         {
                             Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                            if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1 | this.WoWTokenMediaUrl is null) await this.GetGameData(); // Make sure static assets are set
+                            if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1 | this.WoWTokenMediaUrl is null)
+                                await this.GetGameData(); // Make sure static assets are set
                         }
                     }
                 }

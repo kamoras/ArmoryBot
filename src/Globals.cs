@@ -36,9 +36,12 @@ namespace ArmoryBot
             {14461, new AchievementItem(10, 1) }, // Cutting Edge: Sire Denathrius
             // M+
             {14662, new AchievementItem(-1, 0) }, // Realm First! Shadowlands Keystone Master
+            {13078, new AchievementItem(-1, 0) }, // Realm First! Battle for Azeroth Keystone Master
+            {11224, new AchievementItem(-1, 0) }, // Realm First! Legion Keystone Master
             // Season 1
             {14531, new AchievementItem(20, 0) }, // Shadowlands Keystone Conqueror: Season One
             {14532, new AchievementItem(20, 1) }, // Shadowlands Keystone Master: Season One
+            // Season 2
         };
         public static readonly Dictionary<long, AchievementItem> AchievementsPVP = new Dictionary<long, AchievementItem>()
         {
