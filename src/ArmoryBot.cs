@@ -83,7 +83,7 @@ namespace ArmoryBot
             try
             {
                 Program.Log($"Armory Command requested by {this.Context.Message.Author}");
-                if (args[1] != "pve" & args[1] != "pvp") throw new Exception($"Type must be either pve or pvp. '{args[2]}' is invalid."); // Make sure lookup type is valid
+                if (args[1] != "pve" & args[1] != "pvp") throw new Exception($"Type must be either pve or pvp. '{args[1]}' is invalid."); // Make sure lookup type is valid
                 string[] character = args[0].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
                 ArmoryData info = await this.Context.API.ArmoryLookup(character[0], character[1], args[1]); // Main Blizzard API Lookup
                 var eb = new EmbedBuilder(); // Build embedded discord msg

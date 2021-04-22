@@ -14,7 +14,7 @@ namespace ArmoryBot
         Static,
         Dynamic
     }
-    public static class Globals
+    internal static class Globals
     {
         public const string DiscordConfigPath = @"discord.json";
         public const string BlizzardConfigPath = @"blizzard.json";
@@ -31,17 +31,38 @@ namespace ArmoryBot
          */
         public static readonly Dictionary<long, AchievementItem> AchievementsPVE = new Dictionary<long, AchievementItem>()
         {
-            // Raid
+            // Raid Overall
             {14460, new AchievementItem(10, 0) }, // Ahead of the Curve: Sire Denathrius
             {14461, new AchievementItem(10, 1) }, // Cutting Edge: Sire Denathrius
-            // M+
+            // ToDo Sanctum of Domination AOTC/CE
+            // Mythic Progression ToDo
+            //{00000, new AchievementItem(20, 0) }, // The Tarragrue
+            //{00000, new AchievementItem(20, 1) }, // 
+            //{00000, new AchievementItem(20, 2) }, // 
+            //{00000, new AchievementItem(20, 3) }, // 
+            //{00000, new AchievementItem(20, 4) }, // ..
+            //{00000, new AchievementItem(20, 5) }, // ..
+            //{00000, new AchievementItem(20, 6) }, // 
+            //{00000, new AchievementItem(20, 7) }, // 
+            //{00000, new AchievementItem(20, 8) }, // 
+            //{00000, new AchievementItem(20, 9) }, // Sylvanas Windrunner
+            // Realm Firsts
             {14662, new AchievementItem(-1, 0) }, // Realm First! Shadowlands Keystone Master
             {13078, new AchievementItem(-1, 0) }, // Realm First! Battle for Azeroth Keystone Master
             {11224, new AchievementItem(-1, 0) }, // Realm First! Legion Keystone Master
+            // Keystone Hero
+            {15051, new AchievementItem(-1, 0) }, // Keystone Hero: De Other Side
+            {15048, new AchievementItem(-1, 0) }, // Keystone Hero: Halls of Atonement
+            {15047, new AchievementItem(-1, 0) }, // Keystone Hero: Mists of Tirna Scithe
+            {15046, new AchievementItem(-1, 0) }, // Keystone Hero: Plaguefall
+            {15052, new AchievementItem(-1, 0) }, // Keystone Hero: Sanguine Depths
+            {15049, new AchievementItem(-1, 0) }, // Keystone Hero: Spires of Ascension
+            {15045, new AchievementItem(-1, 0) }, // Keystone Hero: The Necrotic Wake
+            {15050, new AchievementItem(-1, 0) }, // Keystone Hero: Theater of Pain
             // Season 1
-            {14531, new AchievementItem(20, 0) }, // Shadowlands Keystone Conqueror: Season One
-            {14532, new AchievementItem(20, 1) }, // Shadowlands Keystone Master: Season One
-            // Season 2
+            {14531, new AchievementItem(100, 0) }, // Shadowlands Keystone Conqueror: Season One
+            {14532, new AchievementItem(100, 1) }, // Shadowlands Keystone Master: Season One
+            // Season 2 ToDo
         };
         public static readonly Dictionary<long, AchievementItem> AchievementsPVP = new Dictionary<long, AchievementItem>()
         {

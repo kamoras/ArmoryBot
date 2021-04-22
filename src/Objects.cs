@@ -142,7 +142,7 @@ namespace ArmoryBot
                         this.List.Add((int)id * -1, new AchievementItem(Globals.AchievementsPVP[id].Group, Globals.AchievementsPVP[id].Value, name));
                         return;
                     }
-                    if (this.List.ContainsKey(Globals.AchievementsPVP[id].Group)) // Group is already in list, check if achievement value is higher
+                    if (this.List.ContainsKey(Globals.AchievementsPVP[id].Group)) // Group is already in list, check if achievement value is equal or higher
                     {
                         if (Globals.AchievementsPVP[id].Value > this.List[Globals.AchievementsPVP[id].Group].Value) // Value is higher
                         {
