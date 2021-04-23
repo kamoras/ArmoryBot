@@ -23,14 +23,14 @@ namespace ArmoryBot
                 }
                 return;
             }
-            Log("Starting up ArmoryBot...");
+            await Log("Starting up ArmoryBot...");
             _ArmoryBot = new ArmoryBot(); // Initializes ArmoryBot
             await _ArmoryBot.StartupAsync(); // Startup Discord Bot (async)
             await Task.Delay(-1); // Prevents program from terminating early
         }
-        public static void Log(string entry)
+        internal static async Task Log(string entry)
         {
-            try { Console.WriteLine($"{DateTime.Now}: {entry}"); } catch { }
+            try { await Console.Out.WriteLineAsync($"{DateTime.Now}: {entry}"); } catch { }
         }
     }
 }

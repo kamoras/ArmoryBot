@@ -10,7 +10,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-#pragma warning disable 4014
 
 namespace ArmoryBot
 {
@@ -37,7 +36,9 @@ namespace ArmoryBot
             {
                 this.Config = (BlizzardConfig)this.Serializer.Deserialize(json, typeof(BlizzardConfig));
             }
-            this.RequestToken(); // Obtain initial BlizzAPI Token
+#pragma warning disable 4014
+            this.RequestToken(); // Obtain initial BlizzAPI Token (cannot await in constructor)
+#pragma warning restore 4014
         }
         public async Task<ArmoryData> ArmoryLookup(string character, string realm, string type) // Main Armory Lookup Method exposed to ArmoryBot.cs
         {
@@ -68,7 +69,7 @@ namespace ArmoryBot
             }
             catch
             {
-                this.CheckToken(); // Make sure token is valid
+                await this.CheckToken(); // Make sure token is valid
                 throw; // Re-throw exception, will be caught in calling function
             }
         }
@@ -92,7 +93,7 @@ namespace ArmoryBot
             }
             catch
             {
-                this.CheckToken(); // Make sure *access* token is valid
+                await this.CheckToken(); // Make sure *access* token is valid
                 throw; // Re-throw exception, will be caught in calling function
             }
         }
@@ -248,12 +249,12 @@ namespace ArmoryBot
         //
         // ** Game Data API 
         //
-        private async Task GetGameData() // Gets Static/Dynamic assets that do not need to be parsed on each user request.
+        private async Task GetGameData() // Gets Static/Dynamic assets that can be stored longer term
         {
             Task<string> json_season = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/season/index", Namespace.Dynamic);
             Task<string> json_dungeon = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/dungeon/index", Namespace.Dynamic);
             Task<string> json_token = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/media/item/{(long)ID.WoWToken}", Namespace.Static);
-            await Task.WhenAll(json_season, json_dungeon, json_token);
+            await Task.WhenAll(json_season, json_dungeon, json_token); // Wait for all tasks to finish up
             using (TextReader sr = new StringReader(json_season.Result))
             {
                 var seasonindex = (MPlusSeasonIndex)this.Serializer.Deserialize(sr, typeof(MPlusSeasonIndex)); // De-serialize JSON to C# Classes
@@ -282,7 +283,7 @@ namespace ArmoryBot
         {
             try
             {
-                Program.Log("Requesting new BlizzAPI Token...");
+                await Program.Log("Requesting new BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/token"))
                 {
                     request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
@@ -303,7 +304,7 @@ namespace ArmoryBot
                             {
                                 this.Config.Token = (BlizzardAccessToken)this.Serializer.Deserialize(sr, typeof(BlizzardAccessToken));
                                 TokenExpTimer_Start(); // Start Auto-Renewing Timer
-                                Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                                await Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                                 await this.GetGameData(); // Update Static Assets
                             }
                         }
@@ -312,7 +313,7 @@ namespace ArmoryBot
             }
             catch (Exception ex)
             {
-                Program.Log(ex.ToString());
+                await Program.Log(ex.ToString());
             }
         } // End RequestToken()
 
@@ -325,7 +326,7 @@ namespace ArmoryBot
         }
         private async void TokenExpTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Program.Log("BlizzAPI Token expired!");
+            await Program.Log("BlizzAPI Token expired!");
             await this.RequestToken();
         }
 
@@ -333,7 +334,7 @@ namespace ArmoryBot
         {
             try
             {
-                Program.Log("Checking BlizzAPI Token...");
+                await Program.Log("Checking BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/check_token"))
                 {
                     request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
@@ -350,7 +351,7 @@ namespace ArmoryBot
                         if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
                         else
                         {
-                            Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                            await Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                             if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1 | this.WoWTokenMediaUrl is null)
                                 await this.GetGameData(); // Make sure static assets are set
                         }
@@ -359,7 +360,7 @@ namespace ArmoryBot
             }
             catch (Exception ex)
             {
-                Program.Log(ex.ToString());
+                await Program.Log(ex.ToString());
                 await this.RequestToken();
             }
         }

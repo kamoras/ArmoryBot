@@ -142,7 +142,7 @@ namespace ArmoryBot
                         this.List.Add((int)id * -1, new AchievementItem(Globals.AchievementsPVP[id].Group, Globals.AchievementsPVP[id].Value, name));
                         return;
                     }
-                    if (this.List.ContainsKey(Globals.AchievementsPVP[id].Group)) // Group is already in list, check if achievement value is equal or higher
+                    if (this.List.ContainsKey(Globals.AchievementsPVP[id].Group)) // Group is already in list, check if achievement value is higher
                     {
                         if (Globals.AchievementsPVP[id].Value > this.List[Globals.AchievementsPVP[id].Group].Value) // Value is higher
                         {
@@ -233,7 +233,7 @@ namespace ArmoryBot
     */
     public class MythicPlusData // Sorts and returns the best runs per Dungeon ID
     {
-        private readonly int DungeonCount = 0;
+        private readonly int DungeonCount;
         private Dictionary<long, BestRun> Runs;
         public int HighestRun { get; private set; } // Highest M+ run player has completed
         public int Plus5Count { get; private set; } // Best runs between +5 and +9
