@@ -292,21 +292,19 @@ namespace ArmoryBot
                     request.Content = new StringContent("grant_type=client_credentials");
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    using (var client = this.ClientFactory.CreateClient())
+                    var client = this.ClientFactory.CreateClient();
+                    client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
+                    var response = await client.SendAsync(request); // Send HTTP request
+                    var json = await response.Content.ReadAsStringAsync(); // Store json response
+                    if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
+                    else // Load token information
                     {
-                        client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
-                        var response = await client.SendAsync(request); // Send HTTP request
-                        var json = await response.Content.ReadAsStringAsync(); // Store json response
-                        if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
-                        else // Load token information
+                        using (var sr = new StringReader(json))
                         {
-                            using (var sr = new StringReader(json))
-                            {
-                                this.Config.Token = (BlizzardAccessToken)this.Serializer.Deserialize(sr, typeof(BlizzardAccessToken));
-                                TokenExpTimer_Start(); // Start Auto-Renewing Timer
-                                await Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                                await this.GetGameData(); // Update Static Assets
-                            }
+                            this.Config.Token = (BlizzardAccessToken)this.Serializer.Deserialize(sr, typeof(BlizzardAccessToken));
+                            TokenExpTimer_Start(); // Start Auto-Renewing Timer
+                            await Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                            await this.GetGameData(); // Update Static Assets
                         }
                     }
                 }
@@ -343,18 +341,16 @@ namespace ArmoryBot
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    using (var client = this.ClientFactory.CreateClient())
+                    var client = this.ClientFactory.CreateClient();
+                    client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
+                    var response = await client.SendAsync(request); // Send HTTP Request
+                    var json = await response.Content.ReadAsStringAsync(); // Store JSON
+                    if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
+                    else
                     {
-                        client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
-                        var response = await client.SendAsync(request); // Send HTTP Request
-                        var json = await response.Content.ReadAsStringAsync(); // Store JSON
-                        if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
-                        else
-                        {
-                            await Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                            if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1 | this.WoWTokenMediaUrl is null)
-                                await this.GetGameData(); // Make sure static assets are set
-                        }
+                        await Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                        if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1 | this.WoWTokenMediaUrl is null)
+                            await this.GetGameData(); // Make sure static assets are set
                     }
                 }
             }
@@ -382,13 +378,10 @@ namespace ArmoryBot
                 }
                 request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
-                using (var client = this.ClientFactory.CreateClient())
-                {
-                    client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
-                    var response = await client.SendAsync(request); // Send HTTP Request
-                    return await response.Content.ReadAsStringAsync(); // Return JSON
-                }
-
+                var client = this.ClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(10); // Set HTTP Request Timeout
+                var response = await client.SendAsync(request); // Send HTTP Request
+                return await response.Content.ReadAsStringAsync(); // Return JSON
             }
         }
     }
