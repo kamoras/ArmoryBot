@@ -293,7 +293,7 @@ namespace ArmoryBot
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
                     var client = this.ClientFactory.CreateClient();
-                    client.Timeout = TimeSpan.FromSeconds(14); // Set HTTP Request Timeout
+                    client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
                     var response = await client.SendAsync(request); // Send HTTP request
                     var json = await response.Content.ReadAsStringAsync(); // Store json response
                     if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
@@ -342,7 +342,7 @@ namespace ArmoryBot
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
                     var client = this.ClientFactory.CreateClient();
-                    client.Timeout = TimeSpan.FromSeconds(14); // Set HTTP Request Timeout
+                    client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
                     var response = await client.SendAsync(request); // Send HTTP Request
                     var json = await response.Content.ReadAsStringAsync(); // Store JSON
                     if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
@@ -379,7 +379,7 @@ namespace ArmoryBot
                 request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
                 var client = this.ClientFactory.CreateClient();
-                client.Timeout = TimeSpan.FromSeconds(14); // Set HTTP Request Timeout
+                client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
                 var response = await client.SendAsync(request); // Send HTTP Request
                 return await response.Content.ReadAsStringAsync(); // Return JSON
             }
