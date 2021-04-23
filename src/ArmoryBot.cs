@@ -119,7 +119,7 @@ namespace ArmoryBot
             catch (Exception ex)
             {
                 await Program.Log($"{this.Context.Message}: {ex} **Sending generic error notification to {this.Context.Message.Author}**");
-                try { await this.Context.Message.Channel.SendMessageAsync($"**ERROR** looking up `{this.Context.Message}`\nSee `{this.Context.Prefix}armory help`"); } catch { } // Generic error notification to user
+                try { await this.Context.Message.Channel.SendMessageAsync($"**ERROR** looking up `{this.Context.Message}`, please try again.\nSee `{this.Context.Prefix}armory help`"); } catch { } // Generic error notification to user
             }
         }
         private async Task CMD_Token()
@@ -138,7 +138,7 @@ namespace ArmoryBot
             catch (Exception ex)
             {
                 await Program.Log($"{this.Context.Message}: {ex} **Sending generic error notification to {this.Context.Message.Author}**");
-                try { await this.Context.Message.Channel.SendMessageAsync($"**ERROR** looking up WoW Token Data.\nSee `{this.Context.Prefix}armory help`"); } catch { } // Generic error notification to user
+                try { await this.Context.Message.Channel.SendMessageAsync($"**ERROR** looking up WoW Token Data, please try again.\nSee `{this.Context.Prefix}armory help`"); } catch { } // Generic error notification to user
             }
         }
         private async Task CMD_Help() // Display usage help to requestor
