@@ -48,22 +48,19 @@ namespace ArmoryBot
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
-            Task.Run(async delegate
+            Task.Run(async delegate // Long running task
             {
-                await this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI, this.Config.cmdprefix), argPos, this.Services).ConfigureAwait(false);
+                await this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI, this.Config.cmdprefix), argPos, this.Services);
             });
         }
+#pragma warning restore 4014
+#pragma warning restore 1998
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method
         {
-            Task.Run(async delegate
-            {
-                await Program.Log(msg.ToString());
-            });
+            await Program.Log(msg.ToString());
         }
     }
-#pragma warning restore 4014
-#pragma warning restore 1998
 
     [Group("armory")] // Armory Base Command
     public class ArmoryModule : ModuleBase<ArmoryCommandContext>
