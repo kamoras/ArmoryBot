@@ -21,7 +21,6 @@ namespace ArmoryBot
     {
         public string Price;
         public string Last_Updated;
-        public string TokenAvatarUrl;
     }
     public class DiscordConfig // Stores Discord Config as loaded from Config File
     {
@@ -221,7 +220,7 @@ namespace ArmoryBot
             string output = "";
             foreach (Mode mode in this.Raid.Modes) // Check each difficulty
             {
-                output += $"• {mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name.GetLocale(this.Locale)}\n"; // ex: 8/10 Normal
+                output += $"• {mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name}\n"; // ex: 8/10 Normal
             }
             return output;
         }

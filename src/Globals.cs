@@ -6,7 +6,6 @@ namespace ArmoryBot
     public enum ID : long
     {
         CurrentExpansion = 499, // Shadowlands
-        WoWToken = 122284 // WoW Token Item ID
     }
     public enum Namespace // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
     {
@@ -22,6 +21,10 @@ namespace ArmoryBot
     }
     internal static class Globals
     {
+        public static string QuestionMarkIconUrl = @"https://render-us.worldofwarcraft.com/icons/56/inv_misc_questionmark.jpg";
+        public static string TomeIconUrl = @"https://render-us.worldofwarcraft.com/icons/56/inv_misc_book_07.jpg";
+        public const string WowTokenIconUrl = @"https://render-us.worldofwarcraft.com/icons/56/wow_token01.jpg";
+
         public const string DiscordConfigPath = @"discord.json";
         public const string BlizzardConfigPath = @"blizzard.json";
         /*

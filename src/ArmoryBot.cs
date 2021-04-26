@@ -69,7 +69,7 @@ namespace ArmoryBot
         public async Task HandleCMD(params string[] args)
         {
             for (int i = 0; i < args.Length; i++) { args[i] = args[i].Trim().ToLower(); } // Trim,lowercase cmd string
-            if (args.Length < 1) { await this.ErrorResponse("No command arguments provided!"); return; }
+            if (args.Length < 1) { await this.SendErrorResponse("No command arguments provided!"); return; }
             if (args[0] == "help")
             {
                 await this.CMD_Help();
@@ -82,13 +82,21 @@ namespace ArmoryBot
             }
             else if (args[0] == "pve" | args[0] == "pvp")
             {
-                if (args.Length < 2) { await this.ErrorResponse("Must provide CharacterName-Realm!"); return; }
-                if (args[0] == "pve") await this.CMD_Armory(args[1], LookupType.PVE);
-                else if (args[0] == "pvp") await this.CMD_Armory(args[1], LookupType.PVP);
+                if (args.Length < 2) { await this.SendErrorResponse("Must provide CharacterName-Realm!"); return; }
+                if (args[0] == "pve")
+                {
+                    await this.CMD_Armory(args[1], LookupType.PVE);
+                    return;
+                }
+                else if (args[0] == "pvp")
+                {
+                    await this.CMD_Armory(args[1], LookupType.PVP);
+                    return;
+                }
             }
-            else await this.ErrorResponse("Invalid command entry!");
-
+            else await this.SendErrorResponse("Invalid command entry!");
         }
+
         private async Task CMD_Armory(string identity, LookupType type) // Main Armory Lookup: [0] = user-realm , [1] = pve/pvp
         {
             try
@@ -123,7 +131,7 @@ namespace ArmoryBot
             }
             catch (Exception ex)
             {
-                await this.ErrorResponse(ex.ToString());
+                await this.SendErrorResponse(ex.ToString());
             }
         }
         private async Task CMD_Token()
@@ -136,12 +144,12 @@ namespace ArmoryBot
                 eb.WithTitle("WoW Token");
                 eb.AddField("Quote", $"• Price: {token.Price}\n• Last Updated: {token.Last_Updated}", false);
                 eb.WithFooter($"{this.Context.Prefix}armory help | https://github.com/imerzan/ArmoryBot"); // Display help information in footer
-                eb.WithThumbnailUrl(token.TokenAvatarUrl);
+                eb.WithThumbnailUrl(Globals.WowTokenIconUrl);
                 await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build()); // Send embed message to requestor
             }
             catch (Exception ex)
             {
-                await this.ErrorResponse(ex.ToString());
+                await this.SendErrorResponse(ex.ToString());
             }
         }
         private async Task CMD_Help() // Display usage help to requestor
@@ -154,19 +162,21 @@ namespace ArmoryBot
                 eb.WithDescription($"• Armory Lookup: `{this.Context.Prefix}armory pve/pvp CharacterName-Realm`\n• WoW Token Lookup: `{this.Context.Prefix}armory token`\n\n**NOTE:** Spaces in realm name should have a dash ' - '");
                 eb.WithUrl("https://github.com/imerzan/ArmoryBot");
                 eb.WithFooter($"Info/Feedback: https://github.com/imerzan/ArmoryBot");
+                eb.WithThumbnailUrl(Globals.TomeIconUrl);
                 await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build());
             }
             catch { }
         }
 
-        private async Task ErrorResponse(string error)
+        private async Task SendErrorResponse(string error)
         {
             try
             {
                 await Program.Log($"{this.Context.Message}: {error}\n**Sending generic error notification to {this.Context.Message.Author}**");
                 var eb = new EmbedBuilder();
-                eb.WithDescription($"Error executing command `{this.Context.Message}`\nPlease double check your spelling and try again.");
+                eb.WithDescription($"**ERROR** executing command `{this.Context.Message}`\nPlease double check your spelling and try again.");
                 eb.WithFooter($"{this.Context.Prefix}armory help | https://github.com/imerzan/ArmoryBot"); // Display help information in footer
+                eb.WithThumbnailUrl(Globals.QuestionMarkIconUrl);
                 await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build());
             }
             catch { }

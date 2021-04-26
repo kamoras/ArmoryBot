@@ -52,65 +52,13 @@ namespace ArmoryBot
         public Self Key { get; set; }
 
         [JsonProperty("name")]
-        public Name Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("id")]
         public long Id { get; set; }
 
         [JsonProperty("slug")]
         public string Slug { get; set; }
-    }
-
-    public partial class Name
-    {
-        [JsonProperty("en_US")]
-        public string EnUs { get; set; }
-        [JsonProperty("es_MX")]
-        public string EsMx { get; set; }
-
-        [JsonProperty("pt_BR")]
-        public string PtBr { get; set; }
-
-        [JsonProperty("de_DE")]
-        public string DeDe { get; set; }
-
-        [JsonProperty("en_GB")]
-        public string EnGb { get; set; }
-
-        [JsonProperty("es_ES")]
-        public string EsEs { get; set; }
-
-        [JsonProperty("fr_FR")]
-        public string FrFr { get; set; }
-
-        [JsonProperty("it_IT")]
-        public string ItIt { get; set; }
-
-        public string GetLocale(string locale)
-        {
-            switch (locale.ToLower())
-            {
-                case "en_us":
-                    return this.EnUs;
-                case "es_mx":
-                    return this.EsMx;
-                case "pt_br":
-                    return this.PtBr;
-                case "de_de":
-                    return this.DeDe;
-                case "en_gb":
-                    return this.EnGb;
-                case "es_es":
-                    return this.EsEs;
-                case "fr_fr":
-                    return this.FrFr;
-                case "it_it":
-                    return this.ItIt;
-                default:
-                    throw new Exception("Invalid locale specified.");
-            }
-        }
-
     }
 
     public partial class Expansion
@@ -149,7 +97,7 @@ namespace ArmoryBot
         public string Type { get; set; }
 
         [JsonProperty("name")]
-        public Name Name { get; set; }
+        public string Name { get; set; }
     }
 
     public partial class Progress
@@ -300,67 +248,16 @@ namespace ArmoryBot
         public Achievements Key { get; set; }
 
         [JsonProperty("name")]
-        public DisplayString Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("id")]
         public long Id { get; set; }
 
         [JsonProperty("display_string", NullValueHandling = NullValueHandling.Ignore)]
-        public DisplayString DisplayString { get; set; }
+        public string DisplayString { get; set; }
 
         [JsonProperty("slug", NullValueHandling = NullValueHandling.Ignore)]
         public string Slug { get; set; }
-    }
-
-    public partial class DisplayString
-    {
-        [JsonProperty("en_US")]
-        public string EnUs { get; set; }
-        [JsonProperty("es_MX")]
-        public string EsMx { get; set; }
-
-        [JsonProperty("pt_BR")]
-        public string PtBr { get; set; }
-
-        [JsonProperty("de_DE")]
-        public string DeDe { get; set; }
-
-        [JsonProperty("en_GB")]
-        public string EnGb { get; set; }
-
-        [JsonProperty("es_ES")]
-        public string EsEs { get; set; }
-
-        [JsonProperty("fr_FR")]
-        public string FrFr { get; set; }
-
-        [JsonProperty("it_IT")]
-        public string ItIt { get; set; }
-        public string GetLocale(string locale)
-        {
-            switch (locale.ToLower())
-            {
-                case "en_us":
-                    return this.EnUs;
-                case "es_mx":
-                    return this.EsMx;
-                case "pt_br":
-                    return this.PtBr;
-                case "de_de":
-                    return this.DeDe;
-                case "en_gb":
-                    return this.EnGb;
-                case "es_es":
-                    return this.EsEs;
-                case "fr_fr":
-                    return this.FrFr;
-                case "it_it":
-                    return this.ItIt;
-                default:
-                    throw new Exception("Invalid locale specified.");
-            }
-        }
-
     }
 
     public partial class CovenantProgress
@@ -381,7 +278,7 @@ namespace ArmoryBot
         public string Type { get; set; }
 
         [JsonProperty("name")]
-        public DisplayString Name { get; set; }
+        public string Name { get; set; }
     }
 
     public partial class Guild
@@ -470,13 +367,6 @@ namespace ArmoryBot
         //public string Slug { get; set; }
     }
 
-    public partial class Name
-    {
-        //[JsonProperty("en_US")]
-        //public string EnUs { get; set; }
-
-    }
-
     public partial class Links
     {
         //[JsonProperty("self")]
@@ -538,12 +428,6 @@ namespace ArmoryBot
         //public string Slug { get; set; }
     }
 
-    public partial class Name
-    {
-        //[JsonProperty("en_US")]
-        //public string EnUs { get; set; }
-
-    }
 
     public partial class CurrentPeriod
     {
@@ -669,7 +553,7 @@ namespace ArmoryBot
         public Self Key { get; set; }
 
         [JsonProperty("name")]
-        public Name Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -681,11 +565,6 @@ namespace ArmoryBot
         //public Uri Href { get; set; }
     }
 
-    public partial class Name
-    {
-        //[JsonProperty("en_US")]
-        //public string EnUs { get; set; }
-    }
 
     public partial class Member
     {
@@ -838,11 +717,6 @@ namespace ArmoryBot
         //public string Slug { get; set; }
     }
 
-    public partial class Name
-    {
-        //[JsonProperty("en_US")]
-        //public string EnUs { get; set; }
-    }
 
     public partial class Faction
     {
@@ -962,11 +836,6 @@ namespace ArmoryBot
         //public string Slug { get; set; }
     }
 
-    public partial class Name
-    {
-        //[JsonProperty("en_US")]
-        //public string EnUs { get; set; }
-    }
 
     public partial class Criteria
     {
@@ -1026,26 +895,27 @@ namespace ArmoryBot
         public Season CurrentSeason { get; set; }
     }
 
-    public partial class Season
-    {
-        //[JsonProperty("key")]
-        //public Self Key { get; set; }
+    //public partial class Season
+    //{
+    //    [JsonProperty("key")]
+    //    public Self Key { get; set; }
 
-        //[JsonProperty("id")]
-        //public long Id { get; set; }
-    }
+    //    [JsonProperty("id")]
+    //    public long Id { get; set; }
+    //}
 
-    public partial class Self
-    {
-        //[JsonProperty("href")]
-        //public Uri Href { get; set; }
-    }
+    //public partial class Self
+    //{
+    //    [JsonProperty("href")]
+    //    public Uri Href { get; set; }
+    //}
 
-    public partial class Links
-    {
-        //[JsonProperty("self")]
-        //public Self Self { get; set; }
-    }
+    //public partial class Links
+    //{
+    //    [JsonProperty("self")]
+    //    public Self Self { get; set; }
+    //}
+
     // Character Stats JSON Objects
     /// <summary>
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}/statistics?namespace=profile-us
@@ -1234,7 +1104,7 @@ namespace ArmoryBot
         public Self Key { get; set; }
 
         [JsonProperty("name")]
-        public Name Name { get; set; }
+        public string Name { get; set; }
 
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -1243,33 +1113,6 @@ namespace ArmoryBot
         public string Slug { get; set; }
     }
 
-    public partial class Name
-    {
-        //[JsonProperty("en_US")]
-        //public string EnUs { get; set; }
-
-        //[JsonProperty("es_MX")]
-        //public string EsMx { get; set; }
-
-        //[JsonProperty("pt_BR")]
-        //public string PtBr { get; set; }
-
-        //[JsonProperty("de_DE")]
-        //public string DeDe { get; set; }
-
-        //[JsonProperty("en_GB")]
-        //public string EnGb { get; set; }
-
-        //[JsonProperty("es_ES")]
-        //public string EsEs { get; set; }
-
-        //[JsonProperty("fr_FR")]
-        //public string FrFr { get; set; }
-
-        //[JsonProperty("it_IT")]
-        //public string ItIt { get; set; }
-
-    }
 
     public partial class Links
     {
@@ -1308,32 +1151,6 @@ namespace ArmoryBot
     //    public Uri Href { get; set; }
     //}
 
-    //public partial class Name
-    //{
-    //    [JsonProperty("en_US")]
-    //    public string EnUs { get; set; }
-
-    //    [JsonProperty("es_MX")]
-    //    public string EsMx { get; set; }
-
-    //    [JsonProperty("pt_BR")]
-    //    public string PtBr { get; set; }
-
-    //    [JsonProperty("de_DE")]
-    //    public string DeDe { get; set; }
-
-    //    [JsonProperty("en_GB")]
-    //    public string EnGb { get; set; }
-
-    //    [JsonProperty("es_ES")]
-    //    public string EsEs { get; set; }
-
-    //    [JsonProperty("fr_FR")]
-    //    public string FrFr { get; set; }
-
-    //    [JsonProperty("it_IT")]
-    //    public string ItIt { get; set; }
-    //}
 
     //public partial class Links
     //{

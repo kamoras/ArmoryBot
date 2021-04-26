@@ -22,7 +22,6 @@ namespace ArmoryBot
         private readonly JsonSerializer Serializer;
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
-        private string WoWTokenMediaUrl = null; // Stores WoW Token Avatar URL as obtained by this.GetGameData() 
         public BlizzardAPI()
         {
             this.Serializer = new JsonSerializer();
@@ -87,7 +86,6 @@ namespace ArmoryBot
                     DateTime lastupdate = origin.AddMilliseconds(wowtoken.LastUpdatedTimestamp).ToUniversalTime();
                     TimeSpan span = DateTime.Now.ToUniversalTime() - lastupdate;
                     info.Last_Updated = $"{lastupdate} ({span.Minutes} minutes ago)";
-                    info.TokenAvatarUrl = this.WoWTokenMediaUrl;
                 }
                 return info;
             }
@@ -107,9 +105,9 @@ namespace ArmoryBot
             using (TextReader sr = new StringReader(json))
             {
                 var charinfo = (CharacterSummary)this.Serializer.Deserialize(sr, typeof(CharacterSummary)); // De-serialize JSON to C# Classes
-                info.Name = $"{charinfo.Name} {charinfo.Level} {charinfo.Race.Name.GetLocale(this.Config.locale)} {charinfo.ActiveSpec.Name.GetLocale(this.Config.locale)} {charinfo.CharacterClass.Name.GetLocale(this.Config.locale)}";
+                info.Name = $"{charinfo.Name} {charinfo.Level} {charinfo.Race.Name} {charinfo.ActiveSpec.Name} {charinfo.CharacterClass.Name}";
                 info.ItemLevel = $"\n**Item Level: {charinfo.EquippedItemLevel}**";
-                info.Renown = $"**Renown: {charinfo.CovenantProgress?.RenownLevel} {charinfo.CovenantProgress?.ChosenCovenant.Name.GetLocale(this.Config.locale)}**";
+                info.Renown = $"**Renown: {charinfo.CovenantProgress?.RenownLevel} {charinfo.CovenantProgress?.ChosenCovenant.Name}**";
                 info.ArmoryUrl = $"https://worldofwarcraft.com/character/{this.Config.Region}/{realm}/{character}";
             }
             return info;
@@ -253,8 +251,7 @@ namespace ArmoryBot
         {
             Task<string> json_season = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/season/index", Namespace.Dynamic);
             Task<string> json_dungeon = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/dungeon/index", Namespace.Dynamic);
-            Task<string> json_token = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/media/item/{(long)ID.WoWToken}", Namespace.Static);
-            await Task.WhenAll(json_season, json_dungeon, json_token); // Wait for all tasks to finish up
+            await Task.WhenAll(json_season, json_dungeon); // Wait for all tasks to finish up
             using (TextReader sr = new StringReader(json_season.Result))
             {
                 var seasonindex = (MPlusSeasonIndex)this.Serializer.Deserialize(sr, typeof(MPlusSeasonIndex)); // De-serialize JSON to C# Classes
@@ -266,14 +263,6 @@ namespace ArmoryBot
                 int count = 0;
                 foreach (Dungeon dungeon in dungeonindex.Dungeons) count++;
                 this.MplusDungeonCount = count;
-            }
-            using (TextReader sr = new StringReader(json_token.Result))
-            {
-                var token_media = (ItemMedia)this.Serializer.Deserialize(sr, typeof(ItemMedia)); // De-serialize JSON to C# Classes
-                foreach (Asset asset in token_media.Assets)
-                {
-                    if (asset.Key.ToLower() == "icon") this.WoWTokenMediaUrl = asset.Value.ToString();
-                }
             }
         }
         //
@@ -349,7 +338,7 @@ namespace ArmoryBot
                     else
                     {
                         await Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                        if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1 | this.WoWTokenMediaUrl is null)
+                        if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1)
                             await this.GetGameData(); // Make sure static assets are set
                     }
                 }
@@ -362,6 +351,7 @@ namespace ArmoryBot
         }
         private async Task<string> Call(string uri, Namespace space) // API Lookup, returns a json string to calling function
         {
+            uri += $"?locale={this.Config.locale}"; // Get data for current locale only
             using (var request = new HttpRequestMessage(new HttpMethod("GET"), uri))
             {
                 switch (space)
