@@ -40,7 +40,7 @@ namespace ArmoryBot
             this.RequestToken(); // Obtain initial BlizzAPI Token (cannot await in constructor)
 #pragma warning restore 4014
         }
-        public async Task<ArmoryData> ArmoryLookup(string character, string realm, string type) // Main Armory Lookup Method exposed to ArmoryBot.cs
+        public async Task<ArmoryData> ArmoryLookup(string character, string realm, LookupType type) // Main Armory Lookup Method exposed to ArmoryBot.cs
         {
             try
             {
@@ -50,13 +50,13 @@ namespace ArmoryBot
                 Task<string> AchievInfo = this.GetAchievements(character, realm, type); // Gets Achievements
                 switch (type)
                 {
-                    case "pve":
+                    case LookupType.PVE:
                         Task<RaidData> RaidInfo = this.GetRaids(character, realm); // Gets all raid info from Current Expansion
                         Task<string> MythicPlus = this.GetMythicPlus(character, realm); // Gets all M+ info from Current Season
                         await Task.WhenAll(RaidInfo, MythicPlus); // Wait for all PVE tasks to finish up
                         info.RaidInfo = RaidInfo.Result; info.MythicPlus = MythicPlus.Result; // Move results into class:ArmoryData
                         break;
-                    case "pvp":
+                    case LookupType.PVP:
                         Task<string> PvpInfo = this.GetPVP(character, realm); // Gets all rated PVP bracket info
                         Task<string> PVPStats = this.GetPvpStats(character, realm); // Gets all PVP Character Stats info (Versatility,etc.)
                         await Task.WhenAll(PvpInfo, PVPStats); // Wait for all PVP tasks to finish up
@@ -169,7 +169,7 @@ namespace ArmoryBot
             }
             catch { return "None"; }
         }
-        private async Task<string> GetAchievements(string character, string realm, string type) // Returns a string to this.ArmoryLookup()
+        private async Task<string> GetAchievements(string character, string realm, LookupType type) // Returns a string to this.ArmoryLookup()
         {
             AchievementsList list = new AchievementsList();
             string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/achievements", Namespace.Profile);
@@ -178,13 +178,13 @@ namespace ArmoryBot
                 var achievinfo = (AchievementSummary)this.Serializer.Deserialize(sr, typeof(AchievementSummary)); // De-serialize JSON to C# Classes
                 switch (type)
                 {
-                    case "pve":
+                    case LookupType.PVE:
                         foreach (Achievement achiev in achievinfo.Achievements)
                         {
                             if (Globals.AchievementsPVE.ContainsKey(achiev.Id)) list.Add(achiev.Id, achiev.AchievementAchievement.Name, type);
                         }
                         break;
-                    case "pvp":
+                    case LookupType.PVP:
                         foreach (Achievement achiev in achievinfo.Achievements)
                         {
                             if (Globals.AchievementsPVP.ContainsKey(achiev.Id)) list.Add(achiev.Id, achiev.AchievementAchievement.Name, type);

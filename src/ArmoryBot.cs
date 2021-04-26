@@ -68,8 +68,8 @@ namespace ArmoryBot
         [Command]
         public async Task HandleCMD(params string[] args)
         {
-            for (int i = 0; i < args.Length; i++) { args[i] = args[i].Trim().ToLower(); } // Trim cmd string
-            if (args.Length < 1) return; // Args Length Check
+            for (int i = 0; i < args.Length; i++) { args[i] = args[i].Trim().ToLower(); } // Trim,lowercase cmd string
+            if (args.Length < 1) { await this.ErrorResponse("No command arguments provided!"); return; }
             if (args[0] == "help")
             {
                 await this.CMD_Help();
@@ -80,23 +80,28 @@ namespace ArmoryBot
                 await this.CMD_Token();
                 return;
             }
-            if (args.Length < 2) return; // Args Length Check
-            await this.CMD_Armory(args);
+            else if (args[0] == "pve" | args[0] == "pvp")
+            {
+                if (args.Length < 2) { await this.ErrorResponse("Must provide CharacterName-Realm!"); return; }
+                if (args[0] == "pve") await this.CMD_Armory(args[1], LookupType.PVE);
+                else if (args[0] == "pvp") await this.CMD_Armory(args[1], LookupType.PVP);
+            }
+            else await this.ErrorResponse("Invalid command entry!");
+
         }
-        private async Task CMD_Armory(string[] args) // Main Armory Lookup: [0] = user-realm , [1] = pve/pvp
+        private async Task CMD_Armory(string identity, LookupType type) // Main Armory Lookup: [0] = user-realm , [1] = pve/pvp
         {
             try
             {
                 await Program.Log($"Armory Command requested by {this.Context.Message.Author}");
-                if (args[1] != "pve" & args[1] != "pvp") throw new Exception($"Type must be either pve or pvp. '{args[1]}' is invalid."); // Make sure lookup type is valid
-                string[] character = args[0].Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
-                ArmoryData info = await this.Context.API.ArmoryLookup(character[0], character[1], args[1]); // Main Blizzard API Lookup, [0]name [1]realm [1]pve/pvp
+                string[] character = identity.Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
+                ArmoryData info = await this.Context.API.ArmoryLookup(character[0], character[1], type); // Main Blizzard API Lookup, [0]name [1]realm [1]LookupType.PVE/PVP
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle(info.CharInfo.Name);
                 eb.WithDescription($"{info.CharInfo.ItemLevel} | {info.CharInfo.Renown}");
-                switch (args[1])
+                switch (type)
                 {
-                    case "pve":
+                    case LookupType.PVE:
                         if (info.RaidInfo.Raids.Count == 0) eb.AddField("Raids", "None", true); // None placeholder if no raids logged
                         else foreach (RaidItem raid in info.RaidInfo.Raids) // Add a field for each raid
                             {
@@ -105,21 +110,20 @@ namespace ArmoryBot
                         eb.AddField("Mythic+", info.MythicPlus, false);
                         eb.AddField("PVE Achievements", info.Achievements, false);
                         break;
-                    case "pvp":
+                    case LookupType.PVP:
                         eb.AddField("Rated PVP", info.PVPRating, false);
                         eb.AddField("PVP Stats", info.PVPStats, false);
                         eb.AddField("PVP Achievements", info.Achievements, false);
                         break;
                 }
-                eb.WithFooter($"{this.Context.Prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
+                eb.WithFooter($"{this.Context.Prefix}armory help | https://github.com/imerzan/ArmoryBot"); // Display help information in footer
                 eb.WithThumbnailUrl(info.AvatarUrl); // Set Character Avatar as Thumbnail Picture
                 eb.WithUrl(info.CharInfo.ArmoryUrl); // Set Armory URL (Clickable on title)
                 await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build()); // Send message to requestor with Armory Info (embed)
             }
             catch (Exception ex)
             {
-                await Program.Log($"{this.Context.Message}: {ex} **Sending generic error notification to {this.Context.Message.Author}**");
-                try { await this.Context.Message.Channel.SendMessageAsync($"**ERROR** looking up `{this.Context.Message}`\nSee `{this.Context.Prefix}armory help`"); } catch { } // Generic error notification to user
+                await this.ErrorResponse(ex.ToString());
             }
         }
         private async Task CMD_Token()
@@ -131,14 +135,13 @@ namespace ArmoryBot
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle("WoW Token");
                 eb.AddField("Quote", $"• Price: {token.Price}\n• Last Updated: {token.Last_Updated}", false);
-                eb.WithFooter($"{this.Context.Prefix}armory help | http://github.com/imerzan/ArmoryBot"); // Display help information in footer
+                eb.WithFooter($"{this.Context.Prefix}armory help | https://github.com/imerzan/ArmoryBot"); // Display help information in footer
                 eb.WithThumbnailUrl(token.TokenAvatarUrl);
                 await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build()); // Send embed message to requestor
             }
             catch (Exception ex)
             {
-                await Program.Log($"{this.Context.Message}: {ex} **Sending generic error notification to {this.Context.Message.Author}**");
-                try { await this.Context.Message.Channel.SendMessageAsync($"**ERROR** looking up WoW Token Data.\nSee `{this.Context.Prefix}armory help`"); } catch { } // Generic error notification to user
+                await this.ErrorResponse(ex.ToString());
             }
         }
         private async Task CMD_Help() // Display usage help to requestor
@@ -147,13 +150,26 @@ namespace ArmoryBot
             {
                 await Program.Log($"Help Command requested by {this.Context.Message.Author}");
                 var eb = new EmbedBuilder(); // Build embedded discord msg
-                eb.WithTitle("ArmoryBot");
-                eb.WithDescription($"Armory Lookup: `{this.Context.Prefix}armory CharacterName-Realm pve/pvp`\nWoW Token Lookup: `{this.Context.Prefix}armory token`\n**NOTE:** Spaces in realm name should have a dash ' - '\n\nLearn more about ArmoryBot at: http://github.com/imerzan/ArmoryBot/");
-                eb.WithUrl("http://github.com/imerzan/ArmoryBot");
-                await this.Context.User.GetOrCreateDMChannelAsync(); // Send user a DM Response
-                await this.Context.User.SendMessageAsync(this.Context.User.Mention, false, eb.Build());
+                eb.WithTitle("ArmoryBot Help");
+                eb.WithDescription($"• Armory Lookup: `{this.Context.Prefix}armory pve/pvp CharacterName-Realm`\n• WoW Token Lookup: `{this.Context.Prefix}armory token`\n\n**NOTE:** Spaces in realm name should have a dash ' - '");
+                eb.WithUrl("https://github.com/imerzan/ArmoryBot");
+                eb.WithFooter($"Info/Feedback: https://github.com/imerzan/ArmoryBot");
+                await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build());
             }
-            catch { return; }
+            catch { }
+        }
+
+        private async Task ErrorResponse(string error)
+        {
+            try
+            {
+                await Program.Log($"{this.Context.Message}: {error}\n**Sending generic error notification to {this.Context.Message.Author}**");
+                var eb = new EmbedBuilder();
+                eb.WithDescription($"Error executing command `{this.Context.Message}`\nPlease double check your spelling and try again.");
+                eb.WithFooter($"{this.Context.Prefix}armory help | https://github.com/imerzan/ArmoryBot"); // Display help information in footer
+                await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build());
+            }
+            catch { }
         }
     }
     public class ArmoryCommandContext : ICommandContext // Custom Command Context to pass BlizzardAPI reference, using DI

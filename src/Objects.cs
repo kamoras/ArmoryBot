@@ -111,11 +111,11 @@ namespace ArmoryBot
         {
             this.List = new Dictionary<int, AchievementItem>(); // Key: (int)group , Value: (AchievementItem)  |   Uses group as key since there should only be one entry per group in the Dictionary.
         }
-        public void Add(long id, string name, string type)
+        public void Add(long id, string name, LookupType type)
         {
             switch (type)
             {
-                case "pve":
+                case LookupType.PVE:
                     if (Globals.AchievementsPVE[id].Group == -1) // No Group (-1) - Always Add
                     {
                         this.List.Add((int)id * -1, new AchievementItem(Globals.AchievementsPVE[id].Group, Globals.AchievementsPVE[id].Value, name));
@@ -136,7 +136,7 @@ namespace ArmoryBot
                         this.List.Add(Globals.AchievementsPVE[id].Group, new AchievementItem(Globals.AchievementsPVE[id].Group, Globals.AchievementsPVE[id].Value, name));
                         return;
                     }
-                case "pvp":
+                case LookupType.PVP:
                     if (Globals.AchievementsPVP[id].Group == -1) // No Group (-1) - Always Add
                     {
                         this.List.Add((int)id * -1, new AchievementItem(Globals.AchievementsPVP[id].Group, Globals.AchievementsPVP[id].Value, name));

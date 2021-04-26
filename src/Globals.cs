@@ -3,16 +3,22 @@ using System.Collections.Generic;
 
 namespace ArmoryBot
 {
-    enum ID : long
+    public enum ID : long
     {
         CurrentExpansion = 499, // Shadowlands
         WoWToken = 122284 // WoW Token Item ID
     }
-    enum Namespace // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
+    public enum Namespace // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
     {
         Profile,
         Static,
         Dynamic
+    }
+
+    public enum LookupType
+    {
+        PVE,
+        PVP
     }
     internal static class Globals
     {
