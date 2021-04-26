@@ -168,7 +168,7 @@ namespace ArmoryBot
             catch { }
         }
 
-        private async Task SendErrorResponse(string error)
+        private async Task SendErrorResponse(string error) // Logs error,exception & sends a generic Error Response Msg to the end-user
         {
             try
             {
