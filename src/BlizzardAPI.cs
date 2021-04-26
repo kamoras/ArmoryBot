@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,6 +9,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Text.Json;
+using System.Net.Http.Json;
 
 namespace ArmoryBot
 {
@@ -19,22 +20,17 @@ namespace ArmoryBot
         private Timer TokenExpTimer;
         private readonly IServiceProvider Services;
         private readonly IHttpClientFactory ClientFactory;
-        private readonly JsonSerializer Serializer;
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
         public BlizzardAPI()
         {
-            this.Serializer = new JsonSerializer();
             this.Services = new ServiceCollection().AddHttpClient().Configure<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
             builder.PrimaryHandler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             })).BuildServiceProvider();
             this.ClientFactory = this.Services.GetService<IHttpClientFactory>();
-            using (StreamReader json = File.OpenText(Globals.BlizzardConfigPath)) // Load Config
-            {
-                this.Config = (BlizzardConfig)this.Serializer.Deserialize(json, typeof(BlizzardConfig));
-            }
+            this.Config = JsonSerializer.Deserialize<BlizzardConfig>(File.ReadAllText(Globals.BlizzardConfigPath)); // Load Config
 #pragma warning disable 4014
             this.RequestToken(); // Obtain initial BlizzAPI Token (cannot await in constructor)
 #pragma warning restore 4014
@@ -77,16 +73,13 @@ namespace ArmoryBot
             try
             {
                 WoWToken info = new WoWToken();
-                string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/token/index", Namespace.Dynamic);
-                using (TextReader sr = new StringReader(json))
-                {
-                    var wowtoken = (WoWTokenJson)this.Serializer.Deserialize(sr, typeof(WoWTokenJson)); // De-serialize JSON to C# Classes
-                    info.Price = (wowtoken.Price / 10000).ToString("N0");
-                    DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-                    DateTime lastupdate = origin.AddMilliseconds(wowtoken.LastUpdatedTimestamp).ToUniversalTime();
-                    TimeSpan span = DateTime.Now.ToUniversalTime() - lastupdate;
-                    info.Last_Updated = $"{lastupdate} ({span.Minutes} minutes ago)";
-                }
+                var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/token/index", Namespace.Dynamic);
+                var wowtoken = await JsonSerializer.DeserializeAsync<WoWTokenJson>(json); // De-serialize JSON to C# Classes
+                info.Price = (wowtoken.Price / 10000).ToString("N0");
+                DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                DateTime lastupdate = origin.AddMilliseconds(wowtoken.LastUpdatedTimestamp).ToUniversalTime();
+                TimeSpan span = DateTime.Now.ToUniversalTime() - lastupdate;
+                info.Last_Updated = $"{lastupdate} ({span.Minutes} minutes ago)";
                 return info;
             }
             catch
@@ -101,51 +94,42 @@ namespace ArmoryBot
         private async Task<CharacterInfo> GetCharacter(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             CharacterInfo info = new CharacterInfo();
-            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}", Namespace.Profile);
-            using (TextReader sr = new StringReader(json))
-            {
-                var charinfo = (CharacterSummary)this.Serializer.Deserialize(sr, typeof(CharacterSummary)); // De-serialize JSON to C# Classes
-                info.Name = $"{charinfo.Name} {charinfo.Level} {charinfo.Race.Name} {charinfo.ActiveSpec.Name} {charinfo.CharacterClass.Name}";
-                info.ItemLevel = $"\n**Item Level: {charinfo.EquippedItemLevel}**";
-                info.Renown = $"**Renown: {charinfo.CovenantProgress?.RenownLevel} {charinfo.CovenantProgress?.ChosenCovenant.Name}**";
-                info.ArmoryUrl = $"https://worldofwarcraft.com/character/{this.Config.Region}/{realm}/{character}";
-            }
+            var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}", Namespace.Profile);
+            var charinfo = await JsonSerializer.DeserializeAsync<CharacterSummary>(json); // De-serialize JSON to C# Classes
+            info.Name = $"{charinfo.Name} {charinfo.Level} {charinfo.Race.Name} {charinfo.ActiveSpec.Name} {charinfo.CharacterClass.Name}";
+            info.ItemLevel = $"\n**Item Level: {charinfo.EquippedItemLevel}**";
+            info.Renown = $"**Renown: {charinfo.CovenantProgress?.RenownLevel} {charinfo.CovenantProgress?.ChosenCovenant.Name}**";
+            info.ArmoryUrl = $"https://worldofwarcraft.com/character/{this.Config.Region}/{realm}/{character}";
             return info;
         }
         private async Task<string> GetAvatar(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
-            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/character-media", Namespace.Profile);
-            using (TextReader sr = new StringReader(json))
+            var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/character-media", Namespace.Profile);
+            var charmedia = await JsonSerializer.DeserializeAsync<CharacterMedia>(json); // De-serialize JSON to C# Classes
+            foreach (Asset asset in charmedia.Assets)
             {
-                var charmedia = (CharacterMedia)this.Serializer.Deserialize(sr, typeof(CharacterMedia)); // De-serialize JSON to C# Classes
-                foreach (Asset asset in charmedia.Assets)
-                {
-                    if (asset.Key.ToLower() == "avatar") return asset.Value.ToString();
-                }
+                if (asset.Key.ToLower() == "avatar") return asset.Value.ToString();
             }
             throw new NullReferenceException("Avatar value is null."); // Raise exception if unable to get Character Avatar
         }
         private async Task<RaidData> GetRaids(string character, string realm) // Returns class:RaidData to this.ArmoryLookup()
         {
             RaidData data = new RaidData(this.Config.locale);
-            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/encounters/raids", Namespace.Profile);
-            using (TextReader sr = new StringReader(json))
+            var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/encounters/raids", Namespace.Profile);
+            var raidinfo = await JsonSerializer.DeserializeAsync<RaidInfo>(json); // De-serialize JSON to C# Classes
+            if (raidinfo.ExpansionsExpansions != null) foreach (Expansion expansion in raidinfo.ExpansionsExpansions)
             {
-                var raidinfo = (RaidInfo)this.Serializer.Deserialize(sr, typeof(RaidInfo)); // De-serialize JSON to C# Classes
-                if (raidinfo.ExpansionsExpansions != null) foreach (Expansion expansion in raidinfo.ExpansionsExpansions)
-                    {
-                        switch (expansion.ExpansionExpansion.Id)
+                switch (expansion.ExpansionExpansion.Id)
+                {
+                    case (long)ID.CurrentExpansion: // Check current expansion
+                        foreach (Instance raid in expansion.Instances) // Check all raids
                         {
-                            case (long)ID.CurrentExpansion: // Check current expansion
-                                foreach (Instance raid in expansion.Instances) // Check all raids
-                                {
-                                    data.Add(raid); // Add to RaidData
-                                }
-                                break;
-                            default:
-                                break;
+                            data.Add(raid); // Add to RaidData
                         }
-                    }
+                        break;
+                    default:
+                        break;
+                }
             }
             return data;
         }
@@ -154,14 +138,11 @@ namespace ArmoryBot
             try // This section will 404 Not found if no M+ completed, use try/catch
             {
                 MythicPlusData data = new MythicPlusData(this.MplusDungeonCount);
-                string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{this.MplusSeasonID}", Namespace.Profile);
-                using (TextReader sr = new StringReader(json))
+                var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{this.MplusSeasonID}", Namespace.Profile);
+                var mplusseasoninfo = await JsonSerializer.DeserializeAsync<MythicPlusSeasonInfo>(json); // De-serialize JSON to C# Classes
+                foreach (BestRun run in mplusseasoninfo.BestRuns)
                 {
-                    var mplusseasoninfo = (MythicPlusSeasonInfo)this.Serializer.Deserialize(sr, typeof(MythicPlusSeasonInfo)); // De-serialize JSON to C# Classes
-                    foreach (BestRun run in mplusseasoninfo.BestRuns)
-                    {
-                        data.Add(run);
-                    }
+                    data.Add(run);
                 }
                 return data.ToString();
             }
@@ -170,26 +151,23 @@ namespace ArmoryBot
         private async Task<string> GetAchievements(string character, string realm, LookupType type) // Returns a string to this.ArmoryLookup()
         {
             AchievementsList list = new AchievementsList();
-            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/achievements", Namespace.Profile);
-            using (TextReader sr = new StringReader(json))
+            var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/achievements", Namespace.Profile);
+            var achievinfo = await JsonSerializer.DeserializeAsync<AchievementSummary>(json); // De-serialize JSON to C# Classes
+            switch (type)
             {
-                var achievinfo = (AchievementSummary)this.Serializer.Deserialize(sr, typeof(AchievementSummary)); // De-serialize JSON to C# Classes
-                switch (type)
-                {
-                    case LookupType.PVE:
-                        foreach (Achievement achiev in achievinfo.Achievements)
-                        {
-                            if (Globals.AchievementsPVE.ContainsKey(achiev.Id)) list.Add(achiev.Id, achiev.AchievementAchievement.Name, type);
-                        }
-                        break;
-                    case LookupType.PVP:
-                        foreach (Achievement achiev in achievinfo.Achievements)
-                        {
-                            if (Globals.AchievementsPVP.ContainsKey(achiev.Id)) list.Add(achiev.Id, achiev.AchievementAchievement.Name, type);
-                        }
-                        break;
-                } // End Switch
-            }
+                case LookupType.PVE:
+                    foreach (Achievement achiev in achievinfo.Achievements)
+                    {
+                        if (Globals.AchievementsPVE.ContainsKey(achiev.Id)) list.Add(achiev.Id, achiev.AchievementAchievement.Name, type);
+                    }
+                    break;
+                case LookupType.PVP:
+                    foreach (Achievement achiev in achievinfo.Achievements)
+                    {
+                        if (Globals.AchievementsPVP.ContainsKey(achiev.Id)) list.Add(achiev.Id, achiev.AchievementAchievement.Name, type);
+                    }
+                    break;
+            } // End Switch
             return list.ToString();
         }
         //
@@ -198,72 +176,54 @@ namespace ArmoryBot
         private async Task<string> GetPVP(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             string output = "";
-            Task<string> json2v2 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/2v2", Namespace.Profile);
-            Task<string> json3v3 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/3v3", Namespace.Profile);
-            Task<string> jsonrbg = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/rbg", Namespace.Profile);
+            Task<Stream> json2v2 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/2v2", Namespace.Profile);
+            Task<Stream> json3v3 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/3v3", Namespace.Profile);
+            Task<Stream> jsonrbg = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/rbg", Namespace.Profile);
             await Task.WhenAll(json2v2, json3v3, jsonrbg); // Allow API calls to run concurrently
-            using (TextReader sr = new StringReader(json2v2.Result)) // 2v2
+            var v2info = await JsonSerializer.DeserializeAsync<PvpBracketInfo>(json2v2.Result); // De-serialize JSON to C# Classes
+            if (v2info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
             {
-                var v2info = (PvpBracketInfo)this.Serializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
-                if (v2info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
-                {
-                    int winpct = 0;
-                    if (v2info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v2info.SeasonMatchStatistics.Won / (double)v2info.SeasonMatchStatistics.Played) * (double)100);
-                    output += $"• 2v2 Rating: {v2info.Rating} (Won {winpct}%)\n";
-                }
+                int winpct = 0;
+                if (v2info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v2info.SeasonMatchStatistics.Won / (double)v2info.SeasonMatchStatistics.Played) * (double)100);
+                output += $"• 2v2 Rating: {v2info.Rating} (Won {winpct}%)\n";
             }
-            using (TextReader sr = new StringReader(json3v3.Result)) // 3v3
+            var v3info = await JsonSerializer.DeserializeAsync<PvpBracketInfo>(json3v3.Result); // De-serialize JSON to C# Classes
+            if (v3info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
             {
-                var v3info = (PvpBracketInfo)this.Serializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
-                if (v3info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
-                {
-                    int winpct = 0;
-                    if (v3info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v3info.SeasonMatchStatistics.Won / (double)v3info.SeasonMatchStatistics.Played) * (double)100);
-                    output += $"• 3v3 Rating: {v3info.Rating} (Won {winpct}%)\n";
-                }
+                int winpct = 0;
+                if (v3info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v3info.SeasonMatchStatistics.Won / (double)v3info.SeasonMatchStatistics.Played) * (double)100);
+                output += $"• 3v3 Rating: {v3info.Rating} (Won {winpct}%)\n";
             }
-            using (TextReader sr = new StringReader(jsonrbg.Result)) // RBG
+            var rbginfo = await JsonSerializer.DeserializeAsync<PvpBracketInfo>(jsonrbg.Result); // De-serialize JSON to C# Classes
+            if (rbginfo.SeasonMatchStatistics?.Played > 0) // Only list brackets played
             {
-                var rbginfo = (PvpBracketInfo)this.Serializer.Deserialize(sr, typeof(PvpBracketInfo)); // De-serialize JSON to C# Classes
-                if (rbginfo.SeasonMatchStatistics?.Played > 0) // Only list brackets played
-                {
-                    int winpct = 0;
-                    if (rbginfo.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)rbginfo.SeasonMatchStatistics.Won / (double)rbginfo.SeasonMatchStatistics.Played) * (double)100);
-                    output += $"• RBG Rating: {rbginfo.Rating} (Won {winpct}%)\n";
-                }
+                int winpct = 0;
+                if (rbginfo.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)rbginfo.SeasonMatchStatistics.Won / (double)rbginfo.SeasonMatchStatistics.Played) * (double)100);
+                output += $"• RBG Rating: {rbginfo.Rating} (Won {winpct}%)\n";
             }
             if (output.Length == 0) return "None";
             else return output;
         }
         private async Task<string> GetPvpStats(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
-            string json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/statistics", Namespace.Profile);
-            using (TextReader sr = new StringReader(json))
-            {
-                var stats = (CharacterStatsInfo)this.Serializer.Deserialize(sr, typeof(CharacterStatsInfo)); // De-serialize JSON to C# Classes
-                return $"• Health: {stats.Health.ToString("N0")}\n• Versatility: {stats.VersatilityDamageDoneBonus}%";
-            }
+            var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/statistics", Namespace.Profile);
+            var stats = await JsonSerializer.DeserializeAsync<CharacterStatsInfo>(json); // De-serialize JSON to C# Classes
+            return $"• Health: {stats.Health.ToString("N0")}\n• Versatility: {stats.VersatilityDamageDoneBonus}%";
         }
         //
         // ** Game Data API 
         //
         private async Task GetGameData() // Gets Static/Dynamic assets that can be stored longer term
         {
-            Task<string> json_season = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/season/index", Namespace.Dynamic);
-            Task<string> json_dungeon = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/dungeon/index", Namespace.Dynamic);
+            Task<Stream> json_season = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/season/index", Namespace.Dynamic);
+            Task<Stream> json_dungeon = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/dungeon/index", Namespace.Dynamic);
             await Task.WhenAll(json_season, json_dungeon); // Wait for all tasks to finish up
-            using (TextReader sr = new StringReader(json_season.Result))
-            {
-                var seasonindex = (MPlusSeasonIndex)this.Serializer.Deserialize(sr, typeof(MPlusSeasonIndex)); // De-serialize JSON to C# Classes
-                this.MplusSeasonID = seasonindex.CurrentSeason.Id;
-            }
-            using (TextReader sr = new StringReader(json_dungeon.Result))
-            {
-                var dungeonindex = (AllDungeons)this.Serializer.Deserialize(sr, typeof(AllDungeons)); // De-serialize JSON to C# Classes
-                int count = 0;
-                foreach (Dungeon dungeon in dungeonindex.Dungeons) count++;
-                this.MplusDungeonCount = count;
-            }
+            var seasonindex = await JsonSerializer.DeserializeAsync<MPlusSeasonIndex>(json_season.Result); // De-serialize JSON to C# Classes
+            this.MplusSeasonID = seasonindex.CurrentSeason.Id;
+            var dungeonindex = await JsonSerializer.DeserializeAsync<AllDungeons>(json_dungeon.Result); // De-serialize JSON to C# Classes
+            int count = 0;
+            foreach (Dungeon dungeon in dungeonindex.Dungeons) count++;
+            this.MplusDungeonCount = count;
         }
         //
         // ** Blizz API Core Methods **
@@ -284,18 +244,12 @@ namespace ArmoryBot
                     var client = this.ClientFactory.CreateClient();
                     client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
                     var response = await client.SendAsync(request); // Send HTTP request
-                    var json = await response.Content.ReadAsStringAsync(); // Store json response
-                    if (!json.Contains("access_token")) throw new Exception($"Error obtaining token:\n{json}\n{response}");
-                    else // Load token information
-                    {
-                        using (var sr = new StringReader(json))
-                        {
-                            this.Config.Token = (BlizzardAccessToken)this.Serializer.Deserialize(sr, typeof(BlizzardAccessToken));
-                            TokenExpTimer_Start(); // Start Auto-Renewing Timer
-                            await Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
-                            await this.GetGameData(); // Update Static Assets
-                        }
-                    }
+                    var json = await response.Content.ReadAsStreamAsync(); // Store json response
+                    this.Config.Token = await JsonSerializer.DeserializeAsync<BlizzardAccessToken>(json, new JsonSerializerOptions() { IgnoreNullValues = true });
+                    if (this.Config.Token.access_token is null) throw new Exception($"Error obtaining token:\n{response}");
+                    this.TokenExpTimer_Start(); // Start Auto-Renewing Timer
+                    await Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                    await this.GetGameData(); // Update Dynamic Assets
                 }
             }
             catch (Exception ex)
@@ -333,13 +287,14 @@ namespace ArmoryBot
                     var client = this.ClientFactory.CreateClient();
                     client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
                     var response = await client.SendAsync(request); // Send HTTP Request
-                    var json = await response.Content.ReadAsStringAsync(); // Store JSON
-                    if (json.Contains("invalid_token")) throw new Exception($"BlizzAPI Token is no longer valid:\n{json}");
+                    var json = await response.Content.ReadAsStreamAsync(); // Store JSON
+                    var result = await JsonSerializer.DeserializeAsync<CheckTokenResult>(json, new JsonSerializerOptions() { IgnoreNullValues = true });
+                    if (result.ClientId is null) throw new Exception($"BlizzAPI Token is no longer valid!\n{response}");
                     else
                     {
                         await Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
                         if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1)
-                            await this.GetGameData(); // Make sure static assets are set
+                            await this.GetGameData(); // Make sure dynamic assets are set
                     }
                 }
             }
@@ -349,7 +304,7 @@ namespace ArmoryBot
                 await this.RequestToken();
             }
         }
-        private async Task<string> Call(string uri, Namespace space) // API Lookup, returns a json string to calling function
+        private async Task<Stream> Call(string uri, Namespace space) // API Lookup, returns a json string to calling function
         {
             uri += $"?locale={this.Config.locale}"; // Get data for current locale only
             using (var request = new HttpRequestMessage(new HttpMethod("GET"), uri))
@@ -371,7 +326,7 @@ namespace ArmoryBot
                 var client = this.ClientFactory.CreateClient();
                 client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
                 var response = await client.SendAsync(request); // Send HTTP Request
-                return await response.Content.ReadAsStringAsync(); // Return JSON
+                return await response.Content.ReadAsStreamAsync(); // Return JSON Stream
             }
         }
     }

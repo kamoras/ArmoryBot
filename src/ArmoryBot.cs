@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 
 namespace ArmoryBot
@@ -21,11 +21,7 @@ namespace ArmoryBot
         public ArmoryBot()
         {
             this.BlizzAPI = new BlizzardAPI(); // Initializes Blizzard API
-            using (StreamReader json = File.OpenText(Globals.DiscordConfigPath)) // Load Config
-            {
-                var serializer = new JsonSerializer();
-                this.Config = (DiscordConfig)serializer.Deserialize(json, typeof(DiscordConfig));
-            }
+            this.Config = JsonSerializer.Deserialize<DiscordConfig>(File.ReadAllText(Globals.DiscordConfigPath)); // Load Config
         }
         public async Task StartupAsync() // Discord bot startup
         {
