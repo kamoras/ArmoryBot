@@ -1187,44 +1187,4 @@ namespace ArmoryBot
     //    public Uri Href { get; set; }
     //}
 
-    // Item Media
-    /// <summary>
-    /// https://{this.Config.Region}.api.blizzard.com/data/wow/media/item/
-    /// Added via https://app.quicktype.io/
-    /// </summary>
-    public partial class ItemMedia
-    {
-        [JsonProperty("_links")]
-        public Links Links { get; set; }
-
-        [JsonProperty("assets")]
-        public Asset[] Assets { get; set; }
-
-        [JsonProperty("id")]
-        public long Id { get; set; }
-    }
-
-    public partial class Asset
-    {
-        //[JsonProperty("key")]
-        //public string Key { get; set; }
-
-        //[JsonProperty("value")]
-        //public Uri Value { get; set; }
-
-        [JsonProperty("file_data_id")]
-        public long FileDataId { get; set; }
-    }
-
-    //public partial class Links
-    //{
-    //    [JsonProperty("self")]
-    //    public Self Self { get; set; }
-    //}
-
-    //public partial class Self
-    //{
-    //    [JsonProperty("href")]
-    //    public Uri Href { get; set; }
-    //}
 }
