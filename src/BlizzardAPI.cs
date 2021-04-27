@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Text.Json;
 using Polly;
+using Polly.Extensions.Http;
 
 namespace ArmoryBot
 {
@@ -29,7 +30,10 @@ namespace ArmoryBot
                 client.Timeout = new TimeSpan(0, 0, 15);
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
             })
-            .AddTransientHttpErrorPolicy(pol => pol.WaitAndRetryAsync(3, delay => TimeSpan.FromMilliseconds(750)))
+            .AddPolicyHandler(HttpPolicyExtensions
+            .HandleTransientHttpError() // HttpRequestException, 5XX and 408
+            .OrResult(response => (int)response.StatusCode != 200) // 200 OK
+            .WaitAndRetryAsync(3, delay => TimeSpan.FromMilliseconds(250)))
             .ConfigurePrimaryHttpMessageHandler(handler =>
             {
                 return new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
