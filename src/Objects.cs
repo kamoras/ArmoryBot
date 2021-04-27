@@ -74,7 +74,7 @@ namespace ArmoryBot
                 } // End switch
             } // end Private Set
         } // End locale
-        public string Region { get; set; } // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
+        public string Region { get; private set; } // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
         public BlizzardAccessToken Token { get; set; }
     }
     public class BlizzardAccessToken // Blizzard Access Token Json > C# Class 
@@ -174,9 +174,9 @@ namespace ArmoryBot
     } // End AchievementList
     public class AchievementItem // Defines a single achievement, used by class:AchievementList and Globals.cs
     {
-        public int Group { get; set; } // Must be unique, use -1 if you want the achievement to always be displayed
-        public int Value { get; set; } // Value of achievement (0 = lowest). Higher value means it will be displayed over lower value achievements in the same group.
-        public string Name { get; set; } // Name of achievement as obtained by the API
+        public int Group { get; private set; } // Must be unique, use -1 if you want the achievement to always be displayed
+        public int Value { get; private set; } // Value of achievement (0 = lowest). Higher value means it will be displayed over lower value achievements in the same group.
+        public string Name { get; private set; } // Name of achievement as obtained by the API
         public AchievementItem(int group, int value, string name = null)
         {
             this.Group = group;
@@ -193,7 +193,7 @@ namespace ArmoryBot
     }
     public class RaidData // Stores all current expansion raids via BlizzardAPI.GetRaids()
     {
-        public List<RaidItem> Raids { get; set; }
+        public List<RaidItem> Raids { get; private set; }
         private string Locale;
         public RaidData(string locale)
         {
@@ -235,11 +235,11 @@ namespace ArmoryBot
     {
         private readonly int DungeonCount;
         private Dictionary<long, BestRun> Runs;
-        public int HighestRun { get; set; } // Highest M+ run player has completed
-        public int Plus5Count { get; set; } // Best runs between +5 and +9
-        public int Plus10Count { get; set; } // Best runs between +10 and +14
-        public int Plus15Count { get; set; } // Best runs +15 and higher
-        public int ExpiredCount { get; set; } // Best runs that the timer expired
+        public int HighestRun { get; private set; } // Highest M+ run player has completed
+        public int Plus5Count { get; private set; } // Best runs between +5 and +9
+        public int Plus10Count { get; private set; } // Best runs between +10 and +14
+        public int Plus15Count { get; private set; } // Best runs +15 and higher
+        public int ExpiredCount { get; private set; } // Best runs that the timer expired
         public MythicPlusData(int dungeonCount)
         {
             this.DungeonCount = dungeonCount;

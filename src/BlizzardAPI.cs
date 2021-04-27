@@ -29,7 +29,7 @@ namespace ArmoryBot
                 client.Timeout = new TimeSpan(0, 0, 15);
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
             })
-            .AddTransientHttpErrorPolicy(pol => pol.RetryAsync(3))
+            .AddTransientHttpErrorPolicy(pol => pol.WaitAndRetryAsync(3, i => TimeSpan.FromMilliseconds(750)))
             .ConfigurePrimaryHttpMessageHandler(handler =>
             {
                 return new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
