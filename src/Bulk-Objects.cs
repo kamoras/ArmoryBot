@@ -36,9 +36,9 @@ namespace ArmoryBot
         [JsonPropertyName("id")]
         public long Id { get; set; }
 
-        [JsonPropertyName("realm")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Realm Realm { get; set; }
+        //[JsonPropertyName("realm")]
+        //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        //public Realm Realm { get; set; }
     }
 
     public partial class Self
@@ -146,11 +146,11 @@ namespace ArmoryBot
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("gender")]
-        public Faction Gender { get; set; }
+        //[JsonPropertyName("gender")]
+        //public Faction Gender { get; set; }
 
-        [JsonPropertyName("faction")]
-        public Faction Faction { get; set; }
+        //[JsonPropertyName("faction")]
+        //public Faction Faction { get; set; }
 
         [JsonPropertyName("race")]
         public ActiveSpec Race { get; set; }
@@ -161,77 +161,77 @@ namespace ArmoryBot
         [JsonPropertyName("active_spec")]
         public ActiveSpec ActiveSpec { get; set; }
 
-        [JsonPropertyName("realm")]
-        public ActiveSpec Realm { get; set; }
+        //[JsonPropertyName("realm")]
+        //public ActiveSpec Realm { get; set; }
 
-        [JsonPropertyName("guild")]
-        public Guild Guild { get; set; }
+        //[JsonPropertyName("guild")]
+        //public Guild Guild { get; set; }
 
         [JsonPropertyName("level")]
         public long Level { get; set; }
 
-        [JsonPropertyName("experience")]
-        public long Experience { get; set; }
+        //[JsonPropertyName("experience")]
+        //public long Experience { get; set; }
 
-        [JsonPropertyName("achievement_points")]
-        public long AchievementPoints { get; set; }
+        //[JsonPropertyName("achievement_points")]
+        //public long AchievementPoints { get; set; }
 
-        [JsonPropertyName("achievements")]
-        public Achievements Achievements { get; set; }
+        //[JsonPropertyName("achievements")]
+        //public Achievements Achievements { get; set; }
 
-        [JsonPropertyName("titles")]
-        public Achievements Titles { get; set; }
+        //[JsonPropertyName("titles")]
+        //public Achievements Titles { get; set; }
 
-        [JsonPropertyName("pvp_summary")]
-        public Achievements PvpSummary { get; set; }
+        //[JsonPropertyName("pvp_summary")]
+        //public Achievements PvpSummary { get; set; }
 
-        [JsonPropertyName("encounters")]
-        public Achievements Encounters { get; set; }
+        //[JsonPropertyName("encounters")]
+        //public Achievements Encounters { get; set; }
 
-        [JsonPropertyName("media")]
-        public Achievements Media { get; set; }
+        //[JsonPropertyName("media")]
+        //public Achievements Media { get; set; }
 
-        [JsonPropertyName("last_login_timestamp")]
-        public long LastLoginTimestamp { get; set; }
+        //[JsonPropertyName("last_login_timestamp")]
+        //public long LastLoginTimestamp { get; set; }
 
-        [JsonPropertyName("average_item_level")]
-        public long AverageItemLevel { get; set; }
+        //[JsonPropertyName("average_item_level")]
+        //public long AverageItemLevel { get; set; }
 
         [JsonPropertyName("equipped_item_level")]
         public long EquippedItemLevel { get; set; }
 
-        [JsonPropertyName("specializations")]
-        public Achievements Specializations { get; set; }
+        //[JsonPropertyName("specializations")]
+        //public Achievements Specializations { get; set; }
 
-        [JsonPropertyName("statistics")]
-        public Achievements Statistics { get; set; }
+        //[JsonPropertyName("statistics")]
+        //public Achievements Statistics { get; set; }
 
-        [JsonPropertyName("mythic_keystone_profile")]
-        public Achievements MythicKeystoneProfile { get; set; }
+        //[JsonPropertyName("mythic_keystone_profile")]
+        //public Achievements MythicKeystoneProfile { get; set; }
 
-        [JsonPropertyName("equipment")]
-        public Achievements Equipment { get; set; }
+        //[JsonPropertyName("equipment")]
+        //public Achievements Equipment { get; set; }
 
-        [JsonPropertyName("appearance")]
-        public Achievements Appearance { get; set; }
+        //[JsonPropertyName("appearance")]
+        //public Achievements Appearance { get; set; }
 
-        [JsonPropertyName("collections")]
-        public Achievements Collections { get; set; }
+        //[JsonPropertyName("collections")]
+        //public Achievements Collections { get; set; }
 
-        [JsonPropertyName("active_title")]
-        public ActiveSpec ActiveTitle { get; set; }
+        //[JsonPropertyName("active_title")]
+        //public ActiveSpec ActiveTitle { get; set; }
 
-        [JsonPropertyName("reputations")]
-        public Achievements Reputations { get; set; }
+        //[JsonPropertyName("reputations")]
+        //public Achievements Reputations { get; set; }
 
-        [JsonPropertyName("quests")]
-        public Achievements Quests { get; set; }
+        //[JsonPropertyName("quests")]
+        //public Achievements Quests { get; set; }
 
-        [JsonPropertyName("achievements_statistics")]
-        public Achievements AchievementsStatistics { get; set; }
+        //[JsonPropertyName("achievements_statistics")]
+        //public Achievements AchievementsStatistics { get; set; }
 
-        [JsonPropertyName("professions")]
-        public Achievements Professions { get; set; }
+        //[JsonPropertyName("professions")]
+        //public Achievements Professions { get; set; }
 
         [JsonPropertyName("covenant_progress")]
         public CovenantProgress CovenantProgress { get; set; }
@@ -766,26 +766,26 @@ namespace ArmoryBot
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
 
-        [JsonPropertyName("total_quantity")]
-        public long TotalQuantity { get; set; }
+        //[JsonPropertyName("total_quantity")]
+        //public long TotalQuantity { get; set; }
 
-        [JsonPropertyName("total_points")]
-        public long TotalPoints { get; set; }
+        //[JsonPropertyName("total_points")]
+        //public long TotalPoints { get; set; }
 
         [JsonPropertyName("achievements")]
         public Achievement[] Achievements { get; set; }
 
-        [JsonPropertyName("category_progress")]
-        public CategoryProgress[] CategoryProgress { get; set; }
+        //[JsonPropertyName("category_progress")]
+        //public CategoryProgress[] CategoryProgress { get; set; }
 
-        [JsonPropertyName("recent_events")]
-        public RecentEvent[] RecentEvents { get; set; }
+        //[JsonPropertyName("recent_events")]
+        //public RecentEvent[] RecentEvents { get; set; }
 
-        [JsonPropertyName("character")]
-        public Character Character { get; set; }
+        //[JsonPropertyName("character")]
+        //public Character Character { get; set; }
 
-        [JsonPropertyName("statistics")]
-        public Statistics Statistics { get; set; }
+        //[JsonPropertyName("statistics")]
+        //public Statistics Statistics { get; set; }
     }
 
     public partial class Achievement
@@ -796,13 +796,13 @@ namespace ArmoryBot
         [JsonPropertyName("achievement")]
         public Character AchievementAchievement { get; set; }
 
-        [JsonPropertyName("criteria")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Criteria Criteria { get; set; }
+        //[JsonPropertyName("criteria")]
+        //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        //public Criteria Criteria { get; set; }
 
-        [JsonPropertyName("completed_timestamp")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public long? CompletedTimestamp { get; set; }
+        //[JsonPropertyName("completed_timestamp")]
+        //[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        //public long? CompletedTimestamp { get; set; }
     }
 
     public partial class Character
@@ -820,11 +820,11 @@ namespace ArmoryBot
         //public Realm Realm { get; set; }
     }
 
-    public partial class Statistics
-    {
-        [JsonPropertyName("href")]
-        public Uri Href { get; set; }
-    }
+    //public partial class Statistics
+    //{
+    //    [JsonPropertyName("href")]
+    //    public Uri Href { get; set; }
+    //}
 
     public partial class Realm
     {
@@ -842,34 +842,34 @@ namespace ArmoryBot
     }
 
 
-    public partial class Criteria
-    {
-        [JsonPropertyName("id")]
-        public long Id { get; set; }
+    //public partial class Criteria
+    //{
+    //    [JsonPropertyName("id")]
+    //    public long Id { get; set; }
 
-        [JsonPropertyName("is_completed")]
-        public bool IsCompleted { get; set; }
+    //    [JsonPropertyName("is_completed")]
+    //    public bool IsCompleted { get; set; }
 
-        [JsonPropertyName("child_criteria")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public Criteria[] ChildCriteria { get; set; }
+    //    [JsonPropertyName("child_criteria")]
+    //    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    //    public Criteria[] ChildCriteria { get; set; }
 
-        [JsonPropertyName("amount")]
-        [JsonIgnore]
-        public BigInteger Amount { get; set; }
-    }
+    //    [JsonPropertyName("amount")]
+    //    [JsonIgnore]
+    //    public BigInteger Amount { get; set; }
+    //}
 
-    public partial class CategoryProgress
-    {
-        [JsonPropertyName("category")]
-        public Character Category { get; set; }
+    //public partial class CategoryProgress
+    //{
+    //    [JsonPropertyName("category")]
+    //    public Character Category { get; set; }
 
-        [JsonPropertyName("quantity")]
-        public long Quantity { get; set; }
+    //    [JsonPropertyName("quantity")]
+    //    public long Quantity { get; set; }
 
-        [JsonPropertyName("points")]
-        public long Points { get; set; }
-    }
+    //    [JsonPropertyName("points")]
+    //    public long Points { get; set; }
+    //}
 
     public partial class Links
     {
@@ -877,14 +877,16 @@ namespace ArmoryBot
         //public Statistics Self { get; set; }
     }
 
-    public partial class RecentEvent
-    {
-        [JsonPropertyName("achievement")]
-        public Character Achievement { get; set; }
+    //public partial class RecentEvent
+    //{
+    //    [JsonPropertyName("achievement")]
+    //    public Character Achievement { get; set; }
 
-        [JsonPropertyName("timestamp")]
-        public long Timestamp { get; set; }
-    }
+    //    [JsonPropertyName("timestamp")]
+    //    public long Timestamp { get; set; }
+    //}
+
+
     // Mythic Plus Season Index JSON Objects
     /// <summary>
     /// https://us.api.blizzard.com/data/wow/mythic-keystone/season/index?namespace=dynamic-us
@@ -936,41 +938,41 @@ namespace ArmoryBot
         [JsonPropertyName("health")]
         public long Health { get; set; }
 
-        [JsonPropertyName("power")]
-        public long Power { get; set; }
+        //[JsonPropertyName("power")]
+        //public long Power { get; set; }
 
-        [JsonPropertyName("power_type")]
-        public PowerType PowerType { get; set; }
+        //[JsonPropertyName("power_type")]
+        //public PowerType PowerType { get; set; }
 
-        [JsonPropertyName("speed")]
-        public Avoidance Speed { get; set; }
+        //[JsonPropertyName("speed")]
+        //public Avoidance Speed { get; set; }
 
-        [JsonPropertyName("strength")]
-        public Agility Strength { get; set; }
+        //[JsonPropertyName("strength")]
+        //public Agility Strength { get; set; }
 
-        [JsonPropertyName("agility")]
-        public Agility Agility { get; set; }
+        //[JsonPropertyName("agility")]
+        //public Agility Agility { get; set; }
 
-        [JsonPropertyName("intellect")]
-        public Agility Intellect { get; set; }
+        //[JsonPropertyName("intellect")]
+        //public Agility Intellect { get; set; }
 
-        [JsonPropertyName("stamina")]
-        public Agility Stamina { get; set; }
+        //[JsonPropertyName("stamina")]
+        //public Agility Stamina { get; set; }
 
-        [JsonPropertyName("melee_crit")]
-        public Block MeleeCrit { get; set; }
+        //[JsonPropertyName("melee_crit")]
+        //public Block MeleeCrit { get; set; }
 
-        [JsonPropertyName("melee_haste")]
-        public Block MeleeHaste { get; set; }
+        //[JsonPropertyName("melee_haste")]
+        //public Block MeleeHaste { get; set; }
 
-        [JsonPropertyName("mastery")]
-        public Block Mastery { get; set; }
+        //[JsonPropertyName("mastery")]
+        //public Block Mastery { get; set; }
 
-        [JsonPropertyName("bonus_armor")]
-        public double BonusArmor { get; set; }
+        //[JsonPropertyName("bonus_armor")]
+        //public double BonusArmor { get; set; }
 
-        [JsonPropertyName("lifesteal")]
-        public Block Lifesteal { get; set; }
+        //[JsonPropertyName("lifesteal")]
+        //public Block Lifesteal { get; set; }
 
         [JsonPropertyName("versatility")]
         public double Versatility { get; set; }
@@ -984,105 +986,105 @@ namespace ArmoryBot
         [JsonPropertyName("versatility_damage_taken_bonus")]
         public double VersatilityDamageTakenBonus { get; set; }
 
-        [JsonPropertyName("avoidance")]
-        public Avoidance Avoidance { get; set; }
+        //[JsonPropertyName("avoidance")]
+        //public Avoidance Avoidance { get; set; }
 
-        [JsonPropertyName("attack_power")]
-        public double AttackPower { get; set; }
+        //[JsonPropertyName("attack_power")]
+        //public double AttackPower { get; set; }
 
-        [JsonPropertyName("main_hand_damage_min")]
-        public double MainHandDamageMin { get; set; }
+        //[JsonPropertyName("main_hand_damage_min")]
+        //public double MainHandDamageMin { get; set; }
 
-        [JsonPropertyName("main_hand_damage_max")]
-        public double MainHandDamageMax { get; set; }
+        //[JsonPropertyName("main_hand_damage_max")]
+        //public double MainHandDamageMax { get; set; }
 
-        [JsonPropertyName("main_hand_speed")]
-        public double MainHandSpeed { get; set; }
+        //[JsonPropertyName("main_hand_speed")]
+        //public double MainHandSpeed { get; set; }
 
-        [JsonPropertyName("main_hand_dps")]
-        public double MainHandDps { get; set; }
+        //[JsonPropertyName("main_hand_dps")]
+        //public double MainHandDps { get; set; }
 
-        [JsonPropertyName("off_hand_damage_min")]
-        public double OffHandDamageMin { get; set; }
+        //[JsonPropertyName("off_hand_damage_min")]
+        //public double OffHandDamageMin { get; set; }
 
-        [JsonPropertyName("off_hand_damage_max")]
-        public double OffHandDamageMax { get; set; }
+        //[JsonPropertyName("off_hand_damage_max")]
+        //public double OffHandDamageMax { get; set; }
 
-        [JsonPropertyName("off_hand_speed")]
-        public double OffHandSpeed { get; set; }
+        //[JsonPropertyName("off_hand_speed")]
+        //public double OffHandSpeed { get; set; }
 
-        [JsonPropertyName("off_hand_dps")]
-        public double OffHandDps { get; set; }
+        //[JsonPropertyName("off_hand_dps")]
+        //public double OffHandDps { get; set; }
 
-        [JsonPropertyName("spell_power")]
-        public double SpellPower { get; set; }
+        //[JsonPropertyName("spell_power")]
+        //public double SpellPower { get; set; }
 
-        [JsonPropertyName("spell_penetration")]
-        public double SpellPenetration { get; set; }
+        //[JsonPropertyName("spell_penetration")]
+        //public double SpellPenetration { get; set; }
 
-        [JsonPropertyName("spell_crit")]
-        public Block SpellCrit { get; set; }
+        //[JsonPropertyName("spell_crit")]
+        //public Block SpellCrit { get; set; }
 
-        [JsonPropertyName("mana_regen")]
-        public double ManaRegen { get; set; }
+        //[JsonPropertyName("mana_regen")]
+        //public double ManaRegen { get; set; }
 
-        [JsonPropertyName("mana_regen_combat")]
-        public double ManaRegenCombat { get; set; }
+        //[JsonPropertyName("mana_regen_combat")]
+        //public double ManaRegenCombat { get; set; }
 
-        [JsonPropertyName("armor")]
-        public Agility Armor { get; set; }
+        //[JsonPropertyName("armor")]
+        //public Agility Armor { get; set; }
 
-        [JsonPropertyName("dodge")]
-        public Block Dodge { get; set; }
+        //[JsonPropertyName("dodge")]
+        //public Block Dodge { get; set; }
 
-        [JsonPropertyName("parry")]
-        public Block Parry { get; set; }
+        //[JsonPropertyName("parry")]
+        //public Block Parry { get; set; }
 
-        [JsonPropertyName("block")]
-        public Block Block { get; set; }
+        //[JsonPropertyName("block")]
+        //public Block Block { get; set; }
 
-        [JsonPropertyName("ranged_crit")]
-        public Block RangedCrit { get; set; }
+        //[JsonPropertyName("ranged_crit")]
+        //public Block RangedCrit { get; set; }
 
-        [JsonPropertyName("ranged_haste")]
-        public Block RangedHaste { get; set; }
+        //[JsonPropertyName("ranged_haste")]
+        //public Block RangedHaste { get; set; }
 
-        [JsonPropertyName("spell_haste")]
-        public Block SpellHaste { get; set; }
+        //[JsonPropertyName("spell_haste")]
+        //public Block SpellHaste { get; set; }
 
-        [JsonPropertyName("character")]
-        public Character Character { get; set; }
+        //[JsonPropertyName("character")]
+        //public Character Character { get; set; }
     }
 
-    public partial class Agility
-    {
-        [JsonPropertyName("base")]
-        public double Base { get; set; }
+    //public partial class Agility
+    //{
+    //    [JsonPropertyName("base")]
+    //    public double Base { get; set; }
 
-        [JsonPropertyName("effective")]
-        public double Effective { get; set; }
-    }
+    //    [JsonPropertyName("effective")]
+    //    public double Effective { get; set; }
+    //}
 
-    public partial class Avoidance
-    {
-        [JsonPropertyName("rating")]
-        public double Rating { get; set; }
+    //public partial class Avoidance
+    //{
+    //    [JsonPropertyName("rating")]
+    //    public double Rating { get; set; }
 
-        [JsonPropertyName("rating_bonus")]
-        public double RatingBonus { get; set; }
-    }
+    //    [JsonPropertyName("rating_bonus")]
+    //    public double RatingBonus { get; set; }
+    //}
 
-    public partial class Block
-    {
-        [JsonPropertyName("rating")]
-        public double Rating { get; set; }
+    //public partial class Block
+    //{
+    //    [JsonPropertyName("rating")]
+    //    public double Rating { get; set; }
 
-        [JsonPropertyName("rating_bonus")]
-        public double RatingBonus { get; set; }
+    //    [JsonPropertyName("rating_bonus")]
+    //    public double RatingBonus { get; set; }
 
-        [JsonPropertyName("value")]
-        public double Value { get; set; }
-    }
+    //    [JsonPropertyName("value")]
+    //    public double Value { get; set; }
+    //}
 
     public partial class Character
     {
@@ -1105,21 +1107,21 @@ namespace ArmoryBot
         //public Uri Href { get; set; }
     }
 
-    public partial class PowerType
-    {
-        [JsonPropertyName("key")]
-        public Self Key { get; set; }
+    //public partial class PowerType
+    //{
+    //    [JsonPropertyName("key")]
+    //    public Self Key { get; set; }
 
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+    //    [JsonPropertyName("name")]
+    //    public string Name { get; set; }
 
-        [JsonPropertyName("id")]
-        public long Id { get; set; }
+    //    [JsonPropertyName("id")]
+    //    public long Id { get; set; }
 
-        [JsonPropertyName("slug")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-        public string Slug { get; set; }
-    }
+    //    [JsonPropertyName("slug")]
+    //    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    //    public string Slug { get; set; }
+    //}
 
 
     public partial class Links

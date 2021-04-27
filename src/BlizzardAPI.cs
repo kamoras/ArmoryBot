@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Text.Json;
-using System.Net.Http.Json;
+using Polly;
 
 namespace ArmoryBot
 {
@@ -18,23 +17,30 @@ namespace ArmoryBot
     {
         private BlizzardConfig Config;
         private Timer TokenExpTimer;
-        private readonly IServiceProvider Services;
+        private readonly IServiceCollection Services;
         private readonly IHttpClientFactory ClientFactory;
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
         public BlizzardAPI()
         {
-            this.Services = new ServiceCollection().AddHttpClient().Configure<HttpClientFactoryOptions>(options => options.HttpMessageHandlerBuilderActions.Add(builder =>
-            builder.PrimaryHandler = new HttpClientHandler
+            this.Services = new ServiceCollection();
+            this.Services.AddHttpClient("ApiClient", client =>
             {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            })).BuildServiceProvider();
-            this.ClientFactory = this.Services.GetService<IHttpClientFactory>();
+                client.Timeout = new TimeSpan(0, 0, 15);
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
+            })
+            .AddTransientHttpErrorPolicy(pol => pol.RetryAsync(3))
+            .ConfigurePrimaryHttpMessageHandler(handler =>
+            {
+                return new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
+            });
+            this.ClientFactory = this.Services.BuildServiceProvider().GetService<IHttpClientFactory>();
             this.Config = JsonSerializer.Deserialize<BlizzardConfig>(File.ReadAllText(Globals.BlizzardConfigPath)); // Load Config
 #pragma warning disable 4014
             this.RequestToken(); // Obtain initial BlizzAPI Token (cannot await in constructor)
 #pragma warning restore 4014
         }
+
         public async Task<ArmoryData> ArmoryLookup(string character, string realm, LookupType type) // Main Armory Lookup Method exposed to ArmoryBot.cs
         {
             try
@@ -235,14 +241,12 @@ namespace ArmoryBot
                 await Program.Log("Requesting new BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/token"))
                 {
-                    request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                     var base64authorization = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{this.Config.client_id}:{this.Config.client_secret}"));
                     request.Headers.TryAddWithoutValidation("Authorization", $"Basic {base64authorization}");
                     request.Content = new StringContent("grant_type=client_credentials");
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var client = this.ClientFactory.CreateClient();
-                    client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
+                    var client = this.ClientFactory.CreateClient("ApiClient");
                     var response = await client.SendAsync(request); // Send HTTP request
                     var json = await response.Content.ReadAsStreamAsync(); // Store json response
                     this.Config.Token = await JsonSerializer.DeserializeAsync<BlizzardAccessToken>(json, new JsonSerializerOptions() { IgnoreNullValues = true });
@@ -278,14 +282,12 @@ namespace ArmoryBot
                 await Program.Log("Checking BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/check_token"))
                 {
-                    request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                     var contentList = new List<string>();
                     contentList.Add($"token={this.Config.Token.access_token}");
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var client = this.ClientFactory.CreateClient();
-                    client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
+                    var client = this.ClientFactory.CreateClient("ApiClient");
                     var response = await client.SendAsync(request); // Send HTTP Request
                     var json = await response.Content.ReadAsStreamAsync(); // Store JSON
                     var result = await JsonSerializer.DeserializeAsync<CheckTokenResult>(json, new JsonSerializerOptions() { IgnoreNullValues = true });
@@ -306,8 +308,7 @@ namespace ArmoryBot
         }
         private async Task<Stream> Call(string uri, Namespace space) // API Lookup, returns a json string to calling function
         {
-            uri += $"?locale={this.Config.locale}"; // Get data for current locale only
-            using (var request = new HttpRequestMessage(new HttpMethod("GET"), uri))
+            using (var request = new HttpRequestMessage(new HttpMethod("GET"), uri + $"?locale={this.Config.locale}"))
             {
                 switch (space)
                 {
@@ -321,10 +322,8 @@ namespace ArmoryBot
                         request.Headers.TryAddWithoutValidation("Battlenet-Namespace", $"dynamic-{this.Config.Region}");
                         break;
                 }
-                request.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate"); // Request compression
                 request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
-                var client = this.ClientFactory.CreateClient();
-                client.Timeout = TimeSpan.FromSeconds(20); // Set HTTP Request Timeout
+                var client = this.ClientFactory.CreateClient("ApiClient");
                 var response = await client.SendAsync(request); // Send HTTP Request
                 return await response.Content.ReadAsStreamAsync(); // Return JSON Stream
             }
