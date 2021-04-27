@@ -1228,4 +1228,155 @@ namespace ArmoryBot
         public string AuthorityAuthority { get; set; }
     }
 
+    // Character PVP Summary
+    /// <summary>
+    /// /profile/wow/character/{realmSlug}/{characterName}/pvp-summary
+    /// Added via https://app.quicktype.io/
+    /// </summary>
+    public partial class PvpSummary
+    {
+        [JsonPropertyName("_links")]
+        public Links Links { get; set; }
+
+        [JsonPropertyName("brackets")]
+        public Self[] Brackets { get; set; }
+
+        //[JsonPropertyName("honor_level")]
+        //public long HonorLevel { get; set; }
+
+        //[JsonPropertyName("pvp_map_statistics")]
+        //public PvpMapStatistic[] PvpMapStatistics { get; set; }
+
+        //[JsonPropertyName("honorable_kills")]
+        //public long HonorableKills { get; set; }
+
+        //[JsonPropertyName("character")]
+        //public Character Character { get; set; }
+    }
+
+    //public partial class Self
+    //{
+    //    [JsonPropertyName("href")]
+    //    public Uri Href { get; set; }
+    //}
+
+    //public partial class Character
+    //{
+    //    [JsonPropertyName("key")]
+    //    public Self Key { get; set; }
+
+    //    [JsonPropertyName("name")]
+    //    public string Name { get; set; }
+
+    //    [JsonPropertyName("id")]
+    //    public long Id { get; set; }
+
+    //    [JsonPropertyName("realm", NullValueHandling = NullValueHandling.Ignore)]
+    //    public Character Realm { get; set; }
+
+    //    [JsonPropertyName("slug", NullValueHandling = NullValueHandling.Ignore)]
+    //    public string Slug { get; set; }
+    //}
+
+    //public partial class Links
+    //{
+    //    [JsonPropertyName("self")]
+    //    public Self Self { get; set; }
+    //}
+
+    //public partial class PvpMapStatistic
+    //{
+    //    [JsonPropertyName("world_map")]
+    //    public WorldMap WorldMap { get; set; }
+
+    //    [JsonPropertyName("match_statistics")]
+    //    public MatchStatistics MatchStatistics { get; set; }
+    //}
+
+    //public partial class MatchStatistics
+    //{
+    //    [JsonPropertyName("played")]
+    //    public long Played { get; set; }
+
+    //    [JsonPropertyName("won")]
+    //    public long Won { get; set; }
+
+    //    [JsonPropertyName("lost")]
+    //    public long Lost { get; set; }
+    //}
+
+    //public partial class WorldMap
+    //{
+    //    [JsonPropertyName("name")]
+    //    public string Name { get; set; }
+
+    //    [JsonPropertyName("id")]
+    //    public long Id { get; set; }
+    //}
+
+    // Character Mythic Keystone Profile Index
+    /// <summary>
+    /// /profile/wow/character/{realmSlug}/{characterName}/mythic-keystone-profile
+    /// Added via https://app.quicktype.io/
+    /// </summary>
+
+    public partial class MythicPlusSummary
+    {
+        [JsonPropertyName("_links")]
+        public Links Links { get; set; }
+
+        [JsonPropertyName("current_period")]
+        public CurrentPeriod CurrentPeriod { get; set; }
+
+        [JsonPropertyName("seasons")]
+        public Period[] Seasons { get; set; }
+
+        [JsonPropertyName("character")]
+        public Character Character { get; set; }
+    }
+
+    //public partial class Character
+    //{
+    //    [JsonPropertyName("key")]
+    //    public Self Key { get; set; }
+
+    //    [JsonPropertyName("name")]
+    //    public string Name { get; set; }
+
+    //    [JsonPropertyName("id")]
+    //    public long Id { get; set; }
+
+    //    [JsonPropertyName("realm", NullValueHandling = NullValueHandling.Ignore)]
+    //    public Character Realm { get; set; }
+
+    //    [JsonPropertyName("slug", NullValueHandling = NullValueHandling.Ignore)]
+    //    public string Slug { get; set; }
+    //}
+
+    //public partial class Self
+    //{
+    //    [JsonPropertyName("href")]
+    //    public Uri Href { get; set; }
+    //}
+
+    //public partial class CurrentPeriod
+    //{
+    //    [JsonPropertyName("period")]
+    //    public Period Period { get; set; }
+    //}
+
+    //public partial class Period
+    //{
+    //    [JsonPropertyName("key")]
+    //    public Self Key { get; set; }
+
+    //    [JsonPropertyName("id")]
+    //    public long Id { get; set; }
+    //}
+
+    //public partial class Links
+    //{
+    //    [JsonPropertyName("self")]
+    //    public Self Self { get; set; }
+    //}
 }

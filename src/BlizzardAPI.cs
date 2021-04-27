@@ -33,7 +33,7 @@ namespace ArmoryBot
             .AddPolicyHandler(HttpPolicyExtensions
             .HandleTransientHttpError() // HttpRequestException, 5XX and 408
             .OrResult(response => (int)response.StatusCode != 200) // 200 OK
-            .WaitAndRetryAsync(3, delay => TimeSpan.FromMilliseconds(250)))
+            .WaitAndRetryAsync(3, delay => TimeSpan.FromMilliseconds(333)))
             .ConfigurePrimaryHttpMessageHandler(handler =>
             {
                 return new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
@@ -146,7 +146,14 @@ namespace ArmoryBot
 
         private async Task<string> GetMythicPlus(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
-            try // This section will 404 Not found if no M+ completed, use try/catch
+            var json_summary = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile", Namespace.Profile);
+            var summary = JsonSerializer.Deserialize<MythicPlusSummary>(json_summary); // De-serialize JSON to C# Classes
+            bool hasCurrentSeason = false;
+            if (!(summary.Seasons is null)) foreach (var season in summary.Seasons)
+            {
+                if (season.Id == this.MplusSeasonID) hasCurrentSeason = true;
+            }
+            if (hasCurrentSeason)
             {
                 MythicPlusData data = new MythicPlusData(this.MplusDungeonCount);
                 var json = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{this.MplusSeasonID}", Namespace.Profile);
@@ -157,7 +164,7 @@ namespace ArmoryBot
                 }
                 return data.ToString();
             }
-            catch { return "None"; }
+            else return "None";
         }
         private async Task<string> GetAchievements(string character, string realm, LookupType type) // Returns a string to this.ArmoryLookup()
         {
@@ -187,30 +194,33 @@ namespace ArmoryBot
         private async Task<string> GetPVP(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             string output = "";
-            Task<string> json2v2 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/2v2", Namespace.Profile);
-            Task<string> json3v3 = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/3v3", Namespace.Profile);
-            Task<string> jsonrbg = this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-bracket/rbg", Namespace.Profile);
-            await Task.WhenAll(json2v2, json3v3, jsonrbg); // Allow API calls to run concurrently
-            var v2info = JsonSerializer.Deserialize<PvpBracketInfo>(json2v2.Result); // De-serialize JSON to C# Classes
-            if (v2info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
+            var json_summary = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-summary", Namespace.Profile);
+            var summary = JsonSerializer.Deserialize<PvpSummary>(json_summary); // De-serialize JSON to C# Classes
+            if (!(summary.Brackets is null)) foreach (var item in summary.Brackets)
             {
-                int winpct = 0;
-                if (v2info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v2info.SeasonMatchStatistics.Won / (double)v2info.SeasonMatchStatistics.Played) * (double)100);
-                output += $"• 2v2 Rating: {v2info.Rating} (Won {winpct}%)\n";
-            }
-            var v3info = JsonSerializer.Deserialize<PvpBracketInfo>(json3v3.Result); // De-serialize JSON to C# Classes
-            if (v3info.SeasonMatchStatistics?.Played > 0) // Only list brackets played
-            {
-                int winpct = 0;
-                if (v3info.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)v3info.SeasonMatchStatistics.Won / (double)v3info.SeasonMatchStatistics.Played) * (double)100);
-                output += $"• 3v3 Rating: {v3info.Rating} (Won {winpct}%)\n";
-            }
-            var rbginfo = JsonSerializer.Deserialize<PvpBracketInfo>(jsonrbg.Result); // De-serialize JSON to C# Classes
-            if (rbginfo.SeasonMatchStatistics?.Played > 0) // Only list brackets played
-            {
-                int winpct = 0;
-                if (rbginfo.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)rbginfo.SeasonMatchStatistics.Won / (double)rbginfo.SeasonMatchStatistics.Played) * (double)100);
-                output += $"• RBG Rating: {rbginfo.Rating} (Won {winpct}%)\n";
+                string[] uri = item.Href.ToString().Split('?'); // Strip namespace
+                var json = await this.Call(uri[0], Namespace.Profile);
+                var bracket = JsonSerializer.Deserialize<PvpBracketInfo>(json); // De-serialize JSON to C# Classes
+                switch (bracket.Bracket.Type.ToLower())
+                {
+                    case "arena_2v2":
+                        bracket.Bracket.Type = "2v2";
+                        break;
+                    case "arena_3v3":
+                        bracket.Bracket.Type = "3v3";
+                        break;
+                    case "battlegrounds":
+                        bracket.Bracket.Type = "RBG";
+                        break;
+                    default:
+                        continue;
+                }
+                if (bracket.SeasonMatchStatistics?.Played > 0) // Only list brackets played
+                {
+                    int winpct = 0;
+                    if (bracket.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)bracket.SeasonMatchStatistics.Won / (double)bracket.SeasonMatchStatistics.Played) * (double)100);
+                    output += $"• {bracket.Bracket.Type} Rating: {bracket.Rating} (Won {winpct}%)\n";
+                }
             }
             if (output.Length == 0) return "None";
             else return output;
