@@ -13,7 +13,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}/encounters/raids?namespace=profile-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class RaidInfo
+    public partial class RaidJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -135,7 +135,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}?namespace=profile-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class CharacterSummary
+    public partial class CharacterSummaryJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -313,7 +313,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}/character-media?namespace=profile-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class CharacterMedia
+    public partial class CharacterMediaJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -380,7 +380,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile?namespace=profile-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class MythicPlusInfo
+    public partial class MythicPlusJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -511,7 +511,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{seasonid}?namespace=profile-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class MythicPlusSeasonInfo
+    public partial class MPlusSeasonInfoJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -761,7 +761,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}/achievements?namespace=profile-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class AchievementSummary
+    public partial class AchievementSummaryJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -892,7 +892,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/data/wow/mythic-keystone/season/index?namespace=dynamic-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class MPlusSeasonIndex
+    public partial class MPlusSeasonIndexJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -930,7 +930,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/profile/wow/character/{realm}/{character}/statistics?namespace=profile-us
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class CharacterStatsInfo
+    public partial class CharacterStatsJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -1134,7 +1134,7 @@ namespace ArmoryBot
     /// https://us.api.blizzard.com/data/wow/mythic-keystone/dungeon/index
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class AllDungeons
+    public partial class AllDungeonsJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -1201,7 +1201,7 @@ namespace ArmoryBot
     ///
     /// Check Token
     ///
-    public partial class CheckTokenResult // Used by BlizzardAPI.CheckToken()
+    public partial class CheckTokenJson // Used by BlizzardAPI.CheckToken()
     {
         [JsonPropertyName("scope")]
         public object[] Scope { get; set; }
@@ -1233,7 +1233,7 @@ namespace ArmoryBot
     /// /profile/wow/character/{realmSlug}/{characterName}/pvp-summary
     /// Added via https://app.quicktype.io/
     /// </summary>
-    public partial class PvpSummary
+    public partial class PvpSummaryJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }
@@ -1320,7 +1320,7 @@ namespace ArmoryBot
     /// Added via https://app.quicktype.io/
     /// </summary>
 
-    public partial class MythicPlusSummary
+    public partial class MPlusSummaryJson
     {
         [JsonPropertyName("_links")]
         public Links Links { get; set; }

@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using System.Text.Json;
 
-
 namespace ArmoryBot
 {
     public class ArmoryBot
