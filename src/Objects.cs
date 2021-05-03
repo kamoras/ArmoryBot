@@ -24,23 +24,28 @@ namespace ArmoryBot
     }
     public class DiscordConfig // Stores Discord Config as loaded from Config File
     {
+        [JsonInclude]
         [JsonPropertyName("token")]
-        public string token { get; set; }
+        public string token { get; private set; }
+        [JsonInclude]
         [JsonPropertyName("cmdprefix")]
-        public char cmdprefix { get; set; }
+        public char cmdprefix { get; private set; }
     }
     public class BlizzardConfig // Stores Blizzard Config as loaded from Config File
     {
+        [JsonInclude]
         [JsonPropertyName("client_id")]
-        public string client_id { get; set; }
+        public string client_id { get; private set; }
+        [JsonInclude]
         [JsonPropertyName("client_secret")]
-        public string client_secret { get; set; }
+        public string client_secret { get; private set; }
         private string _locale; // Backing field
+        [JsonInclude]
         [JsonPropertyName("locale")]
         public string locale
         {
             get { return this._locale; }
-            set
+            private set
             {
                 this._locale = value.ToLower();
                 switch (value.ToLower())
@@ -75,15 +80,17 @@ namespace ArmoryBot
             } // end Private Set
         } // End locale
         public string Region { get; private set; } // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
-        public BlizzardAccessToken Token { get; set; }
     }
     public class BlizzardAccessToken // Blizzard Access Token Json > C# Class 
     {
+        [JsonInclude]
         [JsonPropertyName("access_token")]
-        public string access_token { get; set; }
+        public string access_token { get; private set; }
+        [JsonInclude]
         [JsonPropertyName("token_type")]
-        public string token_type { get; set; }
+        public string token_type { get; private set; }
         private int _expires_in; // Backing Field
+        [JsonInclude]
         [JsonPropertyName("expires_in")]
         public int expires_in // Seconds
         {
@@ -91,17 +98,17 @@ namespace ArmoryBot
             {
                 return this._expires_in;
             }
-            set
+            private set
             {
                 this._expires_in = value;
-                DateTime now = DateTime.Now;
-                TimeSpan time = new TimeSpan(0, 0, value); // Hours , Minutes, Seconds
-                this.expire_date = now.Add(time);
+                TimeSpan exptime = new TimeSpan(0, 0, value); // Hours , Minutes, Seconds
+                this.expire_date = DateTime.Now.Add(exptime);
             }
         }
-        public DateTime expire_date { get; set; }
+        public DateTime expire_date { get; private set; }
+        [JsonInclude]
         [JsonPropertyName("scope")]
-        public string scope { get; set; }
+        public string scope { get; private set; }
     }
 
     public class AchievementsList // Stores list of achievements via BlizzardAPI.GetAchievements()
@@ -207,7 +214,7 @@ namespace ArmoryBot
     }
     public class RaidItem // Child class for RaidData
     {
-        public string Name { get; set; }
+        public string Name { get; private set; }
         private Instance Raid;
         private string Locale;
         public RaidItem(Instance raid, string locale)
@@ -284,7 +291,7 @@ namespace ArmoryBot
         }
         public override string ToString() // Displays output 
         {
-            return $"• Best Run: +{this.HighestRun}\n• 5+ Runs: {this.Plus5Count}/{this.DungeonCount}\n• 10+ Runs: {this.Plus10Count}/{this.DungeonCount}\n• 15+ Runs: {this.Plus15Count}/{this.DungeonCount}\n• Expired Runs: {this.ExpiredCount}/{this.DungeonCount}";
+            return $"• Highest Key: +{this.HighestRun}\n• 5+ Dungeons: {this.Plus5Count}/{this.DungeonCount}\n• 10+ Dungeons: {this.Plus10Count}/{this.DungeonCount}\n• 15+ Dungeons: {this.Plus15Count}/{this.DungeonCount}\n• Time-Expired: {this.ExpiredCount}/{this.DungeonCount}";
         }
     }
 }

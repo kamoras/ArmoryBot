@@ -16,7 +16,8 @@ namespace ArmoryBot
 {
     public class BlizzardAPI
     {
-        private BlizzardConfig Config;
+        private readonly BlizzardConfig Config;
+        private BlizzardAccessToken Token;
         private Timer TokenExpTimer;
         private readonly IServiceCollection Services;
         private readonly IHttpClientFactory ClientFactory;
@@ -27,12 +28,12 @@ namespace ArmoryBot
             this.Services = new ServiceCollection();
             this.Services.AddHttpClient("ApiClient", client =>
             {
-                client.Timeout = new TimeSpan(0, 0, 15);
+                client.Timeout = TimeSpan.FromSeconds(15);
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
             })
             .AddPolicyHandler(HttpPolicyExtensions
             .HandleTransientHttpError() // HttpRequestException, 5XX and 408
-            .OrResult(response => (int)response.StatusCode != 200) // 200 OK
+            .OrResult(response => (int)response.StatusCode != 200) // Only accept 200 'OK'
             .WaitAndRetryAsync(3, delay => TimeSpan.FromMilliseconds(333)))
             .ConfigurePrimaryHttpMessageHandler(handler =>
             {
@@ -149,9 +150,13 @@ namespace ArmoryBot
             var json_summary = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile", Namespace.Profile);
             var summary = JsonSerializer.Deserialize<MythicPlusSummary>(json_summary); // De-serialize JSON to C# Classes
             bool hasCurrentSeason = false;
-            if (!(summary.Seasons is null)) foreach (var season in summary.Seasons)
+            if (summary.Seasons is not null) foreach (var season in summary.Seasons)
             {
-                if (season.Id == this.MplusSeasonID) hasCurrentSeason = true;
+                if (season.Id == this.MplusSeasonID)
+                    {
+                        hasCurrentSeason = true;
+                        break;
+                    }
             }
             if (hasCurrentSeason)
             {
@@ -196,7 +201,7 @@ namespace ArmoryBot
             string output = "";
             var json_summary = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-summary", Namespace.Profile);
             var summary = JsonSerializer.Deserialize<PvpSummary>(json_summary); // De-serialize JSON to C# Classes
-            if (!(summary.Brackets is null)) foreach (var item in summary.Brackets)
+            if (summary.Brackets is not null) foreach (var item in summary.Brackets)
             {
                 string[] uri = item.Href.ToString().Split('?'); // Strip namespace
                 var json = await this.Call(uri[0], Namespace.Profile);
@@ -265,10 +270,10 @@ namespace ArmoryBot
                     using var response = await client.SendAsync(request); // Send HTTP request
                     {
                         var json = await response.Content.ReadAsStringAsync(); // Store json response
-                        this.Config.Token = JsonSerializer.Deserialize<BlizzardAccessToken>(json, new JsonSerializerOptions() { IgnoreNullValues = true });
-                        if (this.Config.Token.access_token is null) throw new Exception($"Error obtaining token:\n{response}");
+                        this.Token = JsonSerializer.Deserialize<BlizzardAccessToken>(json, new JsonSerializerOptions() { IgnoreNullValues = true });
+                        if (this.Token?.access_token is null) throw new Exception($"Error obtaining token:\n{response}");
                         this.TokenExpTimer_Start(); // Start Auto-Renewing Timer
-                        await Program.Log($"BlizzAPI Token obtained! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                        await Program.Log($"BlizzAPI Token obtained! Valid until {this.Token.expire_date} (Auto-Renewing).");
                         await this.GetGameData(); // Update Dynamic Assets
                     }
                 }
@@ -281,7 +286,7 @@ namespace ArmoryBot
 
         private void TokenExpTimer_Start()
         {
-            this.TokenExpTimer = new Timer(this.Config.Token.expires_in * 1000); // Convert seconds to ms
+            this.TokenExpTimer = new Timer(this.Token.expires_in * 1000); // Convert seconds to ms
             this.TokenExpTimer.AutoReset = false;
             this.TokenExpTimer.Elapsed += this.TokenExpTimer_Elapsed; // Set elapsed event method
             this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
@@ -300,7 +305,7 @@ namespace ArmoryBot
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/check_token"))
                 {
                     var contentList = new List<string>();
-                    contentList.Add($"token={this.Config.Token.access_token}");
+                    contentList.Add($"token={this.Token.access_token}");
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
@@ -312,7 +317,7 @@ namespace ArmoryBot
                         if (result.ClientId is null) throw new Exception($"BlizzAPI Token is no longer valid!\n{response}");
                         else
                         {
-                            await Program.Log($"BlizzAPI Token is valid! Valid until {this.Config.Token.expire_date} (Auto-Renewing).");
+                            await Program.Log($"BlizzAPI Token is valid! Valid until {this.Token.expire_date} (Auto-Renewing).");
                             if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1)
                                 await this.GetGameData(); // Make sure dynamic assets are set
                         }
@@ -341,7 +346,7 @@ namespace ArmoryBot
                         request.Headers.TryAddWithoutValidation("Battlenet-Namespace", $"dynamic-{this.Config.Region}");
                         break;
                 }
-                request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Config.Token.access_token}");
+                request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Token.access_token}");
                 var client = this.ClientFactory.CreateClient("ApiClient");
                 using var response = await client.SendAsync(request); // Send HTTP Request
                 {

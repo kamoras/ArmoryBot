@@ -40,7 +40,7 @@ namespace ArmoryBot
         private async Task Discord_HandleCommandAsync(SocketMessage msgParam) // Triggered when a message is received in a channel the bot has visible
         {
             if (msgParam is null) return; // Null check
-            if (!(msgParam is SocketUserMessage msg)) return; // Ignore System/Other messages
+            if (msgParam is not SocketUserMessage msg) return; // Ignore System/Other messages
             if (msg.Source != MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
@@ -111,7 +111,7 @@ namespace ArmoryBot
                             {
                                 eb.AddField(raid.Name, raid.ToString(), true); // inline, up to 3 columns per row
                             }
-                        eb.AddField("Mythic+", info.MythicPlus, false);
+                        eb.AddField("M+ Best Runs", info.MythicPlus, false);
                         eb.AddField("PVE Achievements", info.Achievements, false);
                         break;
                     case LookupType.PVP:
