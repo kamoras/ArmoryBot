@@ -21,12 +21,14 @@ namespace ArmoryBot
         private Timer TokenExpTimer;
         private readonly IServiceCollection Services;
         private readonly IHttpClientFactory ClientFactory;
+
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
-        public BlizzardAPI()
+
+        public BlizzardAPI() // constructor
         {
             this.Services = new ServiceCollection();
-            this.Services.AddHttpClient("ApiClient", client =>
+            this.Services.AddHttpClient("default", client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(15);
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
@@ -34,7 +36,7 @@ namespace ArmoryBot
             .AddPolicyHandler(HttpPolicyExtensions
             .HandleTransientHttpError() // HttpRequestException, 5XX and 408
             .OrResult(response => (int)response.StatusCode != 200) // Only accept 200 'OK'
-            .WaitAndRetryAsync(3, delay => TimeSpan.FromMilliseconds(333)))
+            .WaitAndRetryAsync(3, delay => TimeSpan.FromMilliseconds(250)))
             .ConfigurePrimaryHttpMessageHandler(handler =>
             {
                 return new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
@@ -46,6 +48,8 @@ namespace ArmoryBot
 #pragma warning restore 4014
         }
 
+        // ** Public Access Methods **
+        //
         public async Task<ArmoryData> ArmoryLookup(string character, string realm, LookupType type) // Main Armory Lookup Method exposed to ArmoryBot.cs
         {
             try
@@ -98,8 +102,9 @@ namespace ArmoryBot
                 throw; // Re-throw exception, will be caught in calling function
             }
         }
+
         //
-        // Shared/PVE Methods
+        // Armory Lookup Sub-Tasks
         //
         private async Task<CharacterInfo> GetCharacter(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
@@ -140,7 +145,6 @@ namespace ArmoryBot
             }
             return data;
         }
-
         private async Task<string> GetMythicPlus(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             MPlusSummaryJson summary = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile", Namespace.Profile, typeof(MPlusSummaryJson));
@@ -186,16 +190,13 @@ namespace ArmoryBot
             } // End Switch
             return list.ToString();
         }
-        //
-        // PVP Only Methods
-        //
         private async Task<string> GetPVP(string character, string realm) // Returns a string to this.ArmoryLookup()
         {
             string output = "";
             PvpSummaryJson summary = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/pvp-summary", Namespace.Profile, typeof(PvpSummaryJson));
             if (summary.Brackets is not null) foreach (var item in summary.Brackets)
             {
-                string[] uri = item.Href.ToString().Split('?'); // Strip namespace
+                string[] uri = item.Href.ToString().Split('?'); // Strip namespace from uri (already in req headers)
                 PvpBracketInfo bracket = await this.Call(uri[0], Namespace.Profile, typeof(PvpBracketInfo));
                 switch (bracket.Bracket.Type.ToLower())
                 {
@@ -211,7 +212,7 @@ namespace ArmoryBot
                     default:
                         continue;
                 }
-                if (bracket.SeasonMatchStatistics?.Played > 0) // Only list brackets played
+                if (bracket.SeasonMatchStatistics?.Played > 0)
                 {
                     int winpct = 0;
                     if (bracket.SeasonMatchStatistics?.Won > 0) winpct = (int)(((double)bracket.SeasonMatchStatistics.Won / (double)bracket.SeasonMatchStatistics.Played) * (double)100);
@@ -226,8 +227,9 @@ namespace ArmoryBot
             CharacterStatsJson stats = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/statistics", Namespace.Profile, typeof(CharacterStatsJson));
             return $"• Health: {stats.Health.ToString("N0")}\n• Versatility: {stats.VersatilityDamageDoneBonus}%";
         }
-        //
-        // ** Game Data API 
+        // End Armory Lookup Sub-Tasks
+
+        // Game Data API (Static/Dynamic Assets)
         //
         private async Task GetGameData() // Gets Static/Dynamic assets that can be stored longer term
         {
@@ -240,9 +242,9 @@ namespace ArmoryBot
             this.MplusDungeonCount = count;
         }
         //
-        // ** Blizz API Core Methods **
+        // Blizzard API Core Methods (Obtain/Check Token, API Lookup)
         //
-        private async Task RequestToken() // https://develop.battle.net/documentation/guides/using-oauth/client-credentials-flow
+        private async Task RequestToken() // Request *new* Blizzard API Access Token
         {
             try
             {
@@ -254,12 +256,12 @@ namespace ArmoryBot
                     request.Content = new StringContent("grant_type=client_credentials");
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var client = this.ClientFactory.CreateClient("ApiClient");
+                    var client = this.ClientFactory.CreateClient("default"); // Get HTTP client
                     using (var response = await client.SendAsync(request)) // Send HTTP request
-                    await using (var result = await response.Content.ReadAsStreamAsync())
+                    await using (var content = await response.Content.ReadAsStreamAsync()) // Read Content
                     {
-                        this.Token = await JsonSerializer.DeserializeAsync<BlizzardAccessToken>(result, new JsonSerializerOptions() { IgnoreNullValues = true });
-                        if (this.Token?.access_token is null) throw new Exception($"Error obtaining token:\n{response}");
+                        this.Token = await JsonSerializer.DeserializeAsync<BlizzardAccessToken>(content, new JsonSerializerOptions() { IgnoreNullValues = true });
+                        if (this.Token.access_token is null) throw new Exception($"Error obtaining token:\n{response}");
                         this.TokenExpTimer_Start(); // Start Auto-Renewing Timer
                         await Program.Log($"BlizzAPI Token obtained! Valid until {this.Token.expire_date} (Auto-Renewing).");
                         await this.GetGameData(); // Update Dynamic Assets
@@ -270,22 +272,8 @@ namespace ArmoryBot
             {
                 await Program.Log(ex.ToString());
             }
-        } // End RequestToken()
-
-        private void TokenExpTimer_Start()
-        {
-            this.TokenExpTimer = new Timer(this.Token.expires_in * 1000); // Convert seconds to ms
-            this.TokenExpTimer.AutoReset = false;
-            this.TokenExpTimer.Elapsed += this.TokenExpTimer_Elapsed; // Set elapsed event method
-            this.TokenExpTimer.Start(); // Starts Auto-Renewing Timer for BlizzAPI Token
         }
-        private async void TokenExpTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            await Program.Log("BlizzAPI Token expired!");
-            await this.RequestToken();
-        }
-
-        private async Task CheckToken()
+        private async Task CheckToken() // Checks if current Access Token is valid, if invalid will request a new one
         {
             try
             {
@@ -297,17 +285,17 @@ namespace ArmoryBot
                     request.Content = new StringContent(string.Join("&", contentList));
                     request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/x-www-form-urlencoded");
 
-                    var client = this.ClientFactory.CreateClient("ApiClient");
+                    var client = this.ClientFactory.CreateClient("default"); // Get HTTP client
                     using (var response = await client.SendAsync(request)) // Send HTTP Request
-                    await using (var result = await response.Content.ReadAsStreamAsync())
+                    await using (var content = await response.Content.ReadAsStreamAsync()) // Read Content
                     {
-                        var json = await JsonSerializer.DeserializeAsync<CheckTokenJson>(result, new JsonSerializerOptions() { IgnoreNullValues = true });
-                        if (json.ClientId is null) throw new Exception($"BlizzAPI Token is no longer valid!\n{response}");
+                        var json = await JsonSerializer.DeserializeAsync<CheckTokenJson>(content, new JsonSerializerOptions() { IgnoreNullValues = true });
+                        if (json.ClientId is null) throw new Exception($"BlizzAPI Token is no longer valid!\n{response}"); // Throw exception, will request new token
                         else
                         {
                             await Program.Log($"BlizzAPI Token is valid! Valid until {this.Token.expire_date} (Auto-Renewing).");
                             if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1)
-                                await this.GetGameData(); // Make sure dynamic assets are set
+                                await this.GetGameData(); // Make sure static/dynamic assets are set
                         }
                     }
                 }
@@ -315,14 +303,14 @@ namespace ArmoryBot
             catch (Exception ex)
             {
                 await Program.Log(ex.ToString());
-                await this.RequestToken();
+                await this.RequestToken(); // Renew token
             }
         }
-        private async Task<dynamic> Call(string uri, Namespace space, Type jsonType) // API Lookup, returns a json string to calling function
+        private async Task<dynamic> Call(string uri, Namespace space, Type jsonType) // Main API Lookup Method, returns a dynamic object to caller
         {
-            using (var request = new HttpRequestMessage(new HttpMethod("GET"), uri + $"?locale={this.Config.locale}"))
+            using (var request = new HttpRequestMessage(new HttpMethod("GET"), uri + $"?locale={this.Config.locale}")) // Append Locale to URI
             {
-                switch (space)
+                switch (space) // Set Namespace in Headers
                 {
                     case Namespace.Profile:
                         request.Headers.TryAddWithoutValidation("Battlenet-Namespace", $"profile-{this.Config.Region}");
@@ -334,14 +322,30 @@ namespace ArmoryBot
                         request.Headers.TryAddWithoutValidation("Battlenet-Namespace", $"dynamic-{this.Config.Region}");
                         break;
                 }
-                request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Token.access_token}");
-                var client = this.ClientFactory.CreateClient("ApiClient");
+                request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {this.Token.access_token}"); // Specify Authorization (Access Token)
+
+                var client = this.ClientFactory.CreateClient("default"); // Get HTTP client
                 using (var response = await client.SendAsync(request)) // Send HTTP Request
-                await using (var result = await response.Content.ReadAsStreamAsync())
+                await using (var content = await response.Content.ReadAsStreamAsync()) // Read Content
                 {
-                    return await JsonSerializer.DeserializeAsync(result, jsonType);
+                    return await JsonSerializer.DeserializeAsync(content, jsonType); // Return deserialized json object to caller
                 }
             }
+        }
+
+        // TokenExpTimer Methods
+        //
+        private void TokenExpTimer_Start()
+        {
+            this.TokenExpTimer = new Timer(this.Token.expires_in * 1000); // Convert seconds to ms, set timer duration based on expiration time
+            this.TokenExpTimer.AutoReset = false;
+            this.TokenExpTimer.Elapsed += this.TokenExpTimer_Elapsed; // Set .Elapsed event
+            this.TokenExpTimer.Start(); // Start Timer, when it expires TokenExpTimer_Elapsed() will be invoked
+        }
+        private async void TokenExpTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            await Program.Log("BlizzAPI Token expired!");
+            await this.RequestToken(); // Renew token
         }
     }
 

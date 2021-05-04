@@ -17,6 +17,7 @@ namespace ArmoryBot
         private DiscordSocketClient Client;
         private CommandService Commands;
         private IServiceProvider Services;
+
         public ArmoryBot()
         {
             this.BlizzAPI = new BlizzardAPI(); // Initializes Blizzard API
@@ -40,7 +41,7 @@ namespace ArmoryBot
         {
             if (msgParam is null) return; // Null check
             if (msgParam is not SocketUserMessage msg) return; // Ignore System/Other messages
-            if (msg.Source != MessageSource.User) return; // Only process user messages
+            if (msg.Source is not MessageSource.User) return; // Only process user messages
             int argPos = 0;
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
             Task.Run(async delegate // Long running task
@@ -92,13 +93,13 @@ namespace ArmoryBot
             else await this.SendErrorResponse("Invalid command entry!");
         }
 
-        private async Task CMD_Armory(string identity, LookupType type) // Main Armory Lookup: [0] = user-realm , [1] = pve/pvp
+        private async Task CMD_Armory(string identity, LookupType type) // Main Armory Lookup
         {
             try
             {
                 await Program.Log($"Armory Command requested by {this.Context.Message.Author}");
                 string[] character = identity.Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
-                ArmoryData info = await this.Context.API.ArmoryLookup(character[0], character[1], type); // Main Blizzard API Lookup, [0]name [1]realm [1]LookupType.PVE/PVP
+                ArmoryData info = await this.Context.API.ArmoryLookup(character[0], character[1], type); // Main Blizzard API Lookup: Name, Realm, LookupType.PVE/PVP
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle(info.CharInfo.Name);
                 eb.WithDescription($"{info.CharInfo.ItemLevel} | {info.CharInfo.Renown}");
