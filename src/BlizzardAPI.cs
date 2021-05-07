@@ -16,7 +16,7 @@ namespace ArmoryBot
 {
     public class BlizzardAPI
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<Worker> Logger;
         private readonly ArmoryBotConfig Config;
         private BlizzardAccessToken Token;
         private Timer TokenExpTimer;
@@ -28,7 +28,7 @@ namespace ArmoryBot
 
         public BlizzardAPI(ILogger<Worker> logger, ArmoryBotConfig config) // constructor
         {
-            this._logger = logger;
+            this.Logger = logger;
             this.Config = config;
             this.Services = new ServiceCollection();
             this.Services.AddHttpClient("default", client =>
@@ -250,7 +250,7 @@ namespace ArmoryBot
         {
             try
             {
-                this._logger.LogInformation("Requesting new BlizzAPI Token...");
+                this.Logger.LogInformation("Requesting new BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/token"))
                 {
                     var base64authorization = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{this.Config.client_id}:{this.Config.client_secret}"));
@@ -265,21 +265,21 @@ namespace ArmoryBot
                         this.Token = await JsonSerializer.DeserializeAsync<BlizzardAccessToken>(content, new JsonSerializerOptions() { IgnoreNullValues = true });
                         if (this.Token.access_token is null) throw new Exception($"Error obtaining token:\n{response}");
                         this.TokenExpTimer_Start(); // Start Auto-Renewing Timer
-                        this._logger.LogInformation($"BlizzAPI Token obtained! Valid until {this.Token.expire_date} (Auto-Renewing).");
+                        this.Logger.LogInformation($"BlizzAPI Token obtained! Valid until {this.Token.expire_date} (Auto-Renewing).");
                         await this.GetGameData(); // Update Dynamic Assets
                     }
                 }
             }
             catch (Exception ex)
             {
-                this._logger.LogError(ex.ToString());
+                this.Logger.LogError(ex.ToString());
             }
         }
         private async Task CheckToken() // Checks if current Access Token is valid, if invalid will request a new one
         {
             try
             {
-                this._logger.LogInformation("Checking BlizzAPI Token...");
+                this.Logger.LogInformation("Checking BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/check_token"))
                 {
                     var contentList = new List<string>();
@@ -295,7 +295,7 @@ namespace ArmoryBot
                         if (json.ClientId is null) throw new Exception($"BlizzAPI Token is no longer valid!\n{response}"); // Throw exception, will request new token
                         else
                         {
-                            this._logger.LogInformation($"BlizzAPI Token is valid! Valid until {this.Token.expire_date} (Auto-Renewing).");
+                            this.Logger.LogInformation($"BlizzAPI Token is valid! Valid until {this.Token.expire_date} (Auto-Renewing).");
                             if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1)
                                 await this.GetGameData(); // Make sure static/dynamic assets are set
                         }
@@ -304,7 +304,7 @@ namespace ArmoryBot
             }
             catch (Exception ex)
             {
-                this._logger.LogError(ex.ToString());
+                this.Logger.LogError(ex.ToString());
                 await this.RequestToken(); // Renew token
             }
         }
@@ -346,7 +346,7 @@ namespace ArmoryBot
         }
         private async void TokenExpTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            this._logger.LogWarning("BlizzAPI Token expired!");
+            this.Logger.LogWarning("BlizzAPI Token expired!");
             await this.RequestToken(); // Renew token
         }
     }

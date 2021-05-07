@@ -11,7 +11,7 @@ namespace ArmoryBot
 {
     public class ArmoryBot
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<Worker> Logger;
         private readonly ArmoryBotConfig Config;
         private BlizzardAPI BlizzAPI;
         private DiscordSocketClient Client;
@@ -20,7 +20,7 @@ namespace ArmoryBot
 
         public ArmoryBot(ILogger<Worker> logger, ArmoryBotConfig config)
         {
-            this._logger = logger;
+            this.Logger = logger;
             this.Config = config;
             this.BlizzAPI = new BlizzardAPI(logger, config); // Initializes Blizzard API
         }
@@ -47,32 +47,31 @@ namespace ArmoryBot
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
             Task.Run(async delegate // Long running task
             {
-                await this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI, this.Config.cmdprefix, this._logger), argPos, this.Services);
+                await this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI, this.Config.cmdprefix, this.Logger), argPos, this.Services);
             });
         }
-#pragma warning restore 4014
-#pragma warning restore 1998
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method
         {
             switch (msg.Severity)
             {
                 case LogSeverity.Warning:
-                    this._logger.LogWarning(msg.ToString());
+                    this.Logger.LogWarning(msg.ToString());
                     break;
                 case LogSeverity.Error:
-                    this._logger.LogError(msg.ToString());
+                    this.Logger.LogError(msg.ToString());
                     break;
                 case LogSeverity.Debug:
-                    this._logger.LogDebug(msg.ToString());
+                    this.Logger.LogDebug(msg.ToString());
                     break;
                 default:
-                    this._logger.LogInformation(msg.ToString());
+                    this.Logger.LogInformation(msg.ToString());
                     break;
-
             }
         }
     }
+#pragma warning restore 4014
+#pragma warning restore 1998
 
     [Group("armory")] // Armory Base Command
     public class ArmoryModule : ModuleBase<ArmoryCommandContext>
@@ -113,7 +112,7 @@ namespace ArmoryBot
         {
             try
             {
-                this.Context._logger.LogInformation($"Armory Command requested by {this.Context.Message.Author}");
+                this.Context.Logger.LogInformation($"Armory Command requested by {this.Context.Message.Author}");
                 string[] character = identity.Split(new[] { '-' }, 2); // Split CharacterName-Realm. Example: splits Frostchiji-Wyrmrest-Accord into [0]Frostchiji [1]Wyrmrest-Accord (keeps second dash).
                 ArmoryData info = await this.Context.API.ArmoryLookup(character[0], character[1], type); // Main Blizzard API Lookup: Name, Realm, LookupType.PVE/PVP
                 var eb = new EmbedBuilder(); // Build embedded discord msg
@@ -150,7 +149,7 @@ namespace ArmoryBot
         {
             try
             {
-                this.Context._logger.LogInformation($"Token Command requested by {this.Context.Message.Author}");
+                this.Context.Logger.LogInformation($"Token Command requested by {this.Context.Message.Author}");
                 WoWToken token = await this.Context.API.WoWTokenLookup();
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle("WoW Token");
@@ -168,7 +167,7 @@ namespace ArmoryBot
         {
             try
             {
-                this.Context._logger.LogInformation($"Help Command requested by {this.Context.Message.Author}");
+                this.Context.Logger.LogInformation($"Help Command requested by {this.Context.Message.Author}");
                 var eb = new EmbedBuilder(); // Build embedded discord msg
                 eb.WithTitle("ArmoryBot Help");
                 eb.WithDescription($"• Armory Lookup: `{this.Context.Prefix}armory pve/pvp CharacterName-Realm`\n• WoW Token Lookup: `{this.Context.Prefix}armory token`\n\n**NOTE:** Spaces in realm name should have a dash ' - '");
@@ -184,7 +183,7 @@ namespace ArmoryBot
         {
             try
             {
-                this.Context._logger.LogError($"{this.Context.Message}: {error}\n**Sending generic error notification to {this.Context.Message.Author}**");
+                this.Context.Logger.LogError($"{this.Context.Message}: {error}\n**Sending generic error notification to {this.Context.Message.Author}**");
                 var eb = new EmbedBuilder();
                 eb.WithDescription($"**ERROR** executing command `{this.Context.Message}`\nPlease double check your spelling and try again.");
                 eb.WithFooter($"{this.Context.Prefix}armory help | https://github.com/imerzan/ArmoryBot"); // Display help information in footer
@@ -198,7 +197,7 @@ namespace ArmoryBot
     {
         public readonly BlizzardAPI API;
         public readonly char Prefix;
-        public readonly ILogger<Worker> _logger;
+        public readonly ILogger<Worker> Logger;
         public ArmoryCommandContext(DiscordSocketClient _client, SocketUserMessage _msg, ref BlizzardAPI _api, char _prefix, ILogger<Worker> logger)
         {
             this.Client = _client;
@@ -208,7 +207,7 @@ namespace ArmoryBot
             this.Message = _msg;
             this.API = _api;
             this.Prefix = _prefix;
-            this._logger = logger;
+            this.Logger = logger;
         }
         public IDiscordClient Client { get; }
         public IUserMessage Message { get; }

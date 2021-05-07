@@ -16,7 +16,7 @@ namespace ArmoryBot
             Host.CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-                ArmoryBotConfig config = hostContext.Configuration.GetSection("ArmoryBotConfig").Get<ArmoryBotConfig>();
+                ArmoryBotConfig config = hostContext.Configuration.GetSection("ArmoryBotConfig").Get<ArmoryBotConfig>(); // Read Config from asppsettings.json
                 services.AddSingleton(config);
                 services.AddHostedService<Worker>();
             });
