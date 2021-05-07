@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <UserSecretsId>dotnet-WorkerService1-18C2E208-02FC-46DF-8BB3-533B343E6D77</UserSecretsId>
+    <UserSecretsId>dotnet-ArmoryBot-18C2E208-02FC-46DF-8BB3-533B343E6D77</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
