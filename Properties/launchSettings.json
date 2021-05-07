@@ -1,8 +1,7 @@
-﻿{
+{
   "profiles": {
-    "WorkerService1": {
+    "ArmoryBot": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
