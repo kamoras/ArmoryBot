@@ -22,30 +22,18 @@ namespace ArmoryBot
         public string Price;
         public string Last_Updated;
     }
-    public class DiscordConfig // Stores Discord Config as loaded from Config File
+    public class ArmoryBotConfig // Stores Blizzard Config as loaded from Config File
     {
-        [JsonInclude]
-        [JsonPropertyName("token")]
-        public string token { get; private set; }
-        [JsonInclude]
-        [JsonPropertyName("cmdprefix")]
-        public char cmdprefix { get; private set; }
-    }
-    public class BlizzardConfig // Stores Blizzard Config as loaded from Config File
-    {
-        [JsonInclude]
-        [JsonPropertyName("client_id")]
-        public string client_id { get; private set; }
-        [JsonInclude]
-        [JsonPropertyName("client_secret")]
-        public string client_secret { get; private set; }
+        public ArmoryBotConfig() { }
+        public string discordtoken { get; set; }
+        public char cmdprefix { get; set; }
+        public string client_id { get; set; }
+        public string client_secret { get; set; }
         private string _locale; // Backing field
-        [JsonInclude]
-        [JsonPropertyName("locale")]
         public string locale
         {
             get { return this._locale; }
-            private set
+            set
             {
                 this._locale = value.ToLower();
                 switch (value.ToLower())
@@ -79,7 +67,7 @@ namespace ArmoryBot
                 } // End switch
             } // end Private Set
         } // End locale
-        public string Region { get; private set; } // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
+        public string Region { get; set; } // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
     }
     public class BlizzardAccessToken // Blizzard Access Token Json > C# Class 
     {

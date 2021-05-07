@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArmoryBot", "ArmoryBot.csproj", "{590172E9-56A8-466E-87D2-4E83AA60342E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArmoryBot", "ArmoryBot.csproj", "{E11EDB64-C08B-4A9E-80FB-A0B26DA84145}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{590172E9-56A8-466E-87D2-4E83AA60342E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{590172E9-56A8-466E-87D2-4E83AA60342E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{590172E9-56A8-466E-87D2-4E83AA60342E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{590172E9-56A8-466E-87D2-4E83AA60342E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E11EDB64-C08B-4A9E-80FB-A0B26DA84145}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E11EDB64-C08B-4A9E-80FB-A0B26DA84145}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E11EDB64-C08B-4A9E-80FB-A0B26DA84145}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E11EDB64-C08B-4A9E-80FB-A0B26DA84145}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {703BF1E9-D881-40F4-BA94-110C64A9DF57}
+		SolutionGuid = {BC3B2358-F00D-4165-B14B-2225696B8637}
 	EndGlobalSection
 EndGlobal

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,12 +10,14 @@ using System.Timers;
 using System.Text.Json;
 using Polly;
 using Polly.Extensions.Http;
+using Microsoft.Extensions.Logging;
 
 namespace ArmoryBot
 {
     public class BlizzardAPI
     {
-        private readonly BlizzardConfig Config;
+        private readonly ILogger<Worker> _logger;
+        private readonly ArmoryBotConfig Config;
         private BlizzardAccessToken Token;
         private Timer TokenExpTimer;
         private readonly IServiceCollection Services;
@@ -25,8 +26,10 @@ namespace ArmoryBot
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
 
-        public BlizzardAPI() // constructor
+        public BlizzardAPI(ILogger<Worker> logger, ArmoryBotConfig config) // constructor
         {
+            this._logger = logger;
+            this.Config = config;
             this.Services = new ServiceCollection();
             this.Services.AddHttpClient("default", client =>
             {
@@ -42,7 +45,6 @@ namespace ArmoryBot
                 return new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate };
             });
             this.ClientFactory = this.Services.BuildServiceProvider().GetService<IHttpClientFactory>();
-            this.Config = JsonSerializer.Deserialize<BlizzardConfig>(File.ReadAllText(Globals.BlizzardConfigPath)); // Load Config
 #pragma warning disable 4014
             this.RequestToken(); // Obtain initial BlizzAPI Token (cannot await in constructor)
 #pragma warning restore 4014
@@ -248,7 +250,7 @@ namespace ArmoryBot
         {
             try
             {
-                await Program.Log("Requesting new BlizzAPI Token...");
+                this._logger.LogInformation("Requesting new BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/token"))
                 {
                     var base64authorization = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{this.Config.client_id}:{this.Config.client_secret}"));
@@ -263,21 +265,21 @@ namespace ArmoryBot
                         this.Token = await JsonSerializer.DeserializeAsync<BlizzardAccessToken>(content, new JsonSerializerOptions() { IgnoreNullValues = true });
                         if (this.Token.access_token is null) throw new Exception($"Error obtaining token:\n{response}");
                         this.TokenExpTimer_Start(); // Start Auto-Renewing Timer
-                        await Program.Log($"BlizzAPI Token obtained! Valid until {this.Token.expire_date} (Auto-Renewing).");
+                        this._logger.LogInformation($"BlizzAPI Token obtained! Valid until {this.Token.expire_date} (Auto-Renewing).");
                         await this.GetGameData(); // Update Dynamic Assets
                     }
                 }
             }
             catch (Exception ex)
             {
-                await Program.Log(ex.ToString());
+                this._logger.LogError(ex.ToString());
             }
         }
         private async Task CheckToken() // Checks if current Access Token is valid, if invalid will request a new one
         {
             try
             {
-                await Program.Log("Checking BlizzAPI Token...");
+                this._logger.LogInformation("Checking BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/check_token"))
                 {
                     var contentList = new List<string>();
@@ -293,7 +295,7 @@ namespace ArmoryBot
                         if (json.ClientId is null) throw new Exception($"BlizzAPI Token is no longer valid!\n{response}"); // Throw exception, will request new token
                         else
                         {
-                            await Program.Log($"BlizzAPI Token is valid! Valid until {this.Token.expire_date} (Auto-Renewing).");
+                            this._logger.LogInformation($"BlizzAPI Token is valid! Valid until {this.Token.expire_date} (Auto-Renewing).");
                             if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1)
                                 await this.GetGameData(); // Make sure static/dynamic assets are set
                         }
@@ -302,7 +304,7 @@ namespace ArmoryBot
             }
             catch (Exception ex)
             {
-                await Program.Log(ex.ToString());
+                this._logger.LogError(ex.ToString());
                 await this.RequestToken(); // Renew token
             }
         }
@@ -344,7 +346,7 @@ namespace ArmoryBot
         }
         private async void TokenExpTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            await Program.Log("BlizzAPI Token expired!");
+            this._logger.LogWarning("BlizzAPI Token expired!");
             await this.RequestToken(); // Renew token
         }
     }
