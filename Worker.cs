@@ -21,7 +21,7 @@ namespace ArmoryBot
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Starting up ArmoryBot...");
-            this._ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot
+            _ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot
             await _ArmoryBot.StartupAsync(); // Startup Discord Bot (async)
             await Task.Delay(-1, stoppingToken); // Prevents program from terminating early
         }
