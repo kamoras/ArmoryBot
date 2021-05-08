@@ -48,7 +48,7 @@ namespace ArmoryBot
             _logger.LogInformation("Connected!");
             _logger.LogInformation("Starting up ArmoryBot...");
             _ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot & Blizzard API
-            await _ArmoryBot.StartupAsync(); // Startup Discord Bot (async)
+            await _ArmoryBot.StartupAsync(); // Startup Discord Bot
             await Task.Delay(-1, stoppingToken); // Prevents program from terminating early
         }
     }

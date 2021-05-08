@@ -13,7 +13,7 @@ namespace ArmoryBot
     {
         private readonly ILogger<Worker> Logger;
         private readonly ArmoryBotConfig Config;
-        private BlizzardAPI BlizzAPI;
+        private readonly BlizzardAPI BlizzAPI;
         private DiscordSocketClient Client;
         private CommandService Commands;
         private IServiceProvider Services;
@@ -47,7 +47,7 @@ namespace ArmoryBot
             if (!msg.HasCharPrefix(this.Config.cmdprefix, ref argPos)) return; // Check for cmd prefix
             Task.Run(async delegate // Long running task
             {
-                await this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, ref this.BlizzAPI, this.Config.cmdprefix, this.Logger), argPos, this.Services);
+                await this.Commands.ExecuteAsync(new ArmoryCommandContext(this.Client, msg, this.BlizzAPI, this.Config.cmdprefix, this.Logger), argPos, this.Services);
             });
         }
 
@@ -193,12 +193,12 @@ namespace ArmoryBot
             catch { }
         }
     }
-    public class ArmoryCommandContext : ICommandContext // Custom Command Context to pass BlizzardAPI reference, using DI
+    public class ArmoryCommandContext : ICommandContext // Custom Command Context to pass API/Logger using DI
     {
         public readonly BlizzardAPI API;
         public readonly char Prefix;
         public readonly ILogger<Worker> Logger;
-        public ArmoryCommandContext(DiscordSocketClient _client, SocketUserMessage _msg, ref BlizzardAPI _api, char _prefix, ILogger<Worker> logger)
+        public ArmoryCommandContext(DiscordSocketClient _client, SocketUserMessage _msg, BlizzardAPI _api, char _prefix, ILogger<Worker> _logger)
         {
             this.Client = _client;
             this.Guild = (_msg.Channel as IGuildChannel)?.Guild;
@@ -207,7 +207,7 @@ namespace ArmoryBot
             this.Message = _msg;
             this.API = _api;
             this.Prefix = _prefix;
-            this.Logger = logger;
+            this.Logger = _logger;
         }
         public IDiscordClient Client { get; }
         public IUserMessage Message { get; }

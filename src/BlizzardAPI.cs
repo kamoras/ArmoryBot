@@ -18,10 +18,10 @@ namespace ArmoryBot
     {
         private readonly ILogger<Worker> Logger;
         private readonly ArmoryBotConfig Config;
-        private BlizzardAccessToken Token;
-        private Timer TokenExpTimer;
         private readonly IServiceCollection Services;
         private readonly IHttpClientFactory ClientFactory;
+        private BlizzardAccessToken Token;
+        private Timer TokenExpTimer;
 
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
         private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
