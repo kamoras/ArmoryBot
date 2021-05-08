@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.NetworkInformation;
 
 namespace ArmoryBot
 {
@@ -20,6 +21,10 @@ namespace ArmoryBot
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            while (!NetworkInterface.GetIsNetworkAvailable()) // Wait for network/internet access
+            {
+                await Task.Delay(100);
+            }
             _logger.LogInformation("Starting up ArmoryBot...");
             _ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot
             await _ArmoryBot.StartupAsync(); // Startup Discord Bot (async)

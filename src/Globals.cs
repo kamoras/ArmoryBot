@@ -71,7 +71,9 @@ namespace ArmoryBot
             // Season 1
             {14531, new AchievementItem(100, 0) }, // Shadowlands Keystone Conqueror: Season One
             {14532, new AchievementItem(100, 1) }, // Shadowlands Keystone Master: Season One
-            // Season 2 ToDo
+            // Season 2
+            {15077, new AchievementItem(101, 0) }, // Shadowlands Keystone Conqueror: Season Two
+            {15078, new AchievementItem(101, 1) }, // Shadowlands Keystone Master: Season Two
         };
         public static readonly Dictionary<long, AchievementItem> AchievementsPVP = new Dictionary<long, AchievementItem>()
         {
