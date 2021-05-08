@@ -23,7 +23,7 @@ namespace ArmoryBot
         {
             while (!NetworkInterface.GetIsNetworkAvailable()) // Wait for network/internet access
             {
-                await Task.Delay(100);
+                await Task.Delay(100, stoppingToken);
             }
             _logger.LogInformation("Starting up ArmoryBot...");
             _ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot
