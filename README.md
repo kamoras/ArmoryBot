@@ -16,7 +16,7 @@
 chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ./ArmoryBot    ## Starts the executable
 ```
-![Console output](https://user-images.githubusercontent.com/42287509/117551915-24e5c200-b00e-11eb-9900-0c108b0fe317.jpg)
+![Console output](https://user-images.githubusercontent.com/42287509/117552409-b5250680-b010-11eb-9294-b44706417c2a.jpg)
 
 **NOTE:** When reporting issues with the bot, please utilize the [Issues Page](https://github.com/imerzan/ArmoryBot/issues), and include any error info from your Bot Console Output.
 
