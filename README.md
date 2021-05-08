@@ -9,7 +9,7 @@
 3. On the Oauth2 page of your discord application, use the supplied URL to join your bot to your server(s). The URL should look like `https://discord.com/api/oauth2/authorize?client_id=YOURCLIENTID&permissions=281600&scope=bot`   where YOURCLIENTID is the id listed on the "General Information" page.
 4. Modify `appsettings.json` with the above parameters that are bolded in parts 1 & 2. See [WoW Localizations](https://develop.battle.net/documentation/world-of-warcraft/guides/localization) for localization info, or leave as default (en_US). Non-English localizations are not fully supported. If you lost your appsettings.json file, you can download a default one [here](https://github.com/imerzan/ArmoryBot/files/6443727/appsettings.zip).
 5. Make sure you have [.NET 5.0](https://dotnet.microsoft.com/download) installed on the system that will be running your bot (.NET 5.0 is [cross-platform](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog) so you can run this on Windows/macOS/Linux).
-6. Launch the application. The bot should come online and respond to requests. [See Discord Usage](https://github.com/imerzan/ArmoryBot/tree/master#discord-usage)
+6. Launch the application. The bot should come online and respond to requests. [See Discord Usage](https://github.com/imerzan/ArmoryBot/tree/master#discord-usage), [See Advanced Setup](https://github.com/imerzan/ArmoryBot/tree/master#advanced-setup)
 
 **macOS/Linux:** When running from bash terminal, use the following commands:
 ```bash
@@ -31,3 +31,39 @@ Example: ```!armory pvp Frostchiji-Sargeras``` **NOTE:** Spaces in realm name sh
 ![Example](https://user-images.githubusercontent.com/42287509/117497287-eda7e000-af3d-11eb-924d-5a93be7c4bb6.jpg)
 
 ![Example2](https://user-images.githubusercontent.com/42287509/113765312-b72e3980-96e1-11eb-9400-85f8c62b863b.jpg)
+
+## Advanced Setup:
+### Windows Service:
+1. To run this as a Windows Service (will run in the background and upon system reboot), move the .Exe file and appsettings.json file to a directory of your choosing, for example `C:\ArmoryBot\`
+2. Open a command prompt (Cmd.exe) as **Administrator** (Right-Click Run-as-Admin).
+3. Enter the following commands: 
+```
+sc create ArmoryBot binPath=C:\ArmoryBot\ArmoryBot.exe
+sc config ArmoryBot start=auto
+```
+4. Your service is now configured and will Startup automatically. If you later decide to delete your service use `sc delete ArmoryBot`.
+
+### Linux Service (systemd):
+1. To run this as a Linux Service, move the executable and appsetings.json files to a directory of your choosing. Make sure to `chmod 755` the executable as well.
+2. Create a file called `armorybot.service` in the folder ``/etc/systemd/system/`` with a text editor of your choosing. Save the following contents:
+```
+[Unit]
+Description=ArmoryBot Service
+
+[Service]
+Type=notify
+WorkingDirectory=/Path
+ExecStart=/Path/ArmoryBot
+
+Environment=DOTNET_ROOT=/DotNetRuntimePath
+
+[Install]
+WantedBy=multi-user.target
+```
+3. Make sure the DOTNET_ROOT Environment points towards the folder that contains your .NET Runtime Installation.
+4. Enter the following terminal commands:
+```
+sudo systemctl daemon-reload
+sudo systemctl enable armorybot
+```
+5. Your service is now enabled and will start with your system. If you would like to start/stop your service manually, use: `sudo systemctl start/stop armorybot`
