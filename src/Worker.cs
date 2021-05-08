@@ -21,10 +21,30 @@ namespace ArmoryBot
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!NetworkInterface.GetIsNetworkAvailable()) // Wait for network/internet access
+            CheckForInternet(); // Make sure there is an internet connection before starting up
+            async void CheckForInternet()
             {
-                await Task.Delay(100, stoppingToken);
+                _logger.LogWarning("Waiting for network connection...");
+                using (var ping = new Ping())
+                {
+                    string[] urls = new string[] { $"{_config.Region}.battle.net", "discord.com", "google.com" }; // Check several urls for reliability
+                    while (true)
+                    {
+                        foreach (string url in urls)
+                        {
+                            try
+                            {
+                                var reply = ping.Send(url);
+                                if (reply.Status is IPStatus.Success) return;
+                                await Task.Delay(250, stoppingToken);
+                            }
+                            catch (TaskCanceledException) { throw; } // Cancellation was requested
+                            catch { }
+                        }
+                    }
+                }
             }
+            _logger.LogInformation("Connected!");
             _logger.LogInformation("Starting up ArmoryBot...");
             _ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot
             await _ArmoryBot.StartupAsync(); // Startup Discord Bot (async)
