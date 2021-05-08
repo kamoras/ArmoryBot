@@ -7,7 +7,7 @@
 1. Sign up for [Blizzard API Access](https://develop.battle.net/), and register an application. You will need a `client_id` and `client_secret`.
 2. Register a new [Discord Application](https://discord.com/developers/applications). Subsequently create a "Bot" for your application, and take note of the `token` for your created bot.
 3. On the Oauth2 page of your discord application, use the supplied URL to join your bot to your server(s). The URL should look like `https://discord.com/api/oauth2/authorize?client_id=YOURCLIENTID&permissions=281600&scope=bot`   where YOURCLIENTID is the id listed on the "General Information" page.
-4. Modify `appsettings.json` with the above parameters that are bolded in parts 1 & 2. See [WoW Localizations](https://develop.battle.net/documentation/world-of-warcraft/guides/localization) for localization info, or leave as default (en_US). Non-English localizations are not fully supported. If you lost your appsettings.json file, you can download a default one [here](https://github.com/imerzan/ArmoryBot/files/6443727/appsettings.zip).
+4. Modify `appsettings.json` with the above parameters that are bolded in parts 1 & 2. See [WoW Localizations](https://develop.battle.net/documentation/world-of-warcraft/guides/localization) for localization info, or leave as default (en_US). Non-English localizations are not fully supported. If you lost your appsettings.json file, you can download a default one [here](https://github.com/imerzan/ArmoryBot/files/6446475/appsettings.zip).
 5. Make sure you have [.NET 5.0](https://dotnet.microsoft.com/download) installed on the system that will be running your bot (.NET 5.0 is [cross-platform](https://docs.microsoft.com/en-us/dotnet/core/rid-catalog) so you can run this on Windows/macOS/Linux).
 6. Launch the application. The bot should come online and respond to requests. [See Discord Usage](https://github.com/imerzan/ArmoryBot/tree/master#discord-usage), [See Advanced Setup](https://github.com/imerzan/ArmoryBot/tree/master#advanced-setup)
 
@@ -16,7 +16,7 @@
 chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ./ArmoryBot    ## Starts the executable
 ```
-![Console output](https://user-images.githubusercontent.com/42287509/117523024-3088a880-af7c-11eb-8c45-aec62a6e644c.jpg)
+![Console output](https://user-images.githubusercontent.com/42287509/117551915-24e5c200-b00e-11eb-9900-0c108b0fe317.jpg)
 
 **NOTE:** When reporting issues with the bot, please utilize the [Issues Page](https://github.com/imerzan/ArmoryBot/issues), and include any error info from your Bot Console Output.
 
