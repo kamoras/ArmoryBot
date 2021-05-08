@@ -279,7 +279,7 @@ namespace ArmoryBot
         {
             try
             {
-                this.Logger.LogInformation("Checking BlizzAPI Token...");
+                this.Logger.LogWarning("Checking BlizzAPI Token...");
                 using (var request = new HttpRequestMessage(new HttpMethod("POST"), $"https://{this.Config.Region}.battle.net/oauth/check_token"))
                 {
                     var contentList = new List<string>();
