@@ -56,16 +56,16 @@ namespace ArmoryBot
             switch (msg.Severity)
             {
                 case LogSeverity.Warning:
-                    this.Logger.LogWarning(msg.ToString());
+                    this.Logger.LogWarning(msg.Message);
                     break;
                 case LogSeverity.Error:
-                    this.Logger.LogError(msg.ToString());
+                    this.Logger.LogError(msg.Message);
                     break;
                 case LogSeverity.Debug:
-                    this.Logger.LogDebug(msg.ToString());
+                    this.Logger.LogDebug(msg.Message);
                     break;
                 default:
-                    this.Logger.LogInformation(msg.ToString());
+                    this.Logger.LogInformation(msg.Message);
                     break;
             }
         }
