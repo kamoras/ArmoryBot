@@ -38,7 +38,7 @@ namespace ArmoryBot
                                 var reply = ping.Send(url);
                                 if (reply.Status is IPStatus.Success) return; // Success, continue startup
                             }
-                            catch (TaskCanceledException) { throw; } // Cancellation was requested
+                            catch (OperationCanceledException) { throw; } // Cancellation was requested
                             catch { }
                             finally { Thread.Sleep(250); } // Rate-limit pings
                         }
