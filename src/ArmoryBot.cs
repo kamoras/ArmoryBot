@@ -24,7 +24,7 @@ namespace ArmoryBot
             this.Config = config;
             this.BlizzAPI = new BlizzardAPI(logger, config); // Initializes Blizzard API
         }
-        public async Task StartupAsync() // Discord bot startup
+        public async Task Discord_StartupAsync() // Discord bot startup
         {
             this.Client = new DiscordSocketClient();
             this.Commands = new CommandService();
@@ -53,19 +53,20 @@ namespace ArmoryBot
 
         private async Task Discord_Log(LogMessage msg) // Discord Logging Method
         {
+            string msgOut = $"Discord: {msg.Message}{msg.Exception}";
             switch (msg.Severity)
             {
                 case LogSeverity.Warning:
-                    this.Logger.LogWarning($"Discord: {msg.Message}{msg.Exception}");
+                    this.Logger.LogWarning(msgOut);
                     break;
                 case LogSeverity.Error:
-                    this.Logger.LogError($"Discord: {msg.Message}{msg.Exception}");
+                    this.Logger.LogError(msgOut);
                     break;
                 case LogSeverity.Debug:
-                    this.Logger.LogDebug($"Discord: {msg.Message}{msg.Exception}");
+                    this.Logger.LogDebug(msgOut);
                     break;
                 default:
-                    this.Logger.LogInformation($"Discord: {msg.Message}{msg.Exception}");
+                    this.Logger.LogInformation(msgOut);
                     break;
             }
         }
@@ -176,21 +177,27 @@ namespace ArmoryBot
                 eb.WithThumbnailUrl(Globals.TomeIconUrl);
                 await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build());
             }
-            catch { }
+            catch (Exception ex)
+            {
+                this.Context.Logger.LogError(ex.ToString());
+            }
         }
 
         private async Task SendErrorResponse(string error) // Logs error,exception & sends a generic Error Response Msg to the end-user
         {
             try
             {
-                this.Context.Logger.LogError($"{this.Context.Message}: {error}\n**Sending generic error notification to {this.Context.Message.Author}**");
+                this.Context.Logger.LogWarning($"{this.Context.Message}: {error}\n**Sending generic error notification to {this.Context.Message.Author}**");
                 var eb = new EmbedBuilder();
                 eb.WithDescription($"**ERROR** executing command `{this.Context.Message}`\nPlease double check your spelling and try again.");
                 eb.WithFooter($"{this.Context.Prefix}armory help | https://github.com/imerzan/ArmoryBot"); // Display help information in footer
                 eb.WithThumbnailUrl(Globals.QuestionMarkIconUrl);
                 await this.Context.Message.Channel.SendMessageAsync("", false, eb.Build());
             }
-            catch { }
+            catch (Exception ex)
+            {
+                this.Context.Logger.LogError(ex.ToString());
+            }
         }
     }
     public class ArmoryCommandContext : ICommandContext // Custom Command Context to pass API/Logger using DI

@@ -27,7 +27,7 @@ namespace ArmoryBot
                 _logger.LogWarning("Waiting for network connection...");
                 using (var ping = new Ping())
                 {
-                    string[] urls = new string[] { $"{_config.Region}.battle.net", "discord.com", "google.com" }; // Check several urls for reliability
+                    string[] urls = new string[] { $"{_config.Region}.battle.net", "discord.com", "google.com" }; // Check several hosts for reliability
                     while (true)
                     {
                         foreach (string url in urls)
@@ -35,7 +35,7 @@ namespace ArmoryBot
                             try
                             {
                                 stoppingToken.ThrowIfCancellationRequested(); // Check if cancellation is requested
-                                var reply = ping.Send(url);
+                                var reply = ping.Send(url); // Ping host
                                 if (reply.Status is IPStatus.Success) return; // Success, continue startup
                             }
                             catch (OperationCanceledException) { throw; } // Cancellation was requested
@@ -48,7 +48,7 @@ namespace ArmoryBot
             _logger.LogInformation("Connected!");
             _logger.LogInformation("Starting up ArmoryBot...");
             _ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot & Blizzard API
-            await _ArmoryBot.StartupAsync(); // Startup Discord Bot
+            await _ArmoryBot.Discord_StartupAsync(); // Startup Discord Bot
             await Task.Delay(-1, stoppingToken); // Prevents program from terminating early
         }
     }
