@@ -40,30 +40,30 @@ Example: ```!armory pvp Frostchiji-Sargeras``` **NOTE:** Spaces in realm name sh
 ```
 sc create ArmoryBot binPath=C:\ArmoryBot\ArmoryBot.exe
 sc config ArmoryBot start=auto
+sc start ArmoryBot
 ```
-4. Your service is now configured and will Startup automatically. If you later decide to delete your service use `sc delete ArmoryBot`.
+4. Your service is now configured and will Startup automatically. You can view logs using Event Viewer.
 
 ### Linux Service (systemd):
 1. To run this as a Linux Service, move the executable and appsetings.json files to a directory of your choosing. Make sure to `chmod 755` the executable as well.
 2. Create a file called `armorybot.service` in the folder ``/etc/systemd/system/`` with a text editor of your choosing. Save the following contents:
-```
+```bash
 [Unit]
 Description=ArmoryBot Service
 
 [Service]
 Type=notify
-WorkingDirectory=/Path
-ExecStart=/Path/ArmoryBot
-
-Environment=DOTNET_ROOT=/DotNetRuntimePath
+WorkingDirectory=/Path    ## Folder Path that executable is contained in
+ExecStart=/Path/ArmoryBot   ## Full path to ArmoryBot Executable
+Environment=DOTNET_ROOT=/DotnetPath    ## You can look this up using: echo $DOTNET_ROOT
 
 [Install]
 WantedBy=multi-user.target
 ```
-3. Make sure the DOTNET_ROOT Environment points towards the folder that contains your .NET Runtime Installation.
-4. Enter the following terminal commands:
+3. Enter the following terminal commands:
 ```
 sudo systemctl daemon-reload
 sudo systemctl enable armorybot
+sudo systemctl start armorybot
 ```
-5. Your service is now enabled and will start with your system. If you would like to start/stop your service manually, use: `sudo systemctl start/stop armorybot`
+4. Your service is now configured and will Startup automatically. You can view logs using `journalctl -u armorybot`.
