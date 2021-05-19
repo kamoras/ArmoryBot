@@ -39,17 +39,16 @@ namespace ArmoryBot
                                 if (reply.Status is IPStatus.Success) return; // Success, continue startup
                             }
                             catch (OperationCanceledException) { throw; } // Cancellation was requested
-                            catch { }
+                            catch { } // Ignore other exceptions (dns, no response, etc.)
                             finally { Thread.Sleep(250); } // Rate-limit pings
                         }
                     }
                 }
             }
-            _logger.LogInformation("Connected!");
             _logger.LogInformation("Starting up ArmoryBot...");
             _ArmoryBot = new ArmoryBot(_logger, _config); // Initializes ArmoryBot & Blizzard API
             await _ArmoryBot.Discord_StartupAsync(); // Startup Discord Bot
-            await Task.Delay(-1, stoppingToken); // Prevents program from terminating early
+            await Task.Delay(-1, stoppingToken); // Prevents program from terminating early (unless cancellation is requested)
         }
     }
 }

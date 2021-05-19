@@ -56,11 +56,14 @@ namespace ArmoryBot
             string msgOut = $"Discord: {msg.Message}{msg.Exception}";
             switch (msg.Severity)
             {
-                case LogSeverity.Warning:
-                    this.Logger.LogWarning(msgOut);
+                case LogSeverity.Critical:
+                    this.Logger.LogCritical(msgOut);
                     break;
                 case LogSeverity.Error:
                     this.Logger.LogError(msgOut);
+                    break;
+                case LogSeverity.Warning:
+                    this.Logger.LogWarning(msgOut);
                     break;
                 case LogSeverity.Debug:
                     this.Logger.LogDebug(msgOut);
@@ -179,7 +182,7 @@ namespace ArmoryBot
             }
             catch (Exception ex)
             {
-                this.Context.Logger.LogError(ex.ToString());
+                await this.SendErrorResponse(ex.ToString());
             }
         }
 

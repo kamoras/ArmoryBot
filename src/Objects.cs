@@ -63,7 +63,7 @@ namespace ArmoryBot
                         this.Region = "eu";
                         break;
                     default:
-                        throw new Exception($"Invalid locale specified in {Globals.BlizzardConfigPath}");
+                        throw new Exception("Invalid locale specified in appsettings.json");
                 } // End switch
             } // end Private Set
         } // End locale

@@ -25,8 +25,6 @@ namespace ArmoryBot
         public const string TomeIconUrl = @"https://render-us.worldofwarcraft.com/icons/56/inv_misc_book_07.jpg";
         public const string WowTokenIconUrl = @"https://render-us.worldofwarcraft.com/icons/56/wow_token01.jpg";
 
-        public const string DiscordConfigPath = @"discord.json";
-        public const string BlizzardConfigPath = @"blizzard.json";
         /*
          AchievementItems are entered as follows: (int)Group, (int)Value
         The achievement id is the ID as listed on wowhead/blizz api.
@@ -43,18 +41,8 @@ namespace ArmoryBot
             // Raid Overall
             {14460, new AchievementItem(10, 0) }, // Ahead of the Curve: Sire Denathrius
             {14461, new AchievementItem(10, 1) }, // Cutting Edge: Sire Denathrius
-            // ToDo Sanctum of Domination AOTC/CE
-            // Mythic Progression ToDo
-            //{00000, new AchievementItem(20, 0) }, // The Tarragrue
-            //{00000, new AchievementItem(20, 1) }, // 
-            //{00000, new AchievementItem(20, 2) }, // 
-            //{00000, new AchievementItem(20, 3) }, // 
-            //{00000, new AchievementItem(20, 4) }, // ..
-            //{00000, new AchievementItem(20, 5) }, // ..
-            //{00000, new AchievementItem(20, 6) }, // 
-            //{00000, new AchievementItem(20, 7) }, // 
-            //{00000, new AchievementItem(20, 8) }, // 
-            //{00000, new AchievementItem(20, 9) }, // Sylvanas Windrunner
+            {15134, new AchievementItem(11, 0) }, // Ahead of the Curve: Sylvanas Windrunner
+            {15135, new AchievementItem(11, 1) }, // Cutting Edge: Sylvanas Windrunner
             // Realm Firsts
             {14662, new AchievementItem(-1, 0) }, // Realm First! Shadowlands Keystone Master
             {13078, new AchievementItem(-1, 0) }, // Realm First! Battle for Azeroth Keystone Master

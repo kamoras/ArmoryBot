@@ -18,7 +18,7 @@ namespace ArmoryBot
             .UseSystemd()
             .ConfigureServices((hostContext, services) =>
             {
-                ArmoryBotConfig config = hostContext.Configuration.GetSection("ArmoryBotConfig").Get<ArmoryBotConfig>(); // Read Config from asppsettings.json
+                ArmoryBotConfig config = hostContext.Configuration.GetSection("ArmoryBotConfig").Get<ArmoryBotConfig>(); // Read Config from appsettings.json
                 services.AddSingleton(config);
                 services.AddHostedService<Worker>();
             });
