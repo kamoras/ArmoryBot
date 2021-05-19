@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace ArmoryBot
 {
@@ -9,126 +9,108 @@ namespace ArmoryBot
     //
     public class ArmoryData // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
     {
-        public bool IsError { get; set; } // If BlizzardAPI.ArmoryLookup() throws an exception, this is set to true
-        public string ErrorInfo; // Stores exception.ToString() from BlizzardAPI.ArmoryLookup()
-        public string CharacterInfo; // Stores string returned by BlizzardAPI.GetCharacter()
+        public CharacterInfo CharInfo; // Stores string returned by BlizzardAPI.GetCharacter()
         public string AvatarUrl; // Stores string returned by BlizzardAPI.GetAvatar()
         public RaidData RaidInfo; // Stores RaidData returned by BlizzardAPI.GetRaids()
         public string MythicPlus; // Stores string returned by BlizzardAPI.GetMythicPlus()
         public string Achievements; // Stores string returned by BlizzardAPI.GetAchievements()
         public string PVPRating; // Stores string returned by BlizzardAPI.GetPVP()
         public string PVPStats; // Stores string returned by BlizzardAPI.GetPvpStats()
-        public ArmoryData()
-        {
-            this.IsError = false;
-        }
     }
-    public class DiscordConfig // Stores Discord Config as loaded from Config File
+    public class WoWToken // Stores collection of data passed from BlizzardAPI.cs to ArmoryBot.cs
     {
-        [JsonProperty("token")]
-        public string token { get; private set; }
-        [JsonProperty("cmdprefix")]
-        public char cmdprefix { get; private set; }
-        public string Prefix { get; private set; }
-        public void SetPrefix()
-        {
-            this.Prefix = this.cmdprefix.ToString();
-        }
+        public string Price;
+        public string Last_Updated;
     }
-    public class BlizzardConfig // Stores Blizzard Config as loaded from Config File
+    public class ArmoryBotConfig // Stores Blizzard Config as loaded from Config File
     {
-        [JsonProperty("client_id")]
-        public string client_id { get; private set; }
-        [JsonProperty("client_secret")]
-        public string client_secret { get; private set; }
-        [JsonProperty("locale")]
-        public string locale { get; private set; }
-        public string TOKENroot { get; private set; }
-        public string APIroot { get; private set; }
-        public string PROFILEnamespace { get; private set; }
-        public string DYNAMICnamespace { get; private set; }
-        public BlizzardAccessToken Token { get; set; }
-
-        public void SetLocale()
+        public ArmoryBotConfig() { }
+        public string discordtoken { get; set; }
+        public char cmdprefix { get; set; }
+        public string client_id { get; set; }
+        public string client_secret { get; set; }
+        private string _locale; // Backing field
+        public string locale
         {
-            switch (this.locale)
+            get { return this._locale; }
+            set
             {
-                case "en_US":
-                    this.TOKENroot = "https://us.battle.net";
-                    this.APIroot = "https://us.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-us";
-                    this.DYNAMICnamespace = "?namespace=dynamic-us";
-                    break;
-                case "es_MX":
-                    this.TOKENroot = "https://us.battle.net";
-                    this.APIroot = "https://us.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-us";
-                    this.DYNAMICnamespace = "?namespace=dynamic-us";
-                    break;
-                case "pt_BR":
-                    this.TOKENroot = "https://us.battle.net";
-                    this.APIroot = "https://us.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-us";
-                    this.DYNAMICnamespace = "?namespace=dynamic-us";
-                    break;
-                case "de_DE":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "en_GB":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "es_ES":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "fr_FR":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                case "it_IT":
-                    this.TOKENroot = "https://eu.battle.net";
-                    this.APIroot = "https://eu.api.blizzard.com";
-                    this.PROFILEnamespace = "?namespace=profile-eu";
-                    this.DYNAMICnamespace = "?namespace=dynamic-eu";
-                    break;
-                default:
-                    throw new Exception("Invalid locale specified in " + Globals.BlizzardConfigPath);
-            }
-        }
+                this._locale = value.ToLower();
+                switch (value.ToLower())
+                {
+                    case "en_us":
+                        this.Region = "us";
+                        break;
+                    case "es_mx":
+                        this.Region = "us";
+                        break;
+                    case "pt_br":
+                        this.Region = "us";
+                        break;
+                    case "de_de":
+                        this.Region = "eu";
+                        break;
+                    case "en_gb":
+                        this.Region = "eu";
+                        break;
+                    case "es_es":
+                        this.Region = "eu";
+                        break;
+                    case "fr_fr":
+                        this.Region = "eu";
+                        break;
+                    case "it_it":
+                        this.Region = "eu";
+                        break;
+                    default:
+                        throw new Exception("Invalid locale specified in appsettings.json");
+                } // End switch
+            } // end Private Set
+        } // End locale
+        public string Region { get; set; } // https://develop.battle.net/documentation/world-of-warcraft/guides/namespaces
     }
     public class BlizzardAccessToken // Blizzard Access Token Json > C# Class 
     {
-        [JsonProperty("access_token")]
+        [JsonInclude]
+        [JsonPropertyName("access_token")]
         public string access_token { get; private set; }
-        [JsonProperty("token_type")]
+        [JsonInclude]
+        [JsonPropertyName("token_type")]
         public string token_type { get; private set; }
-        [JsonProperty("expires_in")]
-        public int expires_in { get; private set; } // Seconds
-        [JsonProperty("scope")]
+        private int _expires_in; // Backing Field
+        [JsonInclude]
+        [JsonPropertyName("expires_in")]
+        public int expires_in // Seconds
+        {
+            get
+            {
+                return this._expires_in;
+            }
+            private set
+            {
+                this._expires_in = value;
+                TimeSpan exptime = new TimeSpan(0, 0, value); // Hours , Minutes, Seconds
+                this.expire_date = DateTime.Now.Add(exptime);
+            }
+        }
+        public DateTime expire_date { get; private set; }
+        [JsonInclude]
+        [JsonPropertyName("scope")]
         public string scope { get; private set; }
     }
+
     public class AchievementsList // Stores list of achievements via BlizzardAPI.GetAchievements()
     {
-        private Dictionary<int, AchievementItem> List { get; set; }
+        private Dictionary<int, AchievementItem> List;
         public AchievementsList()
         {
             this.List = new Dictionary<int, AchievementItem>(); // Key: (int)group , Value: (AchievementItem)  |   Uses group as key since there should only be one entry per group in the Dictionary.
         }
-        public void Add(long id, string name, string type)
+        public void Add(long id, string name, LookupType type)
         {
             switch (type)
             {
-                case "pve":
+                case LookupType.PVE:
                     if (Globals.AchievementsPVE[id].Group == -1) // No Group (-1) - Always Add
                     {
                         this.List.Add((int)id * -1, new AchievementItem(Globals.AchievementsPVE[id].Group, Globals.AchievementsPVE[id].Value, name));
@@ -149,7 +131,7 @@ namespace ArmoryBot
                         this.List.Add(Globals.AchievementsPVE[id].Group, new AchievementItem(Globals.AchievementsPVE[id].Group, Globals.AchievementsPVE[id].Value, name));
                         return;
                     }
-                case "pvp":
+                case LookupType.PVP:
                     if (Globals.AchievementsPVP[id].Group == -1) // No Group (-1) - Always Add
                     {
                         this.List.Add((int)id * -1, new AchievementItem(Globals.AchievementsPVP[id].Group, Globals.AchievementsPVP[id].Value, name));
@@ -179,7 +161,7 @@ namespace ArmoryBot
             string output = "";
             foreach (KeyValuePair<int, AchievementItem> entry in this.List)
             {
-                output += "* " + entry.Value.Name + "\n";
+                output += $"• {entry.Value.Name}\n";
             }
             if (output.Length == 0) return "None";
             else return output;
@@ -197,10 +179,17 @@ namespace ArmoryBot
             this.Name = name;
         }
     }
+    public class CharacterInfo // sub-class of (ArmoryData)
+    {
+        public string Name; // Stores string returned by BlizzardAPI.GetCharacter()
+        public string ItemLevel; // Stores string returned by BlizzardAPI.GetCharacter()
+        public string Renown; // Stores string returned by BlizzardAPI.GetCharacter()
+        public string ArmoryUrl; // Stores string returned by BlizzardAPI.GetCharacter()
+    }
     public class RaidData // Stores all current expansion raids via BlizzardAPI.GetRaids()
     {
         public List<RaidItem> Raids { get; private set; }
-        private string Locale { get; set; }
+        private string Locale;
         public RaidData(string locale)
         {
             this.Raids = new List<RaidItem>();
@@ -214,8 +203,8 @@ namespace ArmoryBot
     public class RaidItem // Child class for RaidData
     {
         public string Name { get; private set; }
-        private Instance Raid { get; set; }
-        private string Locale { get; set; }
+        private Instance Raid;
+        private string Locale;
         public RaidItem(Instance raid, string locale)
         {
             this.Name = raid.InstanceInstance.Name;
@@ -227,7 +216,7 @@ namespace ArmoryBot
             string output = "";
             foreach (Mode mode in this.Raid.Modes) // Check each difficulty
             {
-                output += "* " + mode.Progress.CompletedCount + "/" + mode.Progress.TotalCount + " " + mode.Difficulty.Name.GetLocale(this.Locale) + "\n"; // ex: 8/10 Normal
+                output += $"• {mode.Progress.CompletedCount}/{mode.Progress.TotalCount} {mode.Difficulty.Name}\n"; // ex: 8/10 Normal
             }
             return output;
         }
@@ -239,14 +228,16 @@ namespace ArmoryBot
     */
     public class MythicPlusData // Sorts and returns the best runs per Dungeon ID
     {
-        private Dictionary<long, BestRun> Runs { get; set; }
+        private readonly int DungeonCount;
+        private Dictionary<long, BestRun> Runs;
         public int HighestRun { get; private set; } // Highest M+ run player has completed
         public int Plus5Count { get; private set; } // Best runs between +5 and +9
         public int Plus10Count { get; private set; } // Best runs between +10 and +14
         public int Plus15Count { get; private set; } // Best runs +15 and higher
         public int ExpiredCount { get; private set; } // Best runs that the timer expired
-        public MythicPlusData()
+        public MythicPlusData(int dungeonCount)
         {
+            this.DungeonCount = dungeonCount;
             this.Runs = new Dictionary<long, BestRun>();
             this.HighestRun = 0;
             this.Plus5Count = 0;
@@ -268,7 +259,7 @@ namespace ArmoryBot
             }
             else // Already in list, see if run is higher
             {
-                if (run.KeystoneLevel > this.Runs[run.Dungeon.Id].KeystoneLevel) // Run is higher - add
+                if (run.KeystoneLevel > this.Runs[run.Dungeon.Id].KeystoneLevel | (run.KeystoneLevel == this.Runs[run.Dungeon.Id].KeystoneLevel & run.IsCompletedWithinTime)) // Run is higher - add - OR - Run is equal but on-time
                 {
                     // De-increment old run
                     if (!this.Runs[run.Dungeon.Id].IsCompletedWithinTime) this.ExpiredCount -= 1;
@@ -288,7 +279,7 @@ namespace ArmoryBot
         }
         public override string ToString() // Displays output 
         {
-            return "**Best Run:** +" + this.HighestRun + "\n* 5+ Runs: " + this.Plus5Count + "\n* 10+ Runs: " + this.Plus10Count + "\n* 15+ Runs: " + this.Plus15Count + "\n* Time Expired Runs: " + this.ExpiredCount;
+            return $"• Highest Key: +{this.HighestRun}\n• 5+ Dungeons: {this.Plus5Count}/{this.DungeonCount}\n• 10+ Dungeons: {this.Plus10Count}/{this.DungeonCount}\n• 15+ Dungeons: {this.Plus15Count}/{this.DungeonCount}\n• Time-Expired: {this.ExpiredCount}/{this.DungeonCount}";
         }
     }
 }
