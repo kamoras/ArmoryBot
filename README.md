@@ -1,5 +1,6 @@
 # ArmoryBot
 .NET Core Discord Bot for World of Warcraft Armory Lookups.
+### Supports new M+ Rating in 9.1!
 
 ## Current Status: Working in Shadowlands 9.x
 
@@ -28,7 +29,7 @@ chmod 755 ArmoryBot    ## Sets proper permissions, only need to do this once
 ```
 Example: ```!armory pvp Frostchiji-Sargeras``` **NOTE:** Spaces in realm name should have a ' - ' character.
 
-![Example](https://user-images.githubusercontent.com/42287509/117497287-eda7e000-af3d-11eb-924d-5a93be7c4bb6.jpg)
+![Example](https://user-images.githubusercontent.com/42287509/123978874-d60d3680-d985-11eb-92e0-51cc473f565a.jpg)
 
 ![Example2](https://user-images.githubusercontent.com/42287509/113765312-b72e3980-96e1-11eb-9400-85f8c62b863b.jpg)
 
