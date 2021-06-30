@@ -130,7 +130,7 @@ namespace ArmoryBot
                             {
                                 eb.AddField(raid.Name, raid.ToString(), true); // inline, up to 3 columns per row
                             }
-                        eb.AddField("M+ Best Runs", info.MythicPlus, false);
+                        eb.AddField("Mythic+", info.MythicPlus, false);
                         eb.AddField("PVE Achievements", info.Achievements, false);
                         break;
                     case LookupType.PVP:

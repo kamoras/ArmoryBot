@@ -1332,6 +1332,9 @@ namespace ArmoryBot
 
         [JsonPropertyName("character")]
         public Character Character { get; set; }
+
+        [JsonPropertyName("current_mythic_rating")]
+        public MythicRating CurrentMythicRating { get; set; }
     }
 
     //public partial class Character
@@ -1378,4 +1381,10 @@ namespace ArmoryBot
     //    [JsonPropertyName("self")]
     //    public Self Self { get; set; }
     //}
+    public partial class MythicRating
+    {
+        [JsonPropertyName("rating")]
+        public long Rating { get; set; }
+
+    }
 }

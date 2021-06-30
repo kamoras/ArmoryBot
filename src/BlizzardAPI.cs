@@ -163,10 +163,7 @@ namespace ArmoryBot
             {
                 MythicPlusData data = new MythicPlusData(this.MplusDungeonCount);
                 MPlusSeasonInfoJson mplusseasoninfo = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{this.MplusSeasonID}", Namespace.Profile, typeof(MPlusSeasonInfoJson));
-                foreach (BestRun run in mplusseasoninfo.BestRuns)
-                {
-                    data.Add(run);
-                }
+                data.Parse(summary, mplusseasoninfo);
                 return data.ToString();
             }
             else return "None";
