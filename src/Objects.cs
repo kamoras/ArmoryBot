@@ -224,12 +224,10 @@ namespace ArmoryBot
 
     public class MythicPlusData
     {
-        private readonly int DungeonCount;
         public int Rating { get; private set; } // M+ Rating Introduced in 9.1 Chains of Domination
         public int HighestRun { get; private set; } // Highest M+ run player has completed
-        public MythicPlusData(int dungeonCount)
+        public MythicPlusData()
         {
-            this.DungeonCount = dungeonCount;
             this.Rating = 0;
             this.HighestRun = 0;
         }

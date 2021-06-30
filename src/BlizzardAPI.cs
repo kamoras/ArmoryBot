@@ -24,7 +24,6 @@ namespace ArmoryBot
         private Timer TokenExpTimer;
 
         private long MplusSeasonID = -1; // Stores current M+ Season as obtained by this.GetGameData() 
-        private int MplusDungeonCount = -1; // Stores count of M+ eligible dungeons as obtained by this.GetGameData() 
 
         public BlizzardAPI(ILogger<Worker> logger, ArmoryBotConfig config) // constructor
         {
@@ -161,7 +160,7 @@ namespace ArmoryBot
             }
             if (hasCurrentSeason)
             {
-                MythicPlusData data = new MythicPlusData(this.MplusDungeonCount);
+                MythicPlusData data = new MythicPlusData();
                 MPlusSeasonInfoJson mplusseasoninfo = await this.Call($"https://{this.Config.Region}.api.blizzard.com/profile/wow/character/{realm}/{character}/mythic-keystone-profile/season/{this.MplusSeasonID}", Namespace.Profile, typeof(MPlusSeasonInfoJson));
                 data.Parse(summary, mplusseasoninfo);
                 return data.ToString();
@@ -236,9 +235,6 @@ namespace ArmoryBot
             Task<dynamic> json_dungeon = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/dungeon/index", Namespace.Dynamic, typeof(AllDungeonsJson));
             await Task.WhenAll(json_season, json_dungeon); // Wait for all tasks to finish up
             this.MplusSeasonID = json_season.Result.CurrentSeason.Id;
-            int count = 0;
-            foreach (Dungeon dungeon in json_dungeon.Result.Dungeons) count++;
-            this.MplusDungeonCount = count;
         }
         //
         // Blizzard API Core Methods (Obtain/Check Token, API Lookup)
@@ -293,7 +289,7 @@ namespace ArmoryBot
                         else
                         {
                             this.Logger.LogInformation($"BlizzAPI Token is valid! Valid until {this.Token.expire_date} (Auto-Renewing).");
-                            if (this.MplusSeasonID == -1 | this.MplusDungeonCount == -1)
+                            if (this.MplusSeasonID == -1)
                                 await this.GetGameData(); // Make sure static/dynamic assets are set
                         }
                     }
