@@ -1128,44 +1128,7 @@ namespace ArmoryBot
         //[JsonPropertyName("self")]
         //public Self Self { get; set; }
     }
-    // Mythic Keystone Dungeons Index
-    /// <summary>
-    /// https://us.api.blizzard.com/data/wow/mythic-keystone/dungeon/index
-    /// Added via https://app.quicktype.io/
-    /// </summary>
-    public partial class AllDungeonsJson
-    {
-        [JsonPropertyName("_links")]
-        public Links Links { get; set; }
-
-        [JsonPropertyName("dungeons")]
-        public Dungeon[] Dungeons { get; set; }
-    }
-
-    //public partial class Dungeon
-    //{
-    //    [JsonPropertyName("key")]
-    //    public Self Key { get; set; }
-
-    //    [JsonPropertyName("name")]
-    //    public Name Name { get; set; }
-
-    //    [JsonPropertyName("id")]
-    //    public long Id { get; set; }
-    //}
-
-    //public partial class Self
-    //{
-    //    [JsonPropertyName("href")]
-    //    public Uri Href { get; set; }
-    //}
-
-
-    //public partial class Links
-    //{
-    //    [JsonPropertyName("self")]
-    //    public Self Self { get; set; }
-    //}
+    
 
     // WoW Token Index (US, EU, KR, TW)
     /// <summary>

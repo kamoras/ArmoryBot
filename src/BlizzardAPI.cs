@@ -231,10 +231,8 @@ namespace ArmoryBot
         //
         private async Task GetGameData() // Gets Static/Dynamic assets that can be stored longer term
         {
-            Task<dynamic> json_season = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/season/index", Namespace.Dynamic, typeof(MPlusSeasonIndexJson));
-            Task<dynamic> json_dungeon = this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/dungeon/index", Namespace.Dynamic, typeof(AllDungeonsJson));
-            await Task.WhenAll(json_season, json_dungeon); // Wait for all tasks to finish up
-            this.MplusSeasonID = json_season.Result.CurrentSeason.Id;
+            MPlusSeasonIndexJson json_season = await this.Call($"https://{this.Config.Region}.api.blizzard.com/data/wow/mythic-keystone/season/index", Namespace.Dynamic, typeof(MPlusSeasonIndexJson));
+            this.MplusSeasonID = json_season.CurrentSeason.Id;
         }
         //
         // Blizzard API Core Methods (Obtain/Check Token, API Lookup)
