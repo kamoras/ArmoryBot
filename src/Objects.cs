@@ -222,64 +222,31 @@ namespace ArmoryBot
         }
     }
 
-    /* NOTE: The MythicPlusData class was created because I noticed players were returning over 8 dungeons of M+ Data (there are only 8 dungeons in SL). It turned out that the API keeps track of the
- * Best Runs for both On Time/Expired runs, so a particular dungeon ID could have two results. This class will keep track of the best keystone level run for each unique dungeon ID. 
- * So if you did a +4 in Plaguefall that expired, but did a +10 ON TIME, the +4 is discarded. This will give a better indication if a player is completing their Best Runs on time or not.
-    */
-    public class MythicPlusData // Sorts and returns the best runs per Dungeon ID
+    public class MythicPlusData
     {
-        private readonly int DungeonCount;
-        private Dictionary<long, BestRun> Runs;
+        public int Rating { get; private set; } // M+ Rating Introduced in 9.1 Chains of Domination
         public int HighestRun { get; private set; } // Highest M+ run player has completed
-        public int Plus5Count { get; private set; } // Best runs between +5 and +9
-        public int Plus10Count { get; private set; } // Best runs between +10 and +14
-        public int Plus15Count { get; private set; } // Best runs +15 and higher
-        public int ExpiredCount { get; private set; } // Best runs that the timer expired
-        public MythicPlusData(int dungeonCount)
+        public MythicPlusData()
         {
-            this.DungeonCount = dungeonCount;
-            this.Runs = new Dictionary<long, BestRun>();
+            this.Rating = 0;
             this.HighestRun = 0;
-            this.Plus5Count = 0;
-            this.Plus10Count = 0;
-            this.Plus15Count = 0;
-            this.ExpiredCount = 0;
         }
-        public void Add(BestRun run)
+
+        public void Parse(MPlusSummaryJson summary, MPlusSeasonInfoJson season)
         {
-            if (!this.Runs.ContainsKey(run.Dungeon.Id)) // Not in list yet - go ahead and add
+            if (summary.CurrentMythicRating is not null)
             {
-                this.Runs.Add(run.Dungeon.Id, run);
-                // Increment counters
-                if (!run.IsCompletedWithinTime) this.ExpiredCount += 1;
-                if (run.KeystoneLevel > this.HighestRun) this.HighestRun = (int)run.KeystoneLevel;
-                if (run.KeystoneLevel >= 15) this.Plus15Count += 1;
-                else if (run.KeystoneLevel >= 10) this.Plus10Count += 1;
-                else if (run.KeystoneLevel >= 5) this.Plus5Count += 1;
+                this.Rating = (int)summary.CurrentMythicRating.Rating;
             }
-            else // Already in list, see if run is higher
+            foreach (BestRun run in season.BestRuns)
             {
-                if (run.KeystoneLevel > this.Runs[run.Dungeon.Id].KeystoneLevel | (run.KeystoneLevel == this.Runs[run.Dungeon.Id].KeystoneLevel & run.IsCompletedWithinTime)) // Run is higher - add - OR - Run is equal but on-time
-                {
-                    // De-increment old run
-                    if (!this.Runs[run.Dungeon.Id].IsCompletedWithinTime) this.ExpiredCount -= 1;
-                    if (this.Runs[run.Dungeon.Id].KeystoneLevel >= 5 & this.Runs[run.Dungeon.Id].KeystoneLevel < 10) this.Plus5Count -= 1;
-                    else if (this.Runs[run.Dungeon.Id].KeystoneLevel >= 10 & this.Runs[run.Dungeon.Id].KeystoneLevel < 15) this.Plus10Count -= 1;
-                    else if (this.Runs[run.Dungeon.Id].KeystoneLevel >= 15) this.Plus15Count -= 1;
-                    this.Runs.Remove(run.Dungeon.Id); // Remove old run
-                    this.Runs.Add(run.Dungeon.Id, run); // Add new run
-                    // Increment new run
-                    if (!run.IsCompletedWithinTime) this.ExpiredCount += 1;
-                    if (run.KeystoneLevel > this.HighestRun) this.HighestRun = (int)run.KeystoneLevel;
-                    if (run.KeystoneLevel >= 15) this.Plus15Count += 1;
-                    else if (run.KeystoneLevel >= 10) this.Plus10Count += 1;
-                    else if (run.KeystoneLevel >= 5) this.Plus5Count += 1;
-                }
+                if (run.KeystoneLevel > this.HighestRun) this.HighestRun = (int)run.KeystoneLevel;
             }
         }
+
         public override string ToString() // Displays output 
         {
-            return $"• Highest Key: +{this.HighestRun}\n• 5+ Dungeons: {this.Plus5Count}/{this.DungeonCount}\n• 10+ Dungeons: {this.Plus10Count}/{this.DungeonCount}\n• 15+ Dungeons: {this.Plus15Count}/{this.DungeonCount}\n• Time-Expired: {this.ExpiredCount}/{this.DungeonCount}";
+            return $"• Rating: {this.Rating}\n• Highest Key: +{this.HighestRun}";
         }
     }
 }
