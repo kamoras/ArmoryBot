@@ -1,8 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>dotnet-ArmoryBot-18C2E208-02FC-46DF-8BB3-533B343E6D77</UserSecretsId>
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
