@@ -1,4 +1,7 @@
 # ArmoryBot
+
+## Discontinued - I haven't played World of Warcraft in ages, and do not plan to continue further development on this.
+
 .NET Core Discord Bot for World of Warcraft Armory Lookups.
 ### Supports new M+ Rating in 9.1!
 
